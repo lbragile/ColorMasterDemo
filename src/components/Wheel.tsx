@@ -1,32 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-
-const CanvasContainer = styled.div.attrs((props: { radius: number }) => props)`
-  position: relative;
-  height: ${(props) => (props.radius * 2 ?? 400) + "px"};
-
-  & canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    &:first-child {
-      z-index: 0;
-    }
-
-    &:last-child {
-      cursor: crosshair;
-      z-index: 1;
-    }
-  }
-`;
-
-const Swatch = styled.svg.attrs((props: { width: number; height: number; fill: string }) => ({
-  style: { fill: props.fill } // this changes a lot
-}))`
-  width: ${(props) => props.width};
-  height: ${(props) => props.height};
-`;
+import { CanvasContainer, Swatch } from "../styles/Wheel";
 
 interface IWheel {
   radius?: number;
@@ -40,9 +13,11 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: 200, y: 200 });
-  const [hueAngle, setHueAngle] = useState(0);
-  const [saturation, setSaturation] = useState(0);
+  const [mouse, setMouse] = useState({ x: radius, y: 50 });
+  const [slider, setSlider] = useState(0);
+
+  const [hue, setHue] = useState(0);
+  const [saturation, setSaturation] = useState(75);
   const [lightness, setLightness] = useState(50);
 
   useEffect(() => {
@@ -54,27 +29,11 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
   }, [lightness]);
 
   useEffect(() => {
-    if (colorPicker.current) {
-      const ctx = colorPicker.current.getContext("2d");
+    drawColorPicker({ slider: true });
+  }, [slider]);
 
-      if (ctx) {
-        if (Math.pow(mouse.x - radius, 2) + Math.pow(mouse.y - radius, 2) <= Math.pow(radius, 2)) {
-          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-          ctx.beginPath();
-          ctx.moveTo(mouse.x, mouse.y);
-          ctx.arc(mouse.x, mouse.y, pickerRadius, 0, 2 * Math.PI);
-          ctx.fillStyle = "#00000088";
-          ctx.strokeStyle = "transparent";
-          ctx.fill();
-          ctx.stroke();
-        }
-
-        const hue = (Math.atan2(radius - mouse.y, mouse.x - radius) * 180) / Math.PI;
-        setHueAngle(rotate - (hue < 0 ? hue + 360 : hue));
-
-        setSaturation((Math.sqrt(Math.pow(mouse.y - radius, 2) + Math.pow(mouse.x - radius, 2)) * 100) / radius);
-      }
-    }
+  useEffect(() => {
+    drawColorPicker({ slider: false });
   }, [mouse]);
 
   function drawColorWheel(light = 50) {
@@ -93,6 +52,40 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
             ctx.stroke();
             ctx.closePath();
           }
+        }
+      }
+    }
+  }
+
+  function drawColorPicker({ slider }: { slider: boolean }) {
+    if (colorPicker.current) {
+      const ctx = colorPicker.current.getContext("2d");
+
+      if (ctx) {
+        if (Math.pow(mouse.x - radius, 2) + Math.pow(mouse.y - radius, 2) <= Math.pow(radius, 2)) {
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+          ctx.beginPath();
+
+          if (slider) {
+            const cos0 = Math.cos(((hue - rotate) * Math.PI) / 180);
+            const hyp = (saturation * radius) / 100;
+            const x = radius + hyp * cos0;
+            const y = radius - (rotate < hue && hue < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
+
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+          } else {
+            ctx.moveTo(mouse.x, mouse.y);
+            ctx.arc(mouse.x, mouse.y, pickerRadius, 0, 2 * Math.PI);
+
+            setHue((360 + rotate - (Math.atan2(radius - mouse.y, mouse.x - radius) * 180) / Math.PI) % 360);
+            setSaturation((Math.sqrt(Math.pow(mouse.y - radius, 2) + Math.pow(mouse.x - radius, 2)) * 100) / radius);
+          }
+
+          ctx.fillStyle = "#00000088";
+          ctx.strokeStyle = "transparent";
+          ctx.fill();
+          ctx.stroke();
         }
       }
     }
@@ -135,21 +128,60 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
       <div>
         X: {mouse.x - radius}, Y: {radius - mouse.y}
       </div>
-      <Swatch width={swatchWidth} height={swatchWidth} fill={`hsl(${hueAngle}, ${saturation}%, ${lightness}%)`}>
-        <rect x="0" y="0" width={swatchWidth - 50 + ""} height={swatchWidth - 50 + ""} />
+      <Swatch width={swatchWidth} height={swatchWidth} fill={`hsl(${hue}, ${saturation}%, ${lightness}%)`}>
+        <circle cx={swatchWidth / 2} cy={swatchWidth / 2} r={swatchWidth / 4} />
       </Swatch>
-      <input
-        type="range"
-        id="lightness"
-        name="lightness"
-        min="0"
-        max="100"
-        value={lightness.toString()}
-        step="0.01"
-        onChange={(e) => setLightness(+e.target.value)}
-        draggable={false}
-      />
-      <label htmlFor="lightness">{lightness}% Lightness</label>
+
+      <div>
+        <input
+          type="range"
+          id="hue"
+          name="hue"
+          min="0"
+          max="360"
+          value={hue.toString()}
+          step="0.01"
+          onChange={(e) => {
+            const val = +e.target.value;
+            setHue(val);
+            setSlider(val);
+          }}
+          draggable={false}
+        />
+        <label htmlFor="hue">Hue: {hue.toFixed(2)}&deg;</label>
+      </div>
+      <div>
+        <input
+          type="range"
+          id="saturation"
+          name="saturation"
+          min="0"
+          max="100"
+          value={saturation.toString()}
+          step="0.01"
+          onChange={(e) => {
+            const val = +e.target.value;
+            setSaturation(val);
+            setSlider(val);
+          }}
+          draggable={false}
+        />
+        <label htmlFor="saturation">Saturation: {saturation.toFixed(2)}%</label>
+      </div>
+      <div>
+        <input
+          type="range"
+          id="lightness"
+          name="lightness"
+          min="0"
+          max="100"
+          value={lightness.toString()}
+          step="0.01"
+          onChange={(e) => setLightness(+e.target.value)}
+          draggable={false}
+        />
+        <label htmlFor="lightness">Lightness: {lightness}%</label>
+      </div>
     </>
   );
 }

@@ -5,10 +5,11 @@ const HEX = lazy(() => import("./HEX"));
 const HSL = lazy(() => import("./HSL"));
 const RGB = lazy(() => import("./RGB"));
 const Wheel = lazy(() => import("./Wheel"));
+const Flat = lazy(() => import("./Flat"));
 import Loading from "./Loading";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("Wheel");
+  const [activeItem, setActiveItem] = useState("FLAT");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
@@ -47,11 +48,22 @@ export default function App(): JSX.Element {
         <MenuItemWrapper navName="RGB" />
         <MenuItemWrapper navName="HEX" />
         <MenuItemWrapper navName="HSL" />
-        <MenuItemWrapper navName="Wheel" />
+        <MenuItemWrapper navName="WHEEL" />
+        <MenuItemWrapper navName="FLAT" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
-          {activeItem === "RGB" ? <RGB /> : activeItem === "HEX" ? <HEX /> : activeItem === "HSL" ? <HSL /> : <Wheel />}
+          {activeItem === "RGB" ? (
+            <RGB />
+          ) : activeItem === "HEX" ? (
+            <HEX />
+          ) : activeItem === "HSL" ? (
+            <HSL />
+          ) : activeItem === "WHEEL" ? (
+            <Wheel />
+          ) : (
+            <Flat />
+          )}
         </Suspense>
       </Segment>
     </Container>
