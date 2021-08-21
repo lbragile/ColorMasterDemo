@@ -4,10 +4,11 @@ import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react
 const HEX = lazy(() => import("./HEX"));
 const HSL = lazy(() => import("./HSL"));
 const RGB = lazy(() => import("./RGB"));
+const Wheel = lazy(() => import("./Wheel"));
 import Loading from "./Loading";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("RGB");
+  const [activeItem, setActiveItem] = useState("Wheel");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
@@ -46,10 +47,11 @@ export default function App(): JSX.Element {
         <MenuItemWrapper navName="RGB" />
         <MenuItemWrapper navName="HEX" />
         <MenuItemWrapper navName="HSL" />
+        <MenuItemWrapper navName="Wheel" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
-          {activeItem === "RGB" ? <RGB /> : activeItem === "HEX" ? <HEX /> : <HSL />}
+          {activeItem === "RGB" ? <RGB /> : activeItem === "HEX" ? <HEX /> : activeItem === "HSL" ? <HSL /> : <Wheel />}
         </Suspense>
       </Segment>
     </Container>
