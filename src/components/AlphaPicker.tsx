@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
+import RangeSlider from "./RangeSlider";
 
 interface IWheel {
   width?: number;
@@ -118,9 +119,15 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
     canDrag.current = false;
   };
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.valueAsNumber / 100;
+    drawColorPicker(val * width, height / 2);
+    setAlpha(val);
+  };
+
   return (
     <>
-      <CanvasContainer radius={height}>
+      <CanvasContainer height={height}>
         <canvas width={width} height={height} ref={colorHue}></canvas>
         <canvas
           width={width}
@@ -140,24 +147,14 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
         <circle cx={200 / 2} cy={200 / 2} r={200 / 4} />
       </Swatch>
 
-      <div>
-        <input
-          type="range"
-          id="alpha"
-          name="alpha"
-          min="0"
-          max="100"
-          value={(alpha * 100).toString()}
-          step="0.01"
-          onChange={(e) => {
-            const val = +e.target.value / 100;
-            drawColorPicker(val * width, height / 2);
-            setAlpha(val);
-          }}
-          draggable={false}
-        />
-        <label htmlFor="alpha">Alpha: {(alpha * 100).toFixed(2)}%</label>
-      </div>
+      <RangeSlider
+        value={alpha * 100}
+        color="black"
+        title="Alpha"
+        max="100"
+        postfix="%"
+        onChange={handleSliderChange}
+      />
     </>
   );
 }

@@ -122,7 +122,7 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
 
   return (
     <>
-      <CanvasContainer radius={width / 2}>
+      <CanvasContainer height={width}>
         <canvas width={width} height={width} ref={colorFlat}></canvas>
         <canvas
           width={width}

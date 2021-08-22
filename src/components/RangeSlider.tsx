@@ -1,29 +1,30 @@
-import { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
-const StyledInput = styled.input`
+const NumberInput = styled.input`
   border: none;
   outline: none;
 
-  width: fit-content;
-  width: 65px;
+  width: 8.5ch;
   margin-left: 10px;
-
-  &:hover {
-    border-bottom: 1px solid black;
-    padding-bottom: 4px;
-  }
+  padding-left: 20px;
 
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     opacity: 1;
+    position: absolute;
+    left: 0;
+    height: 100%;
   }
 `;
 
 const SliderInput = styled.input`
   -webkit-appearance: none;
-  background: ${(props) =>
-    `linear-gradient(to right, ${props.color}, ${props.color} ${props.value}%, white ${props.value}%, white 100%)`};
+  background: ${(props) => {
+    const pos =
+      ((Number(props.value ?? 0) - Number(props.min ?? 0)) * 100) / (Number(props.max ?? 0) - Number(props.min ?? 0));
+    return `linear-gradient(to right, ${props.color}, ${props.color} ${pos}%, white ${pos}%, white 100%)`;
+  }};
   border: solid 1px ${(props) => props.color};
   width: 200px;
   height: 8px;
@@ -36,51 +37,61 @@ const SliderInput = styled.input`
     width: 20px;
     height: 20px;
   }
+
+  &:hover {
+    cursor: grab;
+  }
+`;
+
+const InputLabel = styled.span`
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-right: 10px;
+  text-transform: capitalize;
 `;
 
 interface IRangeSlider {
-  value: string;
+  value: number;
   color: string;
   title: string;
-  min?: number;
-  max?: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  min?: string;
+  max?: string;
   step?: string;
+  postfix?: string;
 }
 
 export default function RangeSlider({
   value,
   color,
   title,
-  min = 0,
-  max = 100,
-  step = "any"
+  onChange,
+  min = "0",
+  max = "100",
+  step = "any",
+  postfix = ""
 }: IRangeSlider): JSX.Element {
-  const [inputVal, setInputVal] = useState(value);
+  function clamp(min: string, val: number, max: string): string {
+    return Math.max(+min, Math.min(Math.round(val * 100) / 100, +max)).toString();
+  }
+
   return (
     <div>
-      <h3>{title}</h3>
+      <span>{title}</span>
 
-      <SliderInput
-        color={color}
+      <input
         type="range"
-        id="alpha"
-        name="alpha"
-        min="0"
-        max="100"
-        value={inputVal}
-        onChange={(e) => setInputVal(e.target.value)}
+        value={value}
+        color={color}
+        min={min}
+        max={max}
+        onChange={onChange}
         step="0.01"
         draggable={false}
       />
-      <StyledInput
-        type="number"
-        min={min}
-        max={max}
-        step={step}
-        value={inputVal}
-        onChange={(e) => setInputVal(Math.max(min, Math.min(+e.target.value, max)).toString())}
-        onBlur={(e) => setInputVal((+e.target.value).toFixed(2))}
-      />
+
+      <input type="number" min={min} max={max} step={step} value={clamp(min, value, max)} onChange={onChange} />
+      {postfix}
     </div>
   );
 }

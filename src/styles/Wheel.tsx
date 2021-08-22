@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-export const CanvasContainer = styled.div.attrs((props: { radius: number }) => props)`
+export const CanvasContainer = styled.div.attrs((props: { height: number }) => props)`
   position: relative;
-  height: ${(props) => (props.radius * 2 ?? 400) + "px"};
+  height: ${(props) => (props.height ?? 400) + "px"};
 
   & canvas {
     position: absolute;

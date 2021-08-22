@@ -4,7 +4,7 @@ import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react
 const HEX = lazy(() => import("./HEX"));
 const HSL = lazy(() => import("./HSL"));
 const RGB = lazy(() => import("./RGB"));
-const Wheel = lazy(() => import("./Wheel"));
+const WheelPicker = lazy(() => import("./WheelPicker"));
 const Flat = lazy(() => import("./Flat"));
 const HuePicker = lazy(() => import("./HuePicker"));
 const AlphaPicker = lazy(() => import("./AlphaPicker"));
@@ -14,7 +14,7 @@ import Loading from "./Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("SLIDER");
+  const [activeItem, setActiveItem] = useState("HUE");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
@@ -68,13 +68,13 @@ export default function App(): JSX.Element {
           ) : activeItem === "HSL" ? (
             <HSL />
           ) : activeItem === "WHEEL" ? (
-            <Wheel />
+            <WheelPicker />
           ) : activeItem === "HUE" ? (
             <HuePicker />
           ) : activeItem === "ALPHA" ? (
             <AlphaPicker />
           ) : activeItem === "SLIDER" ? (
-            <RangeSlider value="5.00" color="blue" title="Alpha" />
+            <RangeSlider value={5} color="blue" title="Alpha" onChange={() => ""} />
           ) : (
             <Flat />
           )}

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
+import RangeSlider from "./RangeSlider";
 
 interface IWheel {
   radius?: number;
@@ -110,9 +111,18 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
     canDrag.current = false;
   };
 
+  const handleSliderChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setState: React.Dispatch<React.SetStateAction<number>>
+  ) => {
+    const val = e.target.valueAsNumber;
+    setState(val);
+    setSlider(val);
+  };
+
   return (
     <>
-      <CanvasContainer radius={radius}>
+      <CanvasContainer height={radius * 2}>
         <canvas width={2 * radius} height={2 * radius} ref={colorWheel}></canvas>
         <canvas
           width={2 * radius}
@@ -132,56 +142,32 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
         <circle cx={swatchWidth / 2} cy={swatchWidth / 2} r={swatchWidth / 4} />
       </Swatch>
 
-      <div>
-        <input
-          type="range"
-          id="hue"
-          name="hue"
-          min="0"
-          max="360"
-          value={hue.toString()}
-          step="0.01"
-          onChange={(e) => {
-            const val = +e.target.value;
-            setHue(val);
-            setSlider(val);
-          }}
-          draggable={false}
-        />
-        <label htmlFor="hue">Hue: {hue.toFixed(2)}&deg;</label>
-      </div>
-      <div>
-        <input
-          type="range"
-          id="saturation"
-          name="saturation"
-          min="0"
-          max="100"
-          value={saturation.toString()}
-          step="0.01"
-          onChange={(e) => {
-            const val = +e.target.value;
-            setSaturation(val);
-            setSlider(val);
-          }}
-          draggable={false}
-        />
-        <label htmlFor="saturation">Saturation: {saturation.toFixed(2)}%</label>
-      </div>
-      <div>
-        <input
-          type="range"
-          id="lightness"
-          name="lightness"
-          min="0"
-          max="100"
-          value={lightness.toString()}
-          step="0.01"
-          onChange={(e) => setLightness(+e.target.value)}
-          draggable={false}
-        />
-        <label htmlFor="lightness">Lightness: {lightness}%</label>
-      </div>
+      <RangeSlider
+        value={hue}
+        color={`hsla(${hue}, 100%, 50%, 1)`}
+        title="Hue"
+        max="359.99"
+        postfix="&deg;"
+        onChange={(e) => handleSliderChange(e, setHue)}
+      />
+
+      <RangeSlider
+        value={saturation}
+        color={`hsla(${hue}, ${saturation}%, 50%, 1)`}
+        title="Saturation"
+        max="100"
+        postfix="%"
+        onChange={(e) => handleSliderChange(e, setSaturation)}
+      />
+
+      <RangeSlider
+        value={lightness}
+        color={`hsla(0, 0%, ${lightness}%, 1)`}
+        title="Lightness"
+        max="100"
+        postfix="%"
+        onChange={(e) => handleSliderChange(e, setLightness)}
+      />
     </>
   );
 }

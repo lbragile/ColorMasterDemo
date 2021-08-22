@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
 import RangeSlider from "./RangeSlider";
+import CM from "colormaster";
 
 interface IWheel {
   width?: number;
@@ -13,14 +14,14 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
   const canDrag = useRef(false);
 
   const [mouse, setMouse] = useState({ x: width / 2, y: height / 2 });
-  const [rgb, setRgb] = useState("rgba(0, 255, 255, 1)");
+  const [rgb, setRgb] = useState(CM("rgba(0, 255, 255, 1)"));
 
   useEffect(() => {
     drawColorHue();
   }, []);
 
   useEffect(() => {
-    drawColorPicker();
+    drawColorPicker(mouse.x, mouse.y);
   }, [mouse]);
 
   function drawColorHue() {
@@ -42,24 +43,24 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
     }
   }
 
-  function drawColorPicker() {
+  function drawColorPicker(x: number, y: number) {
     if (colorPicker.current) {
       const ctx = colorPicker.current.getContext("2d");
 
       if (ctx) {
-        if (mouse.x <= width && mouse.y <= height) {
+        if (x <= width && y <= height) {
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
           ctx.beginPath();
 
           ctx.lineWidth = 2;
-          ctx.moveTo(mouse.x, height - 6);
-          ctx.lineTo(mouse.x + 5, height - 1);
-          ctx.lineTo(mouse.x - 5, height - 1);
-          ctx.lineTo(mouse.x, height - 6);
-          ctx.lineTo(mouse.x, 5);
-          ctx.lineTo(mouse.x + 5, 0);
-          ctx.lineTo(mouse.x - 5, 0);
-          ctx.lineTo(mouse.x, 5);
+          ctx.moveTo(x, height - 6);
+          ctx.lineTo(x + 5, height - 1);
+          ctx.lineTo(x - 5, height - 1);
+          ctx.lineTo(x, height - 6);
+          ctx.lineTo(x, 5);
+          ctx.lineTo(x + 5, 0);
+          ctx.lineTo(x - 5, 0);
+          ctx.lineTo(x, 5);
 
           ctx.strokeStyle = "#0005";
           ctx.fillStyle = "#0005";
@@ -88,7 +89,7 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
         const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
 
         setMouse({ x, y });
-        setRgb(`rgba(${data.join(", ")}, 1)`);
+        setRgb(CM(`rgba(${data.join(", ")}, 1)`));
       }
     }
   };
@@ -99,9 +100,15 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
     canDrag.current = false;
   };
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.valueAsNumber;
+    drawColorPicker((val * width) / 360, height / 2);
+    setRgb(CM(`hsla(${val}, 100%, 50%, 1)`));
+  };
+
   return (
     <>
-      <CanvasContainer radius={height}>
+      <CanvasContainer height={height}>
         <canvas width={width} height={height} ref={colorHue}></canvas>
         <canvas
           width={width}
@@ -117,11 +124,18 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
         X: {mouse.x - width}, Y: {width - mouse.y}
       </div>
 
-      <Swatch width={200} height={200} fill={rgb}>
+      <Swatch width={200} height={200} fill={rgb.stringRGB()}>
         <circle cx={200 / 2} cy={200 / 2} r={200 / 4} />
       </Swatch>
 
-      <RangeSlider value="5.00" color={rgb} title="Hue" max={360} />
+      <RangeSlider
+        value={rgb.hue}
+        color={rgb.stringRGB()}
+        title="Hue"
+        max="359.99"
+        postfix="&deg;"
+        onChange={handleSliderChange}
+      />
     </>
   );
 }
