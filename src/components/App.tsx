@@ -6,10 +6,15 @@ const HSL = lazy(() => import("./HSL"));
 const RGB = lazy(() => import("./RGB"));
 const Wheel = lazy(() => import("./Wheel"));
 const Flat = lazy(() => import("./Flat"));
+const HuePicker = lazy(() => import("./HuePicker"));
+const AlphaPicker = lazy(() => import("./AlphaPicker"));
+const RangeSlider = lazy(() => import("./RangeSlider"));
 import Loading from "./Loading";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("FLAT");
+  const [activeItem, setActiveItem] = useState("SLIDER");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
@@ -50,6 +55,9 @@ export default function App(): JSX.Element {
         <MenuItemWrapper navName="HSL" />
         <MenuItemWrapper navName="WHEEL" />
         <MenuItemWrapper navName="FLAT" />
+        <MenuItemWrapper navName="HUE" />
+        <MenuItemWrapper navName="ALPHA" />
+        <MenuItemWrapper navName="SLIDER" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
@@ -61,6 +69,12 @@ export default function App(): JSX.Element {
             <HSL />
           ) : activeItem === "WHEEL" ? (
             <Wheel />
+          ) : activeItem === "HUE" ? (
+            <HuePicker />
+          ) : activeItem === "ALPHA" ? (
+            <AlphaPicker />
+          ) : activeItem === "SLIDER" ? (
+            <RangeSlider value="5.00" color="blue" title="Alpha" />
           ) : (
             <Flat />
           )}
