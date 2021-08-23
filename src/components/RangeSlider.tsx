@@ -9,8 +9,7 @@ const SliderInput = styled.input.attrs((props) => {
 
   return {
     style: {
-      background: `linear-gradient(to right, ${props.color}, ${props.color} ${breakpoint}%, white ${breakpoint}%, white 100%)`,
-      border: `solid 1px ${props.color}`
+      background: `linear-gradient(to right, ${props.color} 0%, ${props.color} ${breakpoint}%, hsla(0, 0%, 90%, 1) ${breakpoint}%, hsla(0, 0%, 90%, 1) 100%)`
     }
   };
 })`
@@ -21,8 +20,8 @@ const SliderInput = styled.input.attrs((props) => {
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    background: ${(props) => props.color};
-    border: 2px solid white;
+    background: hsla(0, 0%, 80%, 1);
+    border: 1px solid white;
     border-radius: 50%;
     width: 16px;
     height: 16px;
@@ -57,6 +56,8 @@ const SliderContainer = styled.div`
     font-size: 1.2rem;
     font-weight: bold;
     margin-right: 10px;
+    display: inline-block;
+    width: 1ch;
   }
 `;
 

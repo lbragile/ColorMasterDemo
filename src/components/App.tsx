@@ -1,27 +1,22 @@
-import React, { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react";
 
-const HEX = lazy(() => import("./HEX"));
-const HSL = lazy(() => import("./HSL"));
-const RGB = lazy(() => import("./RGB"));
 const WheelPicker = lazy(() => import("./WheelPicker"));
 const Flat = lazy(() => import("./Flat"));
-const HuePicker = lazy(() => import("./HuePicker"));
 const AlphaPicker = lazy(() => import("./AlphaPicker"));
-const RangeSlider = lazy(() => import("./RangeSlider"));
 import Loading from "./Loading";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("WHEEL");
+  const [activeItem, setActiveItem] = useState("FLAT");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
       <Menu.Item
         name={navName.toUpperCase()}
         active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "RGB")}
+        onClick={(e, { name }) => setActiveItem(name ?? "FLAT")}
       />
     );
   };
@@ -50,34 +45,13 @@ export default function App(): JSX.Element {
       </Button>
 
       <Menu attached="top" tabular>
-        <MenuItemWrapper navName="RGB" />
-        <MenuItemWrapper navName="HEX" />
-        <MenuItemWrapper navName="HSL" />
         <MenuItemWrapper navName="WHEEL" />
         <MenuItemWrapper navName="FLAT" />
-        <MenuItemWrapper navName="HUE" />
         <MenuItemWrapper navName="ALPHA" />
-        <MenuItemWrapper navName="SLIDER" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
-          {activeItem === "RGB" ? (
-            <RGB />
-          ) : activeItem === "HEX" ? (
-            <HEX />
-          ) : activeItem === "HSL" ? (
-            <HSL />
-          ) : activeItem === "WHEEL" ? (
-            <WheelPicker />
-          ) : activeItem === "HUE" ? (
-            <HuePicker />
-          ) : activeItem === "ALPHA" ? (
-            <AlphaPicker />
-          ) : activeItem === "SLIDER" ? (
-            <RangeSlider value={5} color="blue" title="Alpha" onChange={() => ""} />
-          ) : (
-            <Flat />
-          )}
+          {activeItem === "WHEEL" ? <WheelPicker /> : activeItem === "ALPHA" ? <AlphaPicker /> : <Flat />}
         </Suspense>
       </Segment>
     </Container>

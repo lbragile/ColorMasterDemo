@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
 import RangeSlider from "./RangeSlider";
+import { dependencies } from "../../package.json";
 
 interface IWheel {
   radius?: number;
@@ -133,6 +134,8 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
           onMouseUp={handleMouseUp}
         ></canvas>
       </CanvasContainer>
+
+      <h3>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h3>
 
       <div>
         X: {mouse.x - radius}, Y: {radius - mouse.y}

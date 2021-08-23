@@ -1,20 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CanvasContainer, Swatch } from "../styles/Wheel";
+import { CanvasContainer } from "../styles/Wheel";
+import HuePicker from "./HuePicker";
 
 interface IWheel {
   width?: number;
   pickerRadius?: number;
-  swatchWidth?: number;
 }
 
-export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 }: IWheel): JSX.Element {
+export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Element {
   const colorFlat = useRef<HTMLCanvasElement>(null);
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: width / 2, y: width / 2 });
-  const [rgb, setRgb] = useState("rgba(255, 0, 0, 1)");
+  const [mouse, setMouse] = useState({ x: width - 1, y: 0 });
+  const [sketchColor, setSketchColor] = useState("rgba(0, 0, 255, 1)");
+  const [swatchColor, setSwatchColor] = useState(sketchColor);
 
   useEffect(() => {
     drawColorFlat();
@@ -23,10 +24,17 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
 
   useEffect(() => {
     drawColorFlat();
-  }, [rgb]);
+  }, [sketchColor]);
 
   useEffect(() => {
     drawColorPicker();
+    if (colorFlat.current) {
+      const ctx = colorFlat.current.getContext("2d");
+      if (ctx) {
+        const data = ctx.getImageData(mouse.x, mouse.y, 1, 1).data.slice(0, -1);
+        setSwatchColor(`rgba(${data.join(", ")}, 1)`);
+      }
+    }
   }, [mouse]);
 
   function drawColorFlat() {
@@ -34,18 +42,18 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
       const ctx = colorFlat.current.getContext("2d");
 
       if (ctx) {
-        ctx.fillStyle = rgb;
+        ctx.fillStyle = sketchColor;
         ctx.fillRect(0, 0, width, width);
 
         const whiteGradient = ctx.createLinearGradient(0, 0, width, 0);
-        whiteGradient.addColorStop(0, "rgb(255,255,255,1)");
-        whiteGradient.addColorStop(1, "rgb(255,255,255,0)");
+        whiteGradient.addColorStop(0, "rgba(255,255,255,1)");
+        whiteGradient.addColorStop(1, "rgba(255,255,255,0)");
         ctx.fillStyle = whiteGradient;
         ctx.fillRect(0, 0, width, width);
 
         const blackGradient = ctx.createLinearGradient(0, 0, 0, width);
-        blackGradient.addColorStop(0, "rgb(0,0,0,0)");
-        blackGradient.addColorStop(1, "rgb(0,0,0,1)");
+        blackGradient.addColorStop(0, "rgba(0,0,0,0)");
+        blackGradient.addColorStop(1, "rgba(0,0,0,1)");
         ctx.fillStyle = blackGradient;
         ctx.fillRect(0, 0, width, width);
       }
@@ -97,8 +105,14 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
   const handleMouseMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (colorFlat.current && canDrag.current) {
-      const { left, top } = colorFlat.current.getBoundingClientRect();
-      setMouse({ x: e.clientX - left, y: e.clientY - top });
+      const ctx = colorFlat.current.getContext("2d");
+      if (ctx) {
+        const { left, top } = colorFlat.current.getBoundingClientRect();
+        const [x, y] = [e.clientX - left, e.clientY - top];
+        const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
+        setSwatchColor(`rgba(${data.join(", ")}, 1)`);
+        setMouse({ x, y });
+      }
     }
   };
 
@@ -106,18 +120,6 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
     e.preventDefault();
     handleMouseMove(e);
     canDrag.current = false;
-  };
-
-  const recalculateRGB = (e: React.MouseEvent) => {
-    if (colorHue.current && colorFlat.current) {
-      const ctx = colorHue.current.getContext("2d");
-      if (ctx) {
-        const { left, top } = colorFlat.current.getBoundingClientRect();
-        const [x, y] = [e.clientX - left, e.clientY - top];
-        const data = ctx.getImageData(x, y - width, 1, 1).data;
-        setRgb(`rgba(${data.slice(0, -1).join(", ")}, 1)`);
-      }
-    }
   };
 
   return (
@@ -131,18 +133,17 @@ export default function Flat({ width = 400, pickerRadius = 5, swatchWidth = 200 
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
         ></canvas>
       </CanvasContainer>
 
-      <canvas width={width} height={25} ref={colorHue} onClick={recalculateRGB}></canvas>
-
-      <div>
-        X: {mouse.x - width}, Y: {width - mouse.y}
-      </div>
-      <Swatch width={swatchWidth} height={swatchWidth} fill={rgb}>
-        <circle cx={swatchWidth / 2} cy={swatchWidth / 2} r={swatchWidth / 4} />
-      </Swatch>
+      <HuePicker
+        width={width}
+        height={25}
+        setSketchColor={setSketchColor}
+        initColor={sketchColor}
+        swatchColor={swatchColor}
+        setSwatchColor={setSwatchColor}
+      />
     </>
   );
 }
