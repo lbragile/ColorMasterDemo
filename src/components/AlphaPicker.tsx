@@ -1,24 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
 import RangeSlider from "./RangeSlider";
+import RGBSliderGroup from "./RGBSliderGroup";
 
 interface IWheel {
   width?: number;
   height?: number;
-  rgb?: [number, number, number];
+  initRGB?: [number, number, number];
 }
 
-export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 255] }: IWheel): JSX.Element {
+export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 255, 255] }: IWheel): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
   const [mouse, setMouse] = useState({ x: width / 2, y: height / 2 });
-  const [alpha, setAlpha] = useState(mouse.x / width);
+  const [alpha, setAlpha] = useState((mouse.x * 100) / width);
+  const [red, setRed] = useState(initRGB[0]);
+  const [green, setGreen] = useState(initRGB[1]);
+  const [blue, setBlue] = useState(initRGB[2]);
 
   useEffect(() => {
     drawColorAlpha();
-  }, []);
+  }, [red, green, blue]);
 
   useEffect(() => {
     drawColorPicker(mouse.x, mouse.y);
@@ -51,12 +55,14 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
     if (colorHue.current) {
       const ctx = colorHue.current.getContext("2d");
       if (ctx) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.beginPath();
         drawCheckeredBackground(ctx);
 
         ctx.rect(0, 0, width, height);
         const gradient = ctx.createLinearGradient(0, 0, width, 0);
-        gradient.addColorStop(0, `rgba(${rgb.join(", ")}, 0)`);
-        gradient.addColorStop(1, `rgba(${rgb.join(", ")}, 1)`);
+        gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
+        gradient.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 1)`);
         ctx.fillStyle = gradient;
         ctx.fill();
       }
@@ -72,20 +78,19 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
           ctx.beginPath();
 
-          ctx.lineWidth = 2;
-          ctx.moveTo(x, height - 6);
-          ctx.lineTo(x + 5, height - 1);
-          ctx.lineTo(x - 5, height - 1);
-          ctx.lineTo(x, height - 6);
-          ctx.lineTo(x, 5);
-          ctx.lineTo(x + 5, 0);
-          ctx.lineTo(x - 5, 0);
-          ctx.lineTo(x, 5);
+          ctx.arc(x, height / 2, height / 2, 0, 2 * Math.PI);
 
-          ctx.strokeStyle = "#0005";
-          ctx.fillStyle = "#0005";
-          ctx.stroke();
+          // cross-hair
+          ctx.moveTo(x - height / 2, height / 2);
+          ctx.lineTo(x + height / 2, height / 2);
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+
+          ctx.fillStyle = "hsla(0, 0%, 50%, 0.6)";
           ctx.fill();
+          ctx.strokeStyle = "#fff";
+          ctx.stroke();
+
           ctx.closePath();
         }
       }
@@ -106,9 +111,8 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
         const { left, top } = colorHue.current.getBoundingClientRect();
         const [x, y] = [e.clientX - left, e.clientY - top];
 
-        const newAlpha = x / width;
         setMouse({ x, y });
-        setAlpha(newAlpha);
+        setAlpha((x * 100) / width);
       }
     }
   };
@@ -119,10 +123,14 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
     canDrag.current = false;
   };
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.valueAsNumber / 100;
-    drawColorPicker(val * width, height / 2);
-    setAlpha(val);
+  const handleSliderChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setState: React.Dispatch<React.SetStateAction<number>>,
+    isAlpha?: boolean
+  ) => {
+    const val = e.target.valueAsNumber;
+    isAlpha && drawColorPicker((val / 100) * width, height / 2);
+    setState(val);
   };
 
   return (
@@ -143,11 +151,28 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
         X: {mouse.x - width}, Y: {width - mouse.y}
       </div>
 
-      <Swatch width={200} height={200} fill={`rgba(${rgb.join(", ")}, ${alpha})`}>
+      <Swatch width={200} height={200} fill={`rgba(${red}, ${green}, ${blue}, ${alpha / 100})`}>
         <circle cx={200 / 2} cy={200 / 2} r={200 / 4} />
       </Swatch>
 
-      <RangeSlider value={alpha * 100} color="black" title="A" max="100" postfix="%" onChange={handleSliderChange} />
+      <RangeSlider
+        value={alpha}
+        color="rgba(0,0,0,0.5)"
+        title="A"
+        max="100"
+        postfix="%"
+        onChange={(e) => handleSliderChange(e, setAlpha, true)}
+      />
+
+      <RGBSliderGroup
+        red={red}
+        setRed={setRed}
+        green={green}
+        setGreen={setGreen}
+        blue={blue}
+        setBlue={setBlue}
+        onChange={handleSliderChange}
+      />
     </>
   );
 }

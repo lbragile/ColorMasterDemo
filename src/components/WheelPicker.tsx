@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer, Swatch } from "../styles/Wheel";
-import RangeSlider from "./RangeSlider";
 import { dependencies } from "../../package.json";
+import HSLSliderGroup from "./HSLSliderGroup";
 
 interface IWheel {
   radius?: number;
@@ -144,31 +144,14 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
         <circle cx={swatchWidth / 2} cy={swatchWidth / 2} r={swatchWidth / 4} />
       </Swatch>
 
-      <RangeSlider
-        value={hue}
-        color={`hsla(${hue}, 100%, 50%, 1)`}
-        title="H"
-        max="359.99"
-        postfix="&deg;"
-        onChange={(e) => handleSliderChange(e, setHue)}
-      />
-
-      <RangeSlider
-        value={saturation}
-        color={`hsla(${hue}, ${saturation}%, 50%, 1)`}
-        title="S"
-        max="100"
-        postfix="%"
-        onChange={(e) => handleSliderChange(e, setSaturation)}
-      />
-
-      <RangeSlider
-        value={lightness}
-        color={`hsla(0, 0%, ${lightness}%, 1)`}
-        title="L"
-        max="100"
-        postfix="%"
-        onChange={(e) => handleSliderChange(e, setLightness)}
+      <HSLSliderGroup
+        hue={hue}
+        setHue={setHue}
+        saturation={saturation}
+        setSaturation={setSaturation}
+        lightness={lightness}
+        setLightness={setLightness}
+        onChange={handleSliderChange}
       />
     </>
   );
