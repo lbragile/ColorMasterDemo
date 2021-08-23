@@ -131,7 +131,7 @@ export default function HuePicker({ width = 400, height = 25 }: IWheel): JSX.Ele
       <RangeSlider
         value={rgb.hue}
         color={rgb.stringRGB()}
-        title="Hue"
+        title="H"
         max="359.99"
         postfix="&deg;"
         onChange={handleSliderChange}

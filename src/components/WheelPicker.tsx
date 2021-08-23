@@ -131,7 +131,6 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
         ></canvas>
       </CanvasContainer>
 
@@ -145,7 +144,7 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
       <RangeSlider
         value={hue}
         color={`hsla(${hue}, 100%, 50%, 1)`}
-        title="Hue"
+        title="H"
         max="359.99"
         postfix="&deg;"
         onChange={(e) => handleSliderChange(e, setHue)}
@@ -154,7 +153,7 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
       <RangeSlider
         value={saturation}
         color={`hsla(${hue}, ${saturation}%, 50%, 1)`}
-        title="Saturation"
+        title="S"
         max="100"
         postfix="%"
         onChange={(e) => handleSliderChange(e, setSaturation)}
@@ -163,7 +162,7 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
       <RangeSlider
         value={lightness}
         color={`hsla(0, 0%, ${lightness}%, 1)`}
-        title="Lightness"
+        title="L"
         max="100"
         postfix="%"
         onChange={(e) => handleSliderChange(e, setLightness)}

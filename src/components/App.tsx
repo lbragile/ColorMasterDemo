@@ -14,7 +14,7 @@ import Loading from "./Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("HUE");
+  const [activeItem, setActiveItem] = useState("WHEEL");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (

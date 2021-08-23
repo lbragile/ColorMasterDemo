@@ -147,14 +147,7 @@ export default function AlphaPicker({ width = 400, height = 25, rgb = [0, 255, 2
         <circle cx={200 / 2} cy={200 / 2} r={200 / 4} />
       </Swatch>
 
-      <RangeSlider
-        value={alpha * 100}
-        color="black"
-        title="Alpha"
-        max="100"
-        postfix="%"
-        onChange={handleSliderChange}
-      />
+      <RangeSlider value={alpha * 100} color="black" title="A" max="100" postfix="%" onChange={handleSliderChange} />
     </>
   );
 }

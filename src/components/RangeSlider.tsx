@@ -1,6 +1,38 @@
 import React from "react";
 import styled from "styled-components";
 
+const SliderInput = styled.input.attrs((props) => {
+  const val = Number(props.value ?? 0);
+  const min = Number(props.min ?? 0);
+  const max = Number(props.max ?? 100);
+  const breakpoint = 100 * ((val - min) / (max - min));
+
+  return {
+    style: {
+      background: `linear-gradient(to right, ${props.color}, ${props.color} ${breakpoint}%, white ${breakpoint}%, white 100%)`,
+      border: `solid 1px ${props.color}`
+    }
+  };
+})`
+  -webkit-appearance: none;
+  width: 200px;
+  height: 8px;
+  border-radius: 12px;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background: ${(props) => props.color};
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    cursor: grab;
+  }
+`;
+
 const NumberInput = styled.input`
   border: none;
   outline: none;
@@ -18,36 +50,14 @@ const NumberInput = styled.input`
   }
 `;
 
-const SliderInput = styled.input`
-  -webkit-appearance: none;
-  background: ${(props) => {
-    const pos =
-      ((Number(props.value ?? 0) - Number(props.min ?? 0)) * 100) / (Number(props.max ?? 0) - Number(props.min ?? 0));
-    return `linear-gradient(to right, ${props.color}, ${props.color} ${pos}%, white ${pos}%, white 100%)`;
-  }};
-  border: solid 1px ${(props) => props.color};
-  width: 200px;
-  height: 8px;
-  border-radius: 12px;
+const SliderContainer = styled.div`
+  margin: 2em 0;
 
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    background: ${(props) => props.color};
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
+  & > span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 10px;
   }
-
-  &:hover {
-    cursor: grab;
-  }
-`;
-
-const InputLabel = styled.span`
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-right: 10px;
-  text-transform: capitalize;
 `;
 
 interface IRangeSlider {
@@ -76,10 +86,10 @@ export default function RangeSlider({
   }
 
   return (
-    <div>
+    <SliderContainer>
       <span>{title}</span>
 
-      <input
+      <SliderInput
         type="range"
         value={value}
         color={color}
@@ -90,8 +100,8 @@ export default function RangeSlider({
         draggable={false}
       />
 
-      <input type="number" min={min} max={max} step={step} value={clamp(min, value, max)} onChange={onChange} />
+      <NumberInput type="number" min={min} max={max} step={step} value={clamp(min, value, max)} onChange={onChange} />
       {postfix}
-    </div>
+    </SliderContainer>
   );
 }
