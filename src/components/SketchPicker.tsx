@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CanvasContainer } from "../styles/Wheel";
+import { CanvasContainer } from "../styles/Canvas";
 import HuePicker from "./HuePicker";
 
 interface IWheel {
@@ -7,8 +7,8 @@ interface IWheel {
   pickerRadius?: number;
 }
 
-export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Element {
-  const colorFlat = useRef<HTMLCanvasElement>(null);
+export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel): JSX.Element {
+  const colorSketch = useRef<HTMLCanvasElement>(null);
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -18,18 +18,18 @@ export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Ele
   const [swatchColor, setSwatchColor] = useState(sketchColor);
 
   useEffect(() => {
-    drawColorFlat();
+    drawColorSketch();
     drawColorHue();
   }, []);
 
   useEffect(() => {
-    drawColorFlat();
+    drawColorSketch();
   }, [sketchColor]);
 
   useEffect(() => {
     drawColorPicker();
-    if (colorFlat.current) {
-      const ctx = colorFlat.current.getContext("2d");
+    if (colorSketch.current) {
+      const ctx = colorSketch.current.getContext("2d");
       if (ctx) {
         const data = ctx.getImageData(mouse.x, mouse.y, 1, 1).data.slice(0, -1);
         setSwatchColor(`rgba(${data.join(", ")}, 1)`);
@@ -37,9 +37,9 @@ export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Ele
     }
   }, [mouse]);
 
-  function drawColorFlat() {
-    if (colorFlat.current) {
-      const ctx = colorFlat.current.getContext("2d");
+  function drawColorSketch() {
+    if (colorSketch.current) {
+      const ctx = colorSketch.current.getContext("2d");
 
       if (ctx) {
         ctx.fillStyle = sketchColor;
@@ -104,10 +104,10 @@ export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Ele
 
   const handleMouseMove = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (colorFlat.current && canDrag.current) {
-      const ctx = colorFlat.current.getContext("2d");
+    if (colorSketch.current && canDrag.current) {
+      const ctx = colorSketch.current.getContext("2d");
       if (ctx) {
-        const { left, top } = colorFlat.current.getBoundingClientRect();
+        const { left, top } = colorSketch.current.getBoundingClientRect();
         const [x, y] = [e.clientX - left, e.clientY - top];
         const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
         setSwatchColor(`rgba(${data.join(", ")}, 1)`);
@@ -125,7 +125,7 @@ export default function Flat({ width = 400, pickerRadius = 5 }: IWheel): JSX.Ele
   return (
     <>
       <CanvasContainer height={width}>
-        <canvas width={width} height={width} ref={colorFlat}></canvas>
+        <canvas width={width} height={width} ref={colorSketch}></canvas>
         <canvas
           width={width}
           height={width}

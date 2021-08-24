@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CanvasContainer, Swatch } from "../styles/Wheel";
+import { CanvasContainer } from "../styles/Canvas";
+import { Swatch } from "../styles/Swatch";
 import RangeSlider from "./RangeSlider";
 import CM from "colormaster";
 
@@ -24,7 +25,7 @@ export default function HuePicker({
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: (CM(initColor).hue / 360) * width, y: height / 2 });
+  const [mouse, setMouse] = useState({ x: (CM(initColor).hue / 360) * (width - 1), y: height / 2 });
   const [rgb, setRgb] = useState(CM(initColor));
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function HuePicker({
   }, []);
 
   useEffect(() => {
-    drawColorPicker(mouse.x, mouse.y);
+    drawColorPicker(mouse.x);
   }, [mouse]);
 
   function drawColorHue() {
@@ -54,29 +55,20 @@ export default function HuePicker({
     }
   }
 
-  function drawColorPicker(x: number, y: number) {
+  function drawColorPicker(x: number) {
     if (colorPicker.current) {
       const ctx = colorPicker.current.getContext("2d");
 
       if (ctx) {
-        if (x <= width && y <= height) {
-          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-          ctx.beginPath();
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.beginPath();
 
-          ctx.arc(x, height / 2, height / 2, 0, 2 * Math.PI);
+        ctx.arc(x, height / 2, height / 2, 0, 2 * Math.PI);
 
-          // cross-hair
-          ctx.moveTo(x - height / 2, height / 2);
-          ctx.lineTo(x + height / 2, height / 2);
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-
-          ctx.strokeStyle = "#fff";
-          ctx.fillStyle = "hsla(0, 0%, 50%, 0.3)";
-          ctx.stroke();
-          ctx.fill();
-          ctx.closePath();
-        }
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#fff";
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   }
@@ -97,7 +89,6 @@ export default function HuePicker({
 
         const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
         const color = CM(`rgba(${data.join(", ")}, 1)`);
-
         setMouse({ x, y });
         setRgb(color);
         setSketchColor(color.stringRGB());
@@ -115,7 +106,7 @@ export default function HuePicker({
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.valueAsNumber;
     const color = CM(`hsla(${val}, 100%, 50%, 1)`);
-    drawColorPicker((val * width) / 360, height / 2);
+    drawColorPicker((val * width) / 360);
     setRgb(color);
     setSketchColor(color.stringRGB());
     setSwatchColor(CM(swatchColor).hueTo(color.hue).stringRGB());
@@ -136,12 +127,10 @@ export default function HuePicker({
       </CanvasContainer>
 
       <div>
-        X: {mouse.x - width}, Y: {width - mouse.y}
+        X: {mouse.x}, Y: {height / 2}
       </div>
 
-      <Swatch width={200} height={200} fill={swatchColor}>
-        <circle cx={200 / 2} cy={200 / 2} r={200 / 4} />
-      </Swatch>
+      <Swatch radius={50} background={swatchColor} />
 
       <RangeSlider
         value={rgb.hue}

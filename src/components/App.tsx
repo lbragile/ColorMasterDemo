@@ -1,22 +1,21 @@
 import { lazy, Suspense, useState } from "react";
 import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react";
+import { dependencies } from "../../package.json";
 
 const WheelPicker = lazy(() => import("./WheelPicker"));
-const Flat = lazy(() => import("./Flat"));
+const SketchPicker = lazy(() => import("./SketchPicker"));
 const AlphaPicker = lazy(() => import("./AlphaPicker"));
 import Loading from "./Loading";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("FLAT");
+  const [activeItem, setActiveItem] = useState("SKETCH");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
       <Menu.Item
         name={navName.toUpperCase()}
         active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "FLAT")}
+        onClick={(e, { name }) => setActiveItem(name ?? "SKETCH")}
       />
     );
   };
@@ -44,14 +43,16 @@ export default function App(): JSX.Element {
         <Label as="a" basic color="grey" pointing="left" content="ColorMaster" />
       </Button>
 
+      <h3>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h3>
+
       <Menu attached="top" tabular>
         <MenuItemWrapper navName="WHEEL" />
-        <MenuItemWrapper navName="FLAT" />
+        <MenuItemWrapper navName="SKETCH" />
         <MenuItemWrapper navName="ALPHA" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
-          {activeItem === "WHEEL" ? <WheelPicker /> : activeItem === "ALPHA" ? <AlphaPicker /> : <Flat />}
+          {activeItem === "WHEEL" ? <WheelPicker /> : activeItem === "ALPHA" ? <AlphaPicker /> : <SketchPicker />}
         </Suspense>
       </Segment>
     </Container>

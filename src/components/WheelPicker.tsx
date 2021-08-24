@@ -1,16 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CanvasContainer, Swatch } from "../styles/Wheel";
-import { dependencies } from "../../package.json";
+import { CanvasContainer } from "../styles/Canvas";
+import { Swatch } from "../styles/Swatch";
 import HSLSliderGroup from "./HSLSliderGroup";
 
-interface IWheel {
+interface IWheelPicker {
   radius?: number;
   pickerRadius?: number;
   swatchWidth?: number;
   rotate?: number;
+  initHSL?: [number, number, number];
 }
 
-export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 200, rotate = 90 }: IWheel): JSX.Element {
+export default function WheelPicker({
+  radius = 200,
+  pickerRadius = 5,
+  swatchWidth = 100,
+  rotate = 90,
+  initHSL = [0, 75, 50]
+}: IWheelPicker): JSX.Element {
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -18,9 +25,9 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
   const [mouse, setMouse] = useState({ x: radius, y: 50 });
   const [slider, setSlider] = useState(0);
 
-  const [hue, setHue] = useState(0);
-  const [saturation, setSaturation] = useState(75);
-  const [lightness, setLightness] = useState(50);
+  const [hue, setHue] = useState(initHSL[0]);
+  const [saturation, setSaturation] = useState(initHSL[1]);
+  const [lightness, setLightness] = useState(initHSL[2]);
 
   useEffect(() => {
     drawColorWheel();
@@ -43,16 +50,13 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
       const ctx = colorWheel.current.getContext("2d");
 
       if (ctx) {
-        for (let sat = 100; sat >= 0; sat--) {
-          for (let i = 0; i <= 360; i++) {
+        for (let sat = 100; sat > 0; sat -= 2) {
+          for (let hue = 0; hue < 360; hue++) {
             ctx.beginPath();
             ctx.moveTo(radius, radius);
-            ctx.arc(radius, radius, (sat * radius) / 100, (Math.PI / 180) * Math.max(0, i - 2), (Math.PI / 180) * i);
-            ctx.fillStyle = `hsl(${i + rotate}, ${sat}%, ${light}%)`;
+            ctx.arc(radius, radius, (sat * radius) / 100, (Math.PI / 180) * hue, (Math.PI / 180) * (hue + 1));
+            ctx.fillStyle = `hsl(${hue + rotate}, ${sat}%, ${light}%)`;
             ctx.fill();
-            ctx.strokeStyle = "transparent";
-            ctx.stroke();
-            ctx.closePath();
           }
         }
       }
@@ -74,19 +78,16 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
             const x = radius + hyp * cos0;
             const y = radius - (rotate < hue && hue < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
-            ctx.moveTo(x, y);
             ctx.arc(x, y, pickerRadius, 0, 2 * Math.PI);
           } else {
-            ctx.moveTo(mouse.x, mouse.y);
             ctx.arc(mouse.x, mouse.y, pickerRadius, 0, 2 * Math.PI);
 
             setHue((360 + rotate - (Math.atan2(radius - mouse.y, mouse.x - radius) * 180) / Math.PI) % 360);
             setSaturation((Math.sqrt(Math.pow(mouse.y - radius, 2) + Math.pow(mouse.x - radius, 2)) * 100) / radius);
           }
 
-          ctx.fillStyle = "#00000088";
-          ctx.strokeStyle = "transparent";
-          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "black";
           ctx.stroke();
         }
       }
@@ -135,14 +136,11 @@ export default function Wheel({ radius = 200, pickerRadius = 5, swatchWidth = 20
         ></canvas>
       </CanvasContainer>
 
-      <h3>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h3>
-
       <div>
         X: {mouse.x - radius}, Y: {radius - mouse.y}
       </div>
-      <Swatch width={swatchWidth} height={swatchWidth} fill={`hsl(${hue}, ${saturation}%, ${lightness}%)`}>
-        <circle cx={swatchWidth / 2} cy={swatchWidth / 2} r={swatchWidth / 4} />
-      </Swatch>
+
+      <Swatch radius={swatchWidth / 2} background={`hsl(${hue}, ${saturation}%, ${lightness}%)`} />
 
       <HSLSliderGroup
         hue={hue}

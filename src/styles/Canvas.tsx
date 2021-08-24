@@ -19,10 +19,3 @@ export const CanvasContainer = styled.div.attrs((props: { height: number }) => p
     }
   }
 `;
-
-export const Swatch = styled.svg.attrs((props: { width: number; height: number; fill: string }) => ({
-  style: { fill: props.fill } // this changes a lot
-}))`
-  width: ${(props) => props.width};
-  height: ${(props) => props.height};
-`;
