@@ -1,6 +1,6 @@
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
 import { useState } from "react";
-import { Dropdown } from "semantic-ui-react";
+import { Checkbox, Divider, Dropdown } from "semantic-ui-react";
 import { Swatch } from "../styles/Swatch";
 import HSLSliderGroup from "./HSLSliderGroup";
 import RangeSlider from "./RangeSlider";
@@ -24,13 +24,14 @@ const StatisticsContainer = styled.div`
     border: none;
     border-bottom: 1px solid black;
     text-align: center;
-    width: 15ch;
+    width: 30ch;
   }
 `;
 
 export default function SliderGroupSelector(): JSX.Element {
   const [picker, setPicker] = useState(1);
   const [color, setColor] = useState(CM("rgba(200, 125, 50, 1)"));
+  const [withAlpha, setWithAlpha] = useState(true);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
     const val = e.target.valueAsNumber;
@@ -46,6 +47,14 @@ export default function SliderGroupSelector(): JSX.Element {
     setColor(CM(newColor));
   };
 
+  function parseRGB(input: string) {
+    const [r, g, b, a] = input
+      .replace(/rgba\(|\)/g, "")
+      .split(", ")
+      .map((val) => +val);
+    setColor(CM(withAlpha ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`));
+  }
+
   return (
     <>
       <Swatch
@@ -53,26 +62,49 @@ export default function SliderGroupSelector(): JSX.Element {
         background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
       />
 
+      <Divider hidden />
+
       <Dropdown value={picker} options={options} selection onChange={(e, { value }) => setPicker(value as number)} />
+
+      <Divider hidden />
+
+      <Checkbox label="Alpha?" toggle checked={withAlpha} onChange={() => setWithAlpha(!withAlpha)} />
+
       {picker === 1 ? (
-        <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
+        <StatisticsContainer>
+          <input
+            type="text"
+            value={color.stringRGB({ alpha: withAlpha, precision: [2, 2, 2, 2] })}
+            onChange={(e) => parseRGB(e.target.value)}
+          />
+          <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
+        </StatisticsContainer>
       ) : picker === 2 ? (
         <StatisticsContainer>
-          <input type="text" value={color.stringHEX()} onChange={() => ""} />
+          <input type="text" value={color.stringHEX({ alpha: withAlpha })} onChange={() => ""} />
           <HEXSliderGroup hex={color.hexa()} onChange={handleSliderChange} />
         </StatisticsContainer>
       ) : (
-        <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
+        <StatisticsContainer>
+          <input
+            type="text"
+            value={color.stringHSL({ alpha: withAlpha, precision: [2, 2, 2, 2] })}
+            onChange={() => ""}
+          />
+          <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
+        </StatisticsContainer>
       )}
 
-      <RangeSlider
-        value={color.alpha * 100}
-        color="rgba(0,0,0,0.5)"
-        title="A"
-        max="100"
-        postfix="%"
-        onChange={(e) => handleSliderChange(e, "alpha")}
-      />
+      {withAlpha && (
+        <RangeSlider
+          value={color.alpha * 100}
+          color="rgba(0,0,0,0.5)"
+          title="A"
+          max="100"
+          postfix="%"
+          onChange={(e) => handleSliderChange(e, "alpha")}
+        />
+      )}
     </>
   );
 }
