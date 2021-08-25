@@ -1,54 +1,42 @@
+import { Ihsl, TChannelHSL } from "colormaster/types";
 import React from "react";
 import RangeSlider from "./RangeSlider";
 
-type TState<T> = React.Dispatch<React.SetStateAction<T>>;
-
 interface IHSLSliderGroup {
-  hue: number;
-  setHue: TState<number>;
-  saturation: number;
-  setSaturation: TState<number>;
-  lightness: number;
-  setLightness: TState<number>;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>, setState: TState<number>) => void;
+  hsl: Ihsl;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>, type: TChannelHSL) => void;
 }
 
-export default function HSLSliderGroup({
-  hue,
-  setHue,
-  saturation,
-  setSaturation,
-  lightness,
-  setLightness,
-  onChange
-}: IHSLSliderGroup): JSX.Element {
+export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.Element {
+  const { h, s, l } = hsl;
+
   return (
     <>
       <RangeSlider
-        value={hue}
-        color={`hsla(${hue}, 100%, 50%, 1)`}
+        value={h}
+        color={`hsla(${h}, 100%, 50%, 1)`}
         title="H"
         max="359.99"
         postfix="&deg;"
-        onChange={(e) => onChange(e, setHue)}
+        onChange={(e) => onChange(e, "hue")}
       />
 
       <RangeSlider
-        value={saturation}
-        color={`hsla(${hue}, ${saturation}%, 50%, 1)`}
+        value={s}
+        color={`hsla(${h}, ${s}%, 50%, 1)`}
         title="S"
         max="100"
         postfix="%"
-        onChange={(e) => onChange(e, setSaturation)}
+        onChange={(e) => onChange(e, "saturation")}
       />
 
       <RangeSlider
-        value={lightness}
-        color={`hsla(0, 0%, ${lightness}%, 1)`}
+        value={l}
+        color={`hsla(0, 0%, ${l}%, 1)`}
         title="L"
         max="100"
         postfix="%"
-        onChange={(e) => onChange(e, setLightness)}
+        onChange={(e) => onChange(e, "lightness")}
       />
     </>
   );

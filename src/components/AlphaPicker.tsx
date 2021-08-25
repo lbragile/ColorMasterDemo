@@ -3,27 +3,26 @@ import { CanvasContainer } from "../styles/Canvas";
 import { Swatch } from "../styles/Swatch";
 import RangeSlider from "./RangeSlider";
 import RGBSliderGroup from "./RGBSliderGroup";
+import CM from "colormaster";
+import { TChannel } from "colormaster/types";
 
 interface IWheel {
   width?: number;
   height?: number;
-  initRGB?: [number, number, number];
+  initRGB?: [number, number, number, number?];
 }
 
-export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 255, 255] }: IWheel): JSX.Element {
+export default function AlphaPicker({ width = 400, height = 25, initRGB = [200, 125, 50, 0.5] }: IWheel): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
   const [mouse, setMouse] = useState({ x: width / 2, y: height / 2 });
-  const [alpha, setAlpha] = useState((mouse.x * 100) / width);
-  const [red, setRed] = useState(initRGB[0]);
-  const [green, setGreen] = useState(initRGB[1]);
-  const [blue, setBlue] = useState(initRGB[2]);
+  const [color, setColor] = useState(CM(`rgba(${initRGB[0]}, ${initRGB[1]}, ${initRGB[2]}, ${initRGB[3] ?? 0.5})`));
 
   useEffect(() => {
     drawColorAlpha();
-  }, [red, green, blue]);
+  }, [color]);
 
   useEffect(() => {
     drawColorPicker(mouse.x);
@@ -57,8 +56,9 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 25
 
         ctx.rect(0, 0, width, height);
         const gradient = ctx.createLinearGradient(0, 0, width, 0);
-        gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
-        gradient.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 1)`);
+        const { r, g, b } = color.rgba();
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
         ctx.fillStyle = gradient;
         ctx.fill();
       }
@@ -98,10 +98,9 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 25
 
       if (ctx) {
         const { left, top } = colorHue.current.getBoundingClientRect();
-        const [x, y] = [e.clientX - left, e.clientY - top];
-
+        const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
         setMouse({ x, y });
-        setAlpha((x * 100) / (width - 1));
+        setColor(CM(`rgba(${color.red}, ${color.green}, ${color.blue}, ${x / (width - 1)})`));
       }
     }
   };
@@ -112,14 +111,19 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 25
     canDrag.current = false;
   };
 
-  const handleSliderChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setState: React.Dispatch<React.SetStateAction<number>>,
-    isAlpha?: boolean
-  ) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, type: TChannel) => {
     const val = e.target.valueAsNumber;
-    isAlpha && drawColorPicker((val / 100) * width);
-    setState(val);
+    type === "alpha" && drawColorPicker((val / 100) * width);
+
+    const { r, g, b, a } = color.rgba();
+    setColor(
+      CM({
+        r: type === "red" ? val : r,
+        g: type === "green" ? val : g,
+        b: type === "blue" ? val : b,
+        a: type === "alpha" ? val / 100 : a
+      })
+    );
   };
 
   return (
@@ -140,25 +144,17 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [0, 25
         X: {mouse.x}, Y: {height / 2}
       </div>
 
-      <Swatch radius={50} background={`rgba(${red}, ${green}, ${blue}, ${alpha / 100})`} />
+      <Swatch radius={50} background={color.stringRGB()} />
+
+      <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
 
       <RangeSlider
-        value={alpha}
+        value={color.alpha * 100}
         color="rgba(0,0,0,0.5)"
         title="A"
         max="100"
         postfix="%"
-        onChange={(e) => handleSliderChange(e, setAlpha, true)}
-      />
-
-      <RGBSliderGroup
-        red={red}
-        setRed={setRed}
-        green={green}
-        setGreen={setGreen}
-        blue={blue}
-        setBlue={setBlue}
-        onChange={handleSliderChange}
+        onChange={(e) => handleSliderChange(e, "alpha")}
       />
     </>
   );

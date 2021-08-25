@@ -85,9 +85,9 @@ export default function HuePicker({
 
       if (ctx) {
         const { left, top } = colorHue.current.getBoundingClientRect();
-        const [x, y] = [e.clientX - left, e.clientY - top];
+        const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
 
-        const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
+        const data = ctx.getImageData(x === width ? x - 1 : x, y, 1, 1).data.slice(0, -1);
         const color = CM(`rgba(${data.join(", ")}, 1)`);
         setMouse({ x, y });
         setRgb(color);

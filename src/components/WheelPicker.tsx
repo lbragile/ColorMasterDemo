@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
 import { Swatch } from "../styles/Swatch";
 import HSLSliderGroup from "./HSLSliderGroup";
+import CM from "colormaster";
+import { TChannelHSL } from "colormaster/types";
 
 interface IWheelPicker {
   radius?: number;
@@ -25,17 +27,15 @@ export default function WheelPicker({
   const [mouse, setMouse] = useState({ x: radius, y: 50 });
   const [slider, setSlider] = useState(0);
 
-  const [hue, setHue] = useState(initHSL[0]);
-  const [saturation, setSaturation] = useState(initHSL[1]);
-  const [lightness, setLightness] = useState(initHSL[2]);
+  const [color, setColor] = useState(CM(`hsla(${initHSL[0]}, ${initHSL[1]}%, ${initHSL[2]}%, 1)`));
 
   useEffect(() => {
     drawColorWheel();
   }, []);
 
   useEffect(() => {
-    drawColorWheel(lightness);
-  }, [lightness]);
+    drawColorWheel(color.lightness);
+  }, [color.lightness]);
 
   useEffect(() => {
     drawColorPicker({ slider: true });
@@ -72,18 +72,26 @@ export default function WheelPicker({
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
           ctx.beginPath();
 
+          const { h, s, l, a } = color.hsla();
+
           if (slider) {
-            const cos0 = Math.cos(((hue - rotate) * Math.PI) / 180);
-            const hyp = (saturation * radius) / 100;
+            const cos0 = Math.cos(((h - rotate) * Math.PI) / 180);
+            const hyp = (s * radius) / 100;
             const x = radius + hyp * cos0;
-            const y = radius - (rotate < hue && hue < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
+            const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
             ctx.arc(x, y, pickerRadius, 0, 2 * Math.PI);
           } else {
             ctx.arc(mouse.x, mouse.y, pickerRadius, 0, 2 * Math.PI);
 
-            setHue((360 + rotate - (Math.atan2(radius - mouse.y, mouse.x - radius) * 180) / Math.PI) % 360);
-            setSaturation((Math.sqrt(Math.pow(mouse.y - radius, 2) + Math.pow(mouse.x - radius, 2)) * 100) / radius);
+            setColor(
+              CM({
+                h: (360 + rotate - (Math.atan2(radius - mouse.y, mouse.x - radius) * 180) / Math.PI) % 360,
+                s: (Math.sqrt(Math.pow(mouse.y - radius, 2) + Math.pow(mouse.x - radius, 2)) * 100) / radius,
+                l,
+                a
+              })
+            );
           }
 
           ctx.lineWidth = 2;
@@ -113,13 +121,29 @@ export default function WheelPicker({
     canDrag.current = false;
   };
 
-  const handleSliderChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setState: React.Dispatch<React.SetStateAction<number>>
-  ) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, type: TChannelHSL) => {
     const val = e.target.valueAsNumber;
-    setState(val);
     setSlider(val);
+
+    const { h, s, l, a } = color.hsla();
+
+    switch (type) {
+      case "hue":
+        setColor(CM({ h: val, s, l, a }));
+        break;
+
+      case "saturation":
+        setColor(CM({ h, s: val, l, a }));
+        break;
+
+      case "lightness":
+        setColor(CM({ h, s, l: val, a }));
+        break;
+
+      default:
+        setColor(CM({ h, s, l, a: val / 100 }));
+        break;
+    }
   };
 
   return (
@@ -140,17 +164,9 @@ export default function WheelPicker({
         X: {mouse.x - radius}, Y: {radius - mouse.y}
       </div>
 
-      <Swatch radius={swatchWidth / 2} background={`hsl(${hue}, ${saturation}%, ${lightness}%)`} />
+      <Swatch radius={swatchWidth / 2} background={color.stringHSL()} />
 
-      <HSLSliderGroup
-        hue={hue}
-        setHue={setHue}
-        saturation={saturation}
-        setSaturation={setSaturation}
-        lightness={lightness}
-        setLightness={setLightness}
-        onChange={handleSliderChange}
-      />
+      <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
     </>
   );
 }

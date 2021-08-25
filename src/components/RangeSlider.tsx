@@ -82,10 +82,6 @@ export default function RangeSlider({
   step = "any",
   postfix = ""
 }: IRangeSlider): JSX.Element {
-  function clamp(min: string, val: number, max: string): string {
-    return Math.max(+min, Math.min(Math.round(val * 100) / 100, +max)).toString();
-  }
-
   return (
     <SliderContainer>
       <span>{title}</span>
@@ -101,7 +97,7 @@ export default function RangeSlider({
         draggable={false}
       />
 
-      <NumberInput type="number" min={min} max={max} step={step} value={clamp(min, value, max)} onChange={onChange} />
+      <NumberInput type="number" min={min} max={max} step={step} value={value} onChange={onChange} />
       {postfix}
     </SliderContainer>
   );
