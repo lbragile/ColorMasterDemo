@@ -6,7 +6,6 @@ import HSLSliderGroup from "./HSLSliderGroup";
 import RangeSlider from "./RangeSlider";
 import RGBSliderGroup from "./RGBSliderGroup";
 import CM from "colormaster";
-import HEXSliderGroup from "./HEXSliderGroup";
 import styled from "styled-components";
 
 const options = [
@@ -16,8 +15,6 @@ const options = [
 ];
 
 const StatisticsContainer = styled.div`
-  margin: 2em 0;
-
   & > input {
     display: block;
     outline: none;
@@ -59,7 +56,12 @@ export default function SliderGroupSelector(): JSX.Element {
   const [copied, setCopied] = useState(false);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
-    const val = Number.isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber;
+    const val = Number.isNaN(e.target.valueAsNumber)
+      ? e.target.value.length > 0
+        ? parseInt(e.target.value, 16)
+        : 0
+      : e.target.valueAsNumber;
+
     const { r, g, b } = color.rgba();
     const { h, s, l } = color.hsla();
 
@@ -72,7 +74,7 @@ export default function SliderGroupSelector(): JSX.Element {
           a: 1
         };
 
-    newColor.a = type === "alpha" ? val / 100 : color.alpha;
+    newColor.a = type === "alpha" ? val / (picker === 2 ? 255 : 100) : color.alpha;
 
     setColor(CM(newColor));
   };
@@ -134,6 +136,8 @@ export default function SliderGroupSelector(): JSX.Element {
         </Grid.Column>
       </Grid>
 
+      <Divider hidden />
+
       {picker === 1 ? (
         <StatisticsContainer>
           <StyledColorDisplay
@@ -145,6 +149,8 @@ export default function SliderGroupSelector(): JSX.Element {
             fluid
             action={copyAction("rgb")}
           />
+
+          <Divider hidden />
 
           <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
         </StatisticsContainer>
@@ -159,7 +165,10 @@ export default function SliderGroupSelector(): JSX.Element {
             fluid
             action={copyAction("hex")}
           />
-          <HEXSliderGroup hex={color.hexa()} onChange={handleSliderChange} />
+
+          <Divider hidden />
+
+          <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} format="hex" />
         </StatisticsContainer>
       ) : (
         <StatisticsContainer>
@@ -172,19 +181,26 @@ export default function SliderGroupSelector(): JSX.Element {
             fluid
             action={copyAction("hsl")}
           />
+
+          <Divider hidden />
+
           <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
         </StatisticsContainer>
       )}
 
       {withAlpha && (
-        <RangeSlider
-          value={color.alpha * 100}
-          color="rgba(0,0,0,0.5)"
-          title="A"
-          max="100"
-          postfix="%"
-          onChange={(e) => handleSliderChange(e, "alpha")}
-        />
+        <>
+          <Divider hidden />
+          <RangeSlider
+            value={color.alpha * (picker === 2 ? 255 : 100)}
+            color="rgba(0,0,0,0.5)"
+            title="A"
+            max={picker === 2 ? "255" : "100"}
+            format={picker === 2 ? "hex" : undefined}
+            postfix={picker === 2 ? "" : "%"}
+            onChange={(e) => handleSliderChange(e, "alpha")}
+          />
+        </>
       )}
     </Segment>
   );

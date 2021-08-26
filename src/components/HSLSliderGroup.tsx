@@ -1,5 +1,6 @@
 import { Ihsl, TChannelHSL } from "colormaster/types";
 import React from "react";
+import { Divider } from "semantic-ui-react";
 import RangeSlider from "./RangeSlider";
 
 interface IHSLSliderGroup {
@@ -21,24 +22,24 @@ export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.
         onChange={(e) => onChange(e, "hue")}
       />
 
+      <Divider hidden />
+
       <RangeSlider
         value={s}
         color={`hsla(${h}, ${s}%, 50%, 1)`}
         title="S"
-        min="1e-3"
-        max="100.1"
-        error={s === 0 && 0 < l && l < 100}
+        max="100"
         postfix="%"
         onChange={(e) => onChange(e, "saturation")}
       />
+
+      <Divider hidden />
 
       <RangeSlider
         value={l}
         color={`hsla(0, 0%, ${l - 5}%, 1)`}
         title="L"
-        min="0.001"
         max="100"
-        error={0 === l || l === 100}
         postfix="%"
         onChange={(e) => onChange(e, "lightness")}
       />

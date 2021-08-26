@@ -1,3 +1,4 @@
+import { TFormat } from "colormaster/types";
 import React from "react";
 import { Input } from "semantic-ui-react";
 import styled from "styled-components";
@@ -38,8 +39,9 @@ const NumberInput = styled(Input)`
 
   &.ui.input {
     & > input {
-      padding-left: 2em;
       width: 11ch;
+      text-align: ${(props) => (props.format === "hex" ? "center" : "left")};
+      padding-left: ${(props) => (props.format === "hex" ? "" : "2.2em")};
 
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
@@ -55,17 +57,10 @@ const NumberInput = styled(Input)`
         }
       }
     }
-
-    /* Matching red border around the label of the error input */
-    &.error .label {
-      border: 1px solid rgba(159 58 56 / 35%);
-    }
   }
 `;
 
 const SliderContainer = styled.div`
-  margin: 2em 0;
-
   & > span {
     font-size: 1.2rem;
     font-weight: bold;
@@ -84,7 +79,7 @@ interface IRangeSlider {
   max?: string;
   step?: string;
   postfix?: string;
-  error?: boolean;
+  format?: Exclude<TFormat, "name" | "invalid">;
 }
 
 export default function RangeSlider({
@@ -96,16 +91,38 @@ export default function RangeSlider({
   max = "100",
   step = "any",
   postfix = "",
-  error = false
+  format = undefined
 }: IRangeSlider): JSX.Element {
   // formats the input when typing to avoid "jumpy" behavior
-  function clamp(min: string, val: number, max: string): string {
-    return Math.max(+min, Math.min(Math.round(val * 100) / 100, +max)).toString();
+  function clamp(val: number, adjustBase = false): string {
+    console.log(val);
+    const clampedVal = Math.max(+min, format === "hex" ? Math.round(val) : Math.min(Math.round(val * 100) / 100, +max));
+    const strVal = clampedVal.toString(format === "hex" && adjustBase ? 16 : 10).toUpperCase();
+
+    return format === "hex" && strVal.length === 1 ? "0" + strVal : strVal;
   }
 
-  const CommonProps = { type: "number", min, max, step, value: clamp(min, value, max), error, onChange };
-  const SliderInputProps = { ...CommonProps, type: "range", step: "0.01", color, draggable: false };
-  const NumberInputProps = { ...CommonProps, ...(postfix ? { label: postfix, labelPosition: "right" } : {}) };
+  const CommonProps = {
+    min,
+    max,
+    type: format === "hex" ? "text" : "number",
+    format,
+    step,
+    onChange
+  };
+  const SliderInputProps = {
+    ...CommonProps,
+    value: clamp(value, false),
+    type: "range",
+    step: "0.01",
+    color,
+    draggable: false
+  };
+  const NumberInputProps = {
+    ...CommonProps,
+    value: clamp(value, true),
+    ...(postfix ? { label: postfix, labelPosition: "right" } : {})
+  };
 
   return (
     <SliderContainer>
