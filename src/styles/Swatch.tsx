@@ -9,5 +9,6 @@ export const Swatch = styled.div.attrs(
   width: ${(props) => props.radius * 2 + (props.units ?? "px")};
   height: ${(props) => props.radius * 2 + (props.units ?? "px")};
   border-radius: ${(props) => props.borderRadius ?? "50%"};
-  margin: 10px;
+  border: hsla(0, 0%, 95%, 1) 1px solid;
+  margin: 10px auto;
 `;

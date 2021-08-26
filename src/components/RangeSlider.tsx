@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SliderInput = styled.input.attrs((props) => {
@@ -21,7 +22,7 @@ const SliderInput = styled.input.attrs((props) => {
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     background: hsla(0, 0%, 80%, 1);
-    border: 1px solid white;
+    border: 1px solid grey;
     border-radius: 50%;
     width: 16px;
     height: 16px;
@@ -32,20 +33,33 @@ const SliderInput = styled.input.attrs((props) => {
   }
 `;
 
-const NumberInput = styled.input`
-  border: none;
-  outline: none;
-
-  width: 8.5ch;
+const NumberInput = styled(Input)`
   margin-left: 10px;
-  padding-left: 20px;
 
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    opacity: 1;
-    position: absolute;
-    left: 0;
-    height: 100%;
+  &.ui.input {
+    & > input {
+      padding-left: 2em;
+      width: 11ch;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        opacity: 1;
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 50%;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    /* Matching red border around the label of the error input */
+    &.error .label {
+      border: 1px solid rgba(159 58 56 / 35%);
+    }
   }
 `;
 
@@ -70,6 +84,7 @@ interface IRangeSlider {
   max?: string;
   step?: string;
   postfix?: string;
+  error?: boolean;
 }
 
 export default function RangeSlider({
@@ -80,25 +95,25 @@ export default function RangeSlider({
   min = "0",
   max = "100",
   step = "any",
-  postfix = ""
+  postfix = "",
+  error = false
 }: IRangeSlider): JSX.Element {
+  // formats the input when typing to avoid "jumpy" behavior
+  function clamp(min: string, val: number, max: string): string {
+    return Math.max(+min, Math.min(Math.round(val * 100) / 100, +max)).toString();
+  }
+
+  const CommonProps = { type: "number", min, max, step, value: clamp(min, value, max), error, onChange };
+  const SliderInputProps = { ...CommonProps, type: "range", step: "0.01", color, draggable: false };
+  const NumberInputProps = { ...CommonProps, ...(postfix ? { label: postfix, labelPosition: "right" } : {}) };
+
   return (
     <SliderContainer>
       <span>{title}</span>
 
-      <SliderInput
-        type="range"
-        value={value}
-        color={color}
-        min={min}
-        max={max}
-        onChange={onChange}
-        step="0.01"
-        draggable={false}
-      />
+      <SliderInput {...SliderInputProps} />
 
-      <NumberInput type="number" min={min} max={max} step={step} value={value} onChange={onChange} />
-      {postfix}
+      <NumberInput {...NumberInputProps} />
     </SliderContainer>
   );
 }

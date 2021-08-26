@@ -25,16 +25,20 @@ export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.
         value={s}
         color={`hsla(${h}, ${s}%, 50%, 1)`}
         title="S"
-        max="100"
+        min="1e-3"
+        max="100.1"
+        error={s === 0 && 0 < l && l < 100}
         postfix="%"
         onChange={(e) => onChange(e, "saturation")}
       />
 
       <RangeSlider
         value={l}
-        color={`hsla(0, 0%, ${l}%, 1)`}
+        color={`hsla(0, 0%, ${l - 5}%, 1)`}
         title="L"
+        min="0.001"
         max="100"
+        error={0 === l || l === 100}
         postfix="%"
         onChange={(e) => onChange(e, "lightness")}
       />
