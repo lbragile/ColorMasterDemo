@@ -6,17 +6,16 @@ const WheelPicker = lazy(() => import("./WheelPicker"));
 const SketchPicker = lazy(() => import("./SketchPicker"));
 const AlphaPicker = lazy(() => import("./AlphaPicker"));
 import Loading from "./Loading";
-import SliderGroupSelector from "./SliderGroupSelector";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("DROPDOWN");
+  const [activeItem, setActiveItem] = useState("ALPHA");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
       <Menu.Item
         name={navName.toUpperCase()}
         active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "DROPDOWN")}
+        onClick={(e, { name }) => setActiveItem(name ?? "ALPHA")}
       />
     );
   };
@@ -50,19 +49,10 @@ export default function App(): JSX.Element {
         <MenuItemWrapper navName="WHEEL" />
         <MenuItemWrapper navName="SKETCH" />
         <MenuItemWrapper navName="ALPHA" />
-        <MenuItemWrapper navName="DROPDOWN" />
       </Menu>
       <Segment attached="bottom">
         <Suspense fallback={<Loading />}>
-          {activeItem === "WHEEL" ? (
-            <WheelPicker />
-          ) : activeItem === "ALPHA" ? (
-            <AlphaPicker />
-          ) : activeItem === "SKETCH" ? (
-            <SketchPicker />
-          ) : (
-            <SliderGroupSelector />
-          )}
+          {activeItem === "WHEEL" ? <WheelPicker /> : activeItem === "ALPHA" ? <AlphaPicker stats /> : <SketchPicker />}
         </Suspense>
       </Segment>
     </Container>

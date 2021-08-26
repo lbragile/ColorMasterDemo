@@ -1,11 +1,11 @@
 import { Ihsla, Irgba, TChannel, TChannelHSL, TFormat } from "colormaster/types";
 import React, { useMemo, useState } from "react";
-import { Checkbox, Divider, Dropdown, Grid, Icon, Input, Popup, Segment } from "semantic-ui-react";
+import { Button, Checkbox, Divider, Dropdown, Grid, Icon, Input, Popup, Segment } from "semantic-ui-react";
 import { Swatch } from "../styles/Swatch";
 import HSLSliderGroup from "./HSLSliderGroup";
 import RangeSlider from "./RangeSlider";
 import RGBSliderGroup from "./RGBSliderGroup";
-import CM from "colormaster";
+import CM, { ColorMaster } from "colormaster";
 import styled from "styled-components";
 
 const options = [
@@ -41,17 +41,41 @@ const StyledColorDisplay = styled(Input)`
 const StyledDropdown = styled(Dropdown)`
   &.ui.selection.dropdown {
     &,
-    &.menu > .item {
+    & .menu > .item {
       text-align: center;
     }
+
+    & .icon {
+      position: absolute;
+      right: 4px;
+    }
+  }
+`;
+
+const StyledButton = styled(Button.Group)`
+  & .ui.basic.button {
+    padding: 0;
   }
 `;
 
 type TValidColorSpaces = Exclude<TFormat, "name" | "invalid">;
 
-export default function SliderGroupSelector(): JSX.Element {
+interface ISliderGroupSelector {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  drawAlphaPicker?: (xPos: number) => void;
+  drawHuePicker?: (xPos: number) => void;
+  stats?: boolean;
+}
+
+export default function SliderGroupSelector({
+  color,
+  setColor,
+  drawAlphaPicker,
+  drawHuePicker,
+  stats
+}: ISliderGroupSelector): JSX.Element {
   const [picker, setPicker] = useState(1);
-  const [color, setColor] = useState(CM("rgba(200, 125, 50, 1)"));
   const [withAlpha, setWithAlpha] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -74,7 +98,10 @@ export default function SliderGroupSelector(): JSX.Element {
           a: 1
         };
 
-    newColor.a = type === "alpha" ? val / (picker === 2 ? 255 : 100) : color.alpha;
+    const scaledAlpha = val / (picker === 2 ? 255 : 100);
+    type === "alpha" && drawAlphaPicker?.(scaledAlpha * 400);
+    (newColor as Ihsla).h !== h && drawHuePicker?.((h / 360) * 400);
+    newColor.a = type === "alpha" ? scaledAlpha : color.alpha;
 
     setColor(CM(newColor));
   };
@@ -112,7 +139,16 @@ export default function SliderGroupSelector(): JSX.Element {
     [color, withAlpha, copied]
   );
 
-  return (
+  const handlePickerAdjustment = (dir: "up" | "down") => {
+    const numOptions = Object.keys(options).length;
+    if (dir === "down") {
+      setPicker(picker === 1 ? numOptions : picker - 1);
+    } else {
+      setPicker(picker === numOptions ? 1 : picker + 1);
+    }
+  };
+
+  return stats ? (
     <Segment compact>
       <Swatch
         radius={50}
@@ -121,17 +157,28 @@ export default function SliderGroupSelector(): JSX.Element {
 
       <Divider hidden />
 
-      <Grid verticalAlign="middle">
-        <Grid.Column width={5}>
+      <Grid columns={3} verticalAlign="middle" stackable>
+        <Grid.Column width={1}>
+          <StyledButton vertical>
+            <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
+            <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
+          </StyledButton>
+        </Grid.Column>
+
+        <Grid.Column width={8}>
           <StyledDropdown
+            icon={<Icon name="paint brush" color="grey" />}
             value={picker}
             options={options}
+            labeled
             selection
+            scrolling
+            fluid
             onChange={(e: React.ChangeEvent, { value }: { value: number }) => setPicker(value)}
           />
         </Grid.Column>
 
-        <Grid.Column floated="right" width={6}>
+        <Grid.Column width={6}>
           <Checkbox label="Show Alpha" checked={withAlpha} onChange={() => setWithAlpha(!withAlpha)} />
         </Grid.Column>
       </Grid>
@@ -203,5 +250,7 @@ export default function SliderGroupSelector(): JSX.Element {
         </>
       )}
     </Segment>
+  ) : (
+    <></>
   );
 }

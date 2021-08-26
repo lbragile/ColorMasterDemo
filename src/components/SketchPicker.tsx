@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
+import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 
 interface IWheel {
@@ -139,11 +140,14 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel):
       <HuePicker
         width={width}
         height={25}
+        sketchColor={sketchColor}
         setSketchColor={setSketchColor}
-        initColor={sketchColor}
         swatchColor={swatchColor}
         setSwatchColor={setSwatchColor}
+        stats
       />
+
+      <AlphaPicker />
     </>
   );
 }

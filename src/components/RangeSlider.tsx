@@ -58,6 +58,11 @@ const NumberInput = styled(Input)`
       }
     }
   }
+
+  & .ui.label {
+    width: 4ch;
+    text-align: center;
+  }
 `;
 
 const SliderContainer = styled.div`
@@ -95,7 +100,6 @@ export default function RangeSlider({
 }: IRangeSlider): JSX.Element {
   // formats the input when typing to avoid "jumpy" behavior
   function clamp(val: number, adjustBase = false): string {
-    console.log(val);
     const clampedVal = Math.max(+min, format === "hex" ? Math.round(val) : Math.min(Math.round(val * 100) / 100, +max));
     const strVal = clampedVal.toString(format === "hex" && adjustBase ? 16 : 10).toUpperCase();
 

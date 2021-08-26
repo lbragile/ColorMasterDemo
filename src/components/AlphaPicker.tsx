@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
-import { Swatch } from "../styles/Swatch";
-import RangeSlider from "./RangeSlider";
-import RGBSliderGroup from "./RGBSliderGroup";
 import CM from "colormaster";
-import { TChannel } from "colormaster/types";
+import SliderGroupSelector from "./SliderGroupSelector";
 
 interface IWheel {
   width?: number;
   height?: number;
   initRGB?: [number, number, number, number?];
+  stats?: boolean;
 }
 
-export default function AlphaPicker({ width = 400, height = 25, initRGB = [200, 125, 50, 0.5] }: IWheel): JSX.Element {
+export default function AlphaPicker({
+  width = 400,
+  height = 25,
+  initRGB = [200, 125, 50, 0.5],
+  stats = false
+}: IWheel): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -111,21 +114,6 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [200, 
     canDrag.current = false;
   };
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, type: TChannel) => {
-    const val = e.target.valueAsNumber;
-    type === "alpha" && drawColorPicker((val / 100) * width);
-
-    const { r, g, b, a } = color.rgba();
-    setColor(
-      CM({
-        r: type === "red" ? val : r,
-        g: type === "green" ? val : g,
-        b: type === "blue" ? val : b,
-        a: type === "alpha" ? val / 100 : a
-      })
-    );
-  };
-
   return (
     <>
       <CanvasContainer height={height}>
@@ -140,22 +128,7 @@ export default function AlphaPicker({ width = 400, height = 25, initRGB = [200, 
         ></canvas>
       </CanvasContainer>
 
-      <div>
-        X: {mouse.x}, Y: {height / 2}
-      </div>
-
-      <Swatch radius={50} background={color.stringRGB()} />
-
-      <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
-
-      <RangeSlider
-        value={color.alpha * 100}
-        color="rgba(0,0,0,0.5)"
-        title="A"
-        max="100"
-        postfix="%"
-        onChange={(e) => handleSliderChange(e, "alpha")}
-      />
+      <SliderGroupSelector color={color} setColor={setColor} drawAlphaPicker={drawColorPicker} stats={stats} />
     </>
   );
 }

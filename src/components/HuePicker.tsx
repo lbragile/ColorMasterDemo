@@ -1,32 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
-import { Swatch } from "../styles/Swatch";
-import RangeSlider from "./RangeSlider";
 import CM from "colormaster";
+import SliderGroupSelector from "./SliderGroupSelector";
 
 interface IWheel {
-  initColor: string;
   swatchColor: string;
   setSwatchColor: (arg: string) => void;
+  sketchColor: string;
   setSketchColor: (arg: string) => void;
   width?: number;
   height?: number;
+  stats?: boolean;
 }
 
 export default function HuePicker({
-  initColor,
   swatchColor,
   setSwatchColor,
+  sketchColor,
   setSketchColor,
   width = 400,
-  height = 25
+  height = 25,
+  stats = false
 }: IWheel): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: (CM(initColor).hue / 360) * (width - 1), y: height / 2 });
-  const [rgb, setRgb] = useState(CM(initColor));
+  const [mouse, setMouse] = useState({ x: (CM(sketchColor).hue / 360) * (width - 1), y: height / 2 });
+  const [color, setColor] = useState(CM(sketchColor));
 
   useEffect(() => {
     drawColorHue();
@@ -87,12 +88,12 @@ export default function HuePicker({
         const { left, top } = colorHue.current.getBoundingClientRect();
         const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
 
-        const data = ctx.getImageData(x === width ? x - 1 : x, y, 1, 1).data.slice(0, -1);
-        const color = CM(`rgba(${data.join(", ")}, 1)`);
+        const data = ctx.getImageData(x === width ? x - 1 : x, y === height ? y - 1 : y, 1, 1).data.slice(0, -1);
+        const newColor = CM(`rgba(${data.join(", ")}, 1)`);
         setMouse({ x, y });
-        setRgb(color);
-        setSketchColor(color.stringRGB());
-        setSwatchColor(CM(swatchColor).hueTo(color.hue).stringRGB());
+        setColor(newColor);
+        setSketchColor(newColor.stringRGB());
+        setSwatchColor(CM(swatchColor).hueTo(newColor.hue).stringRGB());
       }
     }
   };
@@ -101,15 +102,6 @@ export default function HuePicker({
     e.preventDefault();
     handleMouseMove(e);
     canDrag.current = false;
-  };
-
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.valueAsNumber;
-    const color = CM(`hsla(${val}, 100%, 50%, 1)`);
-    drawColorPicker((val * width) / 360);
-    setRgb(color);
-    setSketchColor(color.stringRGB());
-    setSwatchColor(CM(swatchColor).hueTo(color.hue).stringRGB());
   };
 
   return (
@@ -126,20 +118,7 @@ export default function HuePicker({
         ></canvas>
       </CanvasContainer>
 
-      <div>
-        X: {mouse.x}, Y: {height / 2}
-      </div>
-
-      <Swatch radius={50} background={swatchColor} />
-
-      <RangeSlider
-        value={rgb.hue}
-        color={rgb.stringRGB()}
-        title="H"
-        max="359.99"
-        postfix="&deg;"
-        onChange={handleSliderChange}
-      />
+      <SliderGroupSelector color={color} setColor={setColor} drawHuePicker={drawColorPicker} stats={stats} />
     </>
   );
 }
