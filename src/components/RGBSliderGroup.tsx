@@ -1,5 +1,5 @@
-import { Irgb, TChannel } from "colormaster/types";
 import React from "react";
+import { Irgb, TChannel } from "colormaster/types";
 import { Divider } from "semantic-ui-react";
 import RangeSlider from "./RangeSlider";
 

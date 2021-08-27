@@ -1,6 +1,7 @@
-import { lazy, Suspense, useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react";
 import { dependencies } from "../../package.json";
+import { GlobalStyle } from "../styles/Global";
 
 const WheelPicker = lazy(() => import("./WheelPicker"));
 const SketchPicker = lazy(() => import("./SketchPicker"));
@@ -21,6 +22,8 @@ export default function App(): JSX.Element {
 
   return (
     <Container>
+      <GlobalStyle />
+
       <Button
         as="div"
         labelPosition="right"

@@ -1,5 +1,5 @@
-import { TFormat } from "colormaster/types";
 import React from "react";
+import { TFormat } from "colormaster/types";
 import { Input } from "semantic-ui-react";
 import styled from "styled-components";
 

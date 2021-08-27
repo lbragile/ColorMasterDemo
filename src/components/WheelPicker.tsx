@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
-import CM from "colormaster";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import SliderGroupSelector from "./SliderGroupSelector";
 import { Grid } from "semantic-ui-react";
 import { Ihsla } from "colormaster/types";
+import CM from "colormaster";
 
 interface IWheelPicker {
   radius?: number;

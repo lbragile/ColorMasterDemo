@@ -1,12 +1,12 @@
-import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
 import React, { useCallback, useMemo, useState } from "react";
 import { Button, Checkbox, Divider, Dropdown, Grid, Icon, Input, Popup, Segment } from "semantic-ui-react";
+import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
 import HSLSliderGroup from "./HSLSliderGroup";
 import RangeSlider from "./RangeSlider";
 import RGBSliderGroup from "./RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
-import styled from "styled-components";
+import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
 
 const options = [
   { key: 1, text: "RGB", value: 1 },
