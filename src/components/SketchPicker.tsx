@@ -1,49 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
+import SliderGroupSelector from "./SliderGroupSelector";
+import { Grid } from "semantic-ui-react";
+import CM from "colormaster";
 
-interface IWheel {
+interface ISketchPicker {
   width?: number;
   pickerRadius?: number;
 }
 
-export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel): JSX.Element {
+export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchPicker): JSX.Element {
   const colorSketch = useRef<HTMLCanvasElement>(null);
-  const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: width - 1, y: 0 });
-  const [sketchColor, setSketchColor] = useState("rgba(0, 0, 255, 1)");
+  const [sketchColor, setSketchColor] = useState(CM("rgba(200, 125, 50, 1)"));
   const [swatchColor, setSwatchColor] = useState(sketchColor);
+  const [mouse, setMouse] = useState({ x: sketchColor.alpha * (width - 1), y: 0 });
 
-  useEffect(() => {
-    drawColorSketch();
-    drawColorHue();
-  }, []);
-
-  useEffect(() => {
-    drawColorSketch();
-  }, [sketchColor]);
-
-  useEffect(() => {
-    drawColorPicker();
-    if (colorSketch.current) {
-      const ctx = colorSketch.current.getContext("2d");
-      if (ctx) {
-        const data = ctx.getImageData(mouse.x, mouse.y, 1, 1).data.slice(0, -1);
-        setSwatchColor(`rgba(${data.join(", ")}, 1)`);
-      }
-    }
-  }, [mouse]);
-
-  function drawColorSketch() {
+  const drawColorSketch = useCallback(() => {
     if (colorSketch.current) {
       const ctx = colorSketch.current.getContext("2d");
 
       if (ctx) {
-        ctx.fillStyle = sketchColor;
+        ctx.fillStyle = sketchColor.stringRGB();
         ctx.fillRect(0, 0, width, width);
 
         const whiteGradient = ctx.createLinearGradient(0, 0, width, 0);
@@ -59,28 +41,9 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel):
         ctx.fillRect(0, 0, width, width);
       }
     }
-  }
+  }, [sketchColor, width]);
 
-  function drawColorHue() {
-    if (colorHue.current) {
-      const ctx = colorHue.current.getContext("2d");
-      if (ctx) {
-        ctx.rect(0, 0, width, 100);
-        const gradient = ctx.createLinearGradient(0, 0, width, 0);
-        gradient.addColorStop(0, "rgba(255, 0, 0, 1)");
-        gradient.addColorStop(0.17, "rgba(255, 255, 0, 1)");
-        gradient.addColorStop(0.34, "rgba(0, 255, 0, 1)");
-        gradient.addColorStop(0.51, "rgba(0, 255, 255, 1)");
-        gradient.addColorStop(0.68, "rgba(0, 0, 255, 1)");
-        gradient.addColorStop(0.85, "rgba(255, 0, 255, 1)");
-        gradient.addColorStop(1, "rgba(255, 0, 0, 1)");
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-    }
-  }
-
-  function drawColorPicker() {
+  const drawColorPicker = useCallback(() => {
     if (colorPicker.current) {
       const ctx = colorPicker.current.getContext("2d");
 
@@ -96,7 +59,22 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel):
         }
       }
     }
-  }
+  }, [mouse, pickerRadius, width]);
+
+  useEffect(() => {
+    drawColorSketch();
+  }, [drawColorSketch]);
+
+  useEffect(() => {
+    drawColorPicker();
+    if (colorSketch.current) {
+      const ctx = colorSketch.current.getContext("2d");
+      if (ctx) {
+        const data = ctx.getImageData(mouse.x, mouse.y, 1, 1).data.slice(0, -1);
+        setSwatchColor(CM(`rgba(${data.join(", ")}, 1)`));
+      }
+    }
+  }, [mouse, drawColorPicker]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -111,7 +89,9 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel):
         const { left, top } = colorSketch.current.getBoundingClientRect();
         const [x, y] = [e.clientX - left, e.clientY - top];
         const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
-        setSwatchColor(`rgba(${data.join(", ")}, 1)`);
+
+        const newColor = CM(`rgba(${data.join(", ")}, ${sketchColor.alpha})`);
+        setSwatchColor(newColor);
         setMouse({ x, y });
       }
     }
@@ -124,30 +104,35 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: IWheel):
   };
 
   return (
-    <>
-      <CanvasContainer height={width}>
-        <canvas width={width} height={width} ref={colorSketch}></canvas>
-        <canvas
+    <Grid columns={2} verticalAlign="middle">
+      <Grid.Column>
+        <SliderGroupSelector color={sketchColor} setColor={setSketchColor} />
+      </Grid.Column>
+
+      <Grid.Column>
+        <CanvasContainer height={width}>
+          <canvas width={width} height={width} ref={colorSketch}></canvas>
+          <canvas
+            width={width}
+            height={width}
+            ref={colorPicker}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+          ></canvas>
+        </CanvasContainer>
+
+        <HuePicker
           width={width}
-          height={width}
-          ref={colorPicker}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        ></canvas>
-      </CanvasContainer>
+          height={25}
+          color={sketchColor}
+          setColor={setSketchColor}
+          swatchColor={swatchColor}
+          setSwatchColor={setSwatchColor}
+        />
 
-      <HuePicker
-        width={width}
-        height={25}
-        sketchColor={sketchColor}
-        setSketchColor={setSketchColor}
-        swatchColor={swatchColor}
-        setSwatchColor={setSwatchColor}
-        stats
-      />
-
-      <AlphaPicker />
-    </>
+        <AlphaPicker width={width} height={25} color={sketchColor} setColor={setSketchColor} />
+      </Grid.Column>
+    </Grid>
   );
 }

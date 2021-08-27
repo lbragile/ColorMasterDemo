@@ -1,35 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
-import CM from "colormaster";
-import SliderGroupSelector from "./SliderGroupSelector";
+import CM, { ColorMaster } from "colormaster";
 
-interface IWheel {
+interface IAlphaPicker {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   width?: number;
   height?: number;
   initRGB?: [number, number, number, number?];
-  stats?: boolean;
 }
 
-export default function AlphaPicker({
-  width = 400,
-  height = 25,
-  initRGB = [200, 125, 50, 0.5],
-  stats = false
-}: IWheel): JSX.Element {
+export default function AlphaPicker({ color, setColor, width = 400, height = 25 }: IAlphaPicker): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
   const [mouse, setMouse] = useState({ x: width / 2, y: height / 2 });
-  const [color, setColor] = useState(CM(`rgba(${initRGB[0]}, ${initRGB[1]}, ${initRGB[2]}, ${initRGB[3] ?? 0.5})`));
-
-  useEffect(() => {
-    drawColorAlpha();
-  }, [color]);
-
-  useEffect(() => {
-    drawColorPicker(mouse.x);
-  }, [mouse]);
 
   // https://stackoverflow.com/a/27667424/4298115
   function drawCheckeredBackground(ctx: CanvasRenderingContext2D) {
@@ -49,7 +35,7 @@ export default function AlphaPicker({
     ctx.fill();
   }
 
-  function drawColorAlpha() {
+  const drawColorAlpha = useCallback(() => {
     if (colorHue.current) {
       const ctx = colorHue.current.getContext("2d");
       if (ctx) {
@@ -66,9 +52,9 @@ export default function AlphaPicker({
         ctx.fill();
       }
     }
-  }
+  }, [color, height, width]);
 
-  function drawColorPicker(x: number) {
+  const drawColorPicker = useCallback(() => {
     if (colorPicker.current) {
       const ctx = colorPicker.current.getContext("2d");
 
@@ -76,7 +62,7 @@ export default function AlphaPicker({
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.beginPath();
 
-        ctx.arc(x, height / 2, height / 2, 0, 2 * Math.PI);
+        ctx.arc(color.alpha * width, height / 2, height / 2, 0, 2 * Math.PI);
 
         ctx.lineWidth = 2;
         ctx.fillStyle = "hsla(0, 0%, 50%, 0.6)";
@@ -87,7 +73,15 @@ export default function AlphaPicker({
         ctx.closePath();
       }
     }
-  }
+  }, [width, height, color]);
+
+  useEffect(() => {
+    drawColorAlpha();
+  }, [drawColorAlpha]);
+
+  useEffect(() => {
+    drawColorPicker();
+  }, [mouse, drawColorPicker]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -127,8 +121,6 @@ export default function AlphaPicker({
           onMouseUp={handleMouseUp}
         ></canvas>
       </CanvasContainer>
-
-      <SliderGroupSelector color={color} setColor={setColor} drawAlphaPicker={drawColorPicker} stats={stats} />
     </>
   );
 }

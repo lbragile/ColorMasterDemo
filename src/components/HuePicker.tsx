@@ -1,62 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { CanvasContainer } from "../styles/Canvas";
-import CM from "colormaster";
-import SliderGroupSelector from "./SliderGroupSelector";
+import CM, { ColorMaster } from "colormaster";
 
-interface IWheel {
-  swatchColor: string;
-  setSwatchColor: (arg: string) => void;
-  sketchColor: string;
-  setSketchColor: (arg: string) => void;
+interface IHuePicker {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   width?: number;
   height?: number;
-  stats?: boolean;
+  swatchColor?: ColorMaster;
+  setSwatchColor?: React.Dispatch<React.SetStateAction<ColorMaster>>;
 }
 
 export default function HuePicker({
-  swatchColor,
-  setSwatchColor,
-  sketchColor,
-  setSketchColor,
+  color,
+  setColor,
   width = 400,
   height = 25,
-  stats = false
-}: IWheel): JSX.Element {
+  swatchColor,
+  setSwatchColor
+}: IHuePicker): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: (CM(sketchColor).hue / 360) * (width - 1), y: height / 2 });
-  const [color, setColor] = useState(CM(sketchColor));
-
-  useEffect(() => {
-    drawColorHue();
-  }, []);
-
-  useEffect(() => {
-    drawColorPicker(mouse.x);
-  }, [mouse]);
-
-  function drawColorHue() {
-    if (colorHue.current) {
-      const ctx = colorHue.current.getContext("2d");
-      if (ctx) {
-        ctx.rect(0, 0, width, height);
-        const gradient = ctx.createLinearGradient(0, 0, width, 0);
-        gradient.addColorStop(0, "rgba(255, 0, 0, 1)");
-        gradient.addColorStop(0.17, "rgba(255, 255, 0, 1)");
-        gradient.addColorStop(0.34, "rgba(0, 255, 0, 1)");
-        gradient.addColorStop(0.51, "rgba(0, 255, 255, 1)");
-        gradient.addColorStop(0.68, "rgba(0, 0, 255, 1)");
-        gradient.addColorStop(0.85, "rgba(255, 0, 255, 1)");
-        gradient.addColorStop(1, "rgba(255, 0, 0, 1)");
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-    }
-  }
-
-  function drawColorPicker(x: number) {
+  const drawColorPicker = useCallback(() => {
     if (colorPicker.current) {
       const ctx = colorPicker.current.getContext("2d");
 
@@ -64,7 +31,7 @@ export default function HuePicker({
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.beginPath();
 
-        ctx.arc(x, height / 2, height / 2, 0, 2 * Math.PI);
+        ctx.arc((color.hue * width) / 360, height / 2, height / 2, 0, 2 * Math.PI);
 
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#fff";
@@ -72,7 +39,36 @@ export default function HuePicker({
         ctx.closePath();
       }
     }
-  }
+  }, [height, width, color]);
+
+  const drawHuePicker = useCallback(() => {
+    if (colorHue.current) {
+      const ctx = colorHue.current.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.rect(0, 0, width, height);
+        const gradient = ctx.createLinearGradient(0, 0, width, 0);
+        const a = color.alpha;
+        gradient.addColorStop(0, `rgba(255, 0, 0, ${a})`);
+        gradient.addColorStop(0.17, `rgba(255, 255, 0, ${a})`);
+        gradient.addColorStop(0.34, `rgba(0, 255, 0, ${a})`);
+        gradient.addColorStop(0.51, `rgba(0, 255, 255, ${a})`);
+        gradient.addColorStop(0.68, `rgba(0, 0, 255, ${a})`);
+        gradient.addColorStop(0.85, `rgba(255, 0, 255, ${a})`);
+        gradient.addColorStop(1, `rgba(255, 0, 0, ${a})`);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+    }
+  }, [height, width, color]);
+
+  useEffect(() => {
+    drawHuePicker();
+  }, [drawHuePicker]);
+
+  useEffect(() => {
+    drawColorPicker();
+  }, [drawColorPicker]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,11 +85,9 @@ export default function HuePicker({
         const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
 
         const data = ctx.getImageData(x === width ? x - 1 : x, y === height ? y - 1 : y, 1, 1).data.slice(0, -1);
-        const newColor = CM(`rgba(${data.join(", ")}, 1)`);
-        setMouse({ x, y });
-        setColor(newColor);
-        setSketchColor(newColor.stringRGB());
-        setSwatchColor(CM(swatchColor).hueTo(newColor.hue).stringRGB());
+        const newColor = CM(`rgba(${data.join(", ")}, ${color.alpha})`);
+        setColor(CM({ ...color.hsla(), h: newColor.hue }));
+        setSwatchColor?.(swatchColor?.hueTo(newColor.hue) ?? newColor);
       }
     }
   };
@@ -117,8 +111,6 @@ export default function HuePicker({
           onMouseUp={handleMouseUp}
         ></canvas>
       </CanvasContainer>
-
-      <SliderGroupSelector color={color} setColor={setColor} drawHuePicker={drawColorPicker} stats={stats} />
     </>
   );
 }

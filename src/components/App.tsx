@@ -4,18 +4,17 @@ import { dependencies } from "../../package.json";
 
 const WheelPicker = lazy(() => import("./WheelPicker"));
 const SketchPicker = lazy(() => import("./SketchPicker"));
-const AlphaPicker = lazy(() => import("./AlphaPicker"));
 import Loading from "./Loading";
 
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("ALPHA");
+  const [activeItem, setActiveItem] = useState("SKETCH");
 
   const MenuItemWrapper = ({ navName }: { navName: string }) => {
     return (
       <Menu.Item
         name={navName.toUpperCase()}
         active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "ALPHA")}
+        onClick={(e, { name }) => setActiveItem(name ?? "SKETCH")}
       />
     );
   };
@@ -48,12 +47,9 @@ export default function App(): JSX.Element {
       <Menu attached="top" tabular>
         <MenuItemWrapper navName="WHEEL" />
         <MenuItemWrapper navName="SKETCH" />
-        <MenuItemWrapper navName="ALPHA" />
       </Menu>
       <Segment attached="bottom">
-        <Suspense fallback={<Loading />}>
-          {activeItem === "WHEEL" ? <WheelPicker /> : activeItem === "ALPHA" ? <AlphaPicker stats /> : <SketchPicker />}
-        </Suspense>
+        <Suspense fallback={<Loading />}>{activeItem === "WHEEL" ? <WheelPicker /> : <SketchPicker />}</Suspense>
       </Segment>
     </Container>
   );
