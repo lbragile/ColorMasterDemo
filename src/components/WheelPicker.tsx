@@ -3,7 +3,7 @@ import { CanvasContainer } from "../styles/Canvas";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import SliderGroupSelector from "./SliderGroupSelector";
-import { Grid } from "semantic-ui-react";
+import { Divider, Grid } from "semantic-ui-react";
 import { Ihsla } from "colormaster/types";
 import CM from "colormaster";
 
@@ -31,17 +31,20 @@ export default function WheelPicker({
   const drawColorWheel = useCallback(() => {
     if (colorWheel.current) {
       const ctx = colorWheel.current.getContext("2d");
+      const radScale = Math.PI / 180;
+
       if (ctx) {
         ctx.clearRect(0, 0, radius * 2, radius * 2);
+        for (let hue = 0; hue < 360; hue++) {
+          const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+          gradient.addColorStop(0, `hsla(${hue + rotate}, 0%, ${color.lightness}%, ${color.alpha})`);
+          gradient.addColorStop(1, `hsla(${hue + rotate}, 100%, ${color.lightness}%, ${color.alpha})`);
 
-        for (let sat = 100; sat > 0; sat -= 2) {
-          for (let hue = 0; hue < 360; hue++) {
-            ctx.beginPath();
-            ctx.moveTo(radius, radius);
-            ctx.arc(radius, radius, (sat * radius) / 100, (Math.PI / 180) * hue, (Math.PI / 180) * (hue + 1));
-            ctx.fillStyle = `hsla(${hue + rotate}, ${sat}%, ${color.lightness}%, ${color.alpha})`;
-            ctx.fill();
-          }
+          ctx.beginPath();
+          ctx.moveTo(radius, radius);
+          ctx.arc(radius, radius, radius, radScale * (hue - 1), radScale * (hue + 1));
+          ctx.fillStyle = gradient;
+          ctx.fill();
         }
       }
     }
@@ -143,9 +146,13 @@ export default function WheelPicker({
           ></canvas>
         </CanvasContainer>
 
-        <HuePicker width={400} height={25} color={color} setColor={setColor} />
+        <Divider hidden></Divider>
 
-        <AlphaPicker width={400} height={25} color={color} setColor={setColor} />
+        <HuePicker width={radius * 2} height={25} color={color} setColor={setColor} />
+
+        <Divider hidden></Divider>
+
+        <AlphaPicker width={radius * 2} height={25} color={color} setColor={setColor} />
       </Grid.Column>
     </Grid>
   );

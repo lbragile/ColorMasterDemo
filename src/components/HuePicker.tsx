@@ -7,8 +7,7 @@ interface IHuePicker {
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   width?: number;
   height?: number;
-  swatchColor?: ColorMaster;
-  setSwatchColor?: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setSketchColor?: React.Dispatch<React.SetStateAction<ColorMaster>>;
 }
 
 export default function HuePicker({
@@ -16,8 +15,7 @@ export default function HuePicker({
   setColor,
   width = 400,
   height = 25,
-  swatchColor,
-  setSwatchColor
+  setSketchColor
 }: IHuePicker): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
@@ -87,7 +85,7 @@ export default function HuePicker({
         const data = ctx.getImageData(x === width ? x - 1 : x, y === height ? y - 1 : y, 1, 1).data.slice(0, -1);
         const newColor = CM(`rgba(${data.join(", ")}, ${color.alpha})`);
         setColor(CM({ ...color.hsla(), h: newColor.hue }));
-        setSwatchColor?.(swatchColor?.hueTo(newColor.hue) ?? newColor);
+        setSketchColor?.(CM(`hsla(${newColor.hue}, 100%, 50%, 1)`));
       }
     }
   };

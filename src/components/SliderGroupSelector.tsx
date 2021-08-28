@@ -58,6 +58,31 @@ const StyledButton = styled(Button.Group)`
   }
 `;
 
+const SwatchPicker = styled(Segment)`
+  &.ui.segment {
+    & .swatch-color {
+      padding: 4px;
+
+      &,
+      & div {
+        margin: 0;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    & .grid {
+      display: block;
+
+      .row {
+        padding: 1px;
+      }
+    }
+  }
+`;
+
 interface ISliderGroupSelector {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
@@ -152,11 +177,80 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
 
   return (
     <Segment compact>
-      <Swatch
-        radius={50}
-        background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
-      />
+      <Grid columns={2} verticalAlign="middle" centered>
+        <Grid.Column width={6}>
+          <Swatch
+            radius={50}
+            background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
+          />
+        </Grid.Column>
+        <Grid.Column width={10}>
+          <SwatchPicker compact>
+            <Grid columns={5}>
+              <Grid.Row>
+                {[
+                  "hsl(0, 100%, 50%)",
+                  "hsl(30, 100%, 50%)",
+                  "hsl(60, 100%, 50%)",
+                  "hsl(90, 100%, 50%)",
+                  "hsl(0, 0%, 0%)"
+                ].map((background) => (
+                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
+                    <Swatch
+                      radius={15}
+                      borderColor="rgba(0,0,0,0.3)"
+                      borderRadius="4px"
+                      background={background}
+                      onClick={() => setColor(CM(background))}
+                    />
+                  </Grid.Column>
+                ))}
+              </Grid.Row>
+              <Grid.Row>
+                {[
+                  "hsl(120, 100%, 50%)",
+                  "hsl(150, 100%, 50%)",
+                  "hsl(180, 100%, 50%)",
+                  "hsl(210, 100%, 50%)",
+                  "hsl(0, 0%,50%)"
+                ].map((background) => (
+                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
+                    <Swatch
+                      radius={15}
+                      borderColor="rgba(0,0,0,0.3)"
+                      borderRadius="4px"
+                      background={background}
+                      onClick={() => setColor(CM(background))}
+                    />
+                  </Grid.Column>
+                ))}
+              </Grid.Row>
+              <Grid.Row>
+                {[
+                  "hsl(240, 100%, 50%)",
+                  "hsl(270, 100%, 50%)",
+                  "hsl(300, 100%, 50%)",
+                  "hsl(330, 100%, 50%)",
+                  "hsl(0, 0%, 100%)"
+                ].map((background) => (
+                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
+                    <Swatch
+                      radius={15}
+                      borderColor="rgba(0,0,0,0.3)"
+                      borderRadius="4px"
+                      background={background}
+                      onClick={() => setColor(CM(background))}
+                    />
+                  </Grid.Column>
+                ))}
+              </Grid.Row>
+            </Grid>
+          </SwatchPicker>
+        </Grid.Column>
+      </Grid>
+
       <Divider hidden />
+
       <Grid columns={3} verticalAlign="middle" stackable>
         <Grid.Column width={1}>
           <StyledButton vertical>

@@ -16,9 +16,9 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [sketchColor, setSketchColor] = useState(CM("rgba(200, 125, 50, 1)"));
-  const [swatchColor, setSwatchColor] = useState(sketchColor);
-  const [mouse, setMouse] = useState({ x: sketchColor.alpha * (width - 1), y: 0 });
+  const [color, setColor] = useState(CM("rgba(200, 125, 50, 1)"));
+  const [sketchColor, setSketchColor] = useState(color);
+  const [mouse, setMouse] = useState({ x: color.alpha * (width - 1), y: 0 });
 
   const drawColorSketch = useCallback(() => {
     if (colorSketch.current) {
@@ -48,7 +48,7 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
       const ctx = colorPicker.current.getContext("2d");
 
       if (ctx) {
-        if (mouse.x <= width && mouse.y <= width) {
+        if (mouse.x < width && mouse.y < width) {
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
           ctx.beginPath();
 
@@ -67,14 +67,7 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
 
   useEffect(() => {
     drawColorPicker();
-    if (colorSketch.current) {
-      const ctx = colorSketch.current.getContext("2d");
-      if (ctx) {
-        const data = ctx.getImageData(mouse.x, mouse.y, 1, 1).data.slice(0, -1);
-        setSwatchColor(CM(`rgba(${data.join(", ")}, 1)`));
-      }
-    }
-  }, [mouse, drawColorPicker]);
+  }, [drawColorPicker]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,9 +82,11 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
         const { left, top } = colorSketch.current.getBoundingClientRect();
         const [x, y] = [e.clientX - left, e.clientY - top];
         const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
-
-        const newColor = CM(`rgba(${data.join(", ")}, ${sketchColor.alpha})`);
-        setSwatchColor(newColor);
+        setColor(
+          CM(`rgb(${data.join(", ")})`)
+            .hueTo(sketchColor.hue)
+            .alphaTo(color.alpha)
+        ); // maintain hue of the sketch
         setMouse({ x, y });
       }
     }
@@ -106,7 +101,7 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
   return (
     <Grid columns={2} verticalAlign="middle">
       <Grid.Column>
-        <SliderGroupSelector color={sketchColor} setColor={setSketchColor} />
+        <SliderGroupSelector color={color} setColor={setColor} />
       </Grid.Column>
 
       <Grid.Column>
@@ -122,16 +117,8 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
           ></canvas>
         </CanvasContainer>
 
-        <HuePicker
-          width={width}
-          height={25}
-          color={sketchColor}
-          setColor={setSketchColor}
-          swatchColor={swatchColor}
-          setSwatchColor={setSwatchColor}
-        />
-
-        <AlphaPicker width={width} height={25} color={sketchColor} setColor={setSketchColor} />
+        <HuePicker width={width} height={25} color={color} setColor={setColor} setSketchColor={setSketchColor} />
+        <AlphaPicker width={width} height={25} color={color} setColor={setColor} />
       </Grid.Column>
     </Grid>
   );
