@@ -7,6 +7,7 @@ import RangeSlider from "./RangeSlider";
 import RGBSliderGroup from "./RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
+import useIsMobile from "../hooks/useIsMobile";
 
 const options = [
   { key: 1, text: "RGB", value: 1 },
@@ -26,9 +27,11 @@ const StatisticsContainer = styled.div`
 `;
 
 const StyledColorDisplay = styled(Input)`
-  &.ui.input {
+  && {
     & > input {
       text-align: center;
+      font-size: ${(props) => (props.mobile === "true" ? "0.95em" : "1em")};
+      padding: 0;
     }
 
     &.action button:hover,
@@ -58,27 +61,27 @@ const StyledButton = styled(Button.Group)`
   }
 `;
 
-const SwatchPicker = styled(Segment)`
-  &.ui.segment {
-    & .swatch-color {
-      padding: 4px;
+const SwatchSegment = styled(Segment)`
+  && {
+    margin: auto;
+    border: none;
+    box-shadow: none;
+    padding: 0;
 
-      &,
-      & div {
-        margin: 0;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
+    .left-swatch-arrow,
+    .right-swatch-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    & .grid {
-      display: block;
+    .left-swatch-arrow {
+      transform: translate(-100%, -50%);
+    }
 
-      .row {
-        padding: 1px;
-      }
+    .swatch-color:hover,
+    i:hover {
+      cursor: pointer;
     }
   }
 `;
@@ -89,10 +92,33 @@ interface ISliderGroupSelector {
   initPicker?: number;
 }
 
+const SWATCH_COLORS = [
+  "hsla(0, 100%, 50%, 1)",
+  "hsla(30, 100%, 50%, 1)",
+  "hsla(60, 100%, 50%, 1)",
+  "hsla(90, 100%, 50%, 1)",
+  "hsla(120, 100%, 50%, 1)",
+  "hsla(150, 100%, 50%, 1)",
+  "hsla(180, 100%, 50%, 1)",
+  "hsla(210, 100%, 50%, 1)",
+  "hsla(240, 100%, 50%, 1)",
+  "hsla(270, 100%, 50%, 1)",
+  "hsla(300, 100%, 50%, 1)",
+  "hsla(330, 100%, 50%, 1)",
+  "hsla(0, 0%, 100%, 1)",
+  "hsla(0, 0%, 75%, 1)",
+  "hsla(0, 0%,50%, 1)",
+  "hsla(0, 0%,25%, 1)",
+  "hsla(0, 0%, 0%, 1)"
+];
+
 export default function SliderGroupSelector({ color, setColor, initPicker = 1 }: ISliderGroupSelector): JSX.Element {
   const [picker, setPicker] = useState(initPicker);
   const [withAlpha, setWithAlpha] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [swatchIndex, setSwatchIndex] = useState(0);
+
+  const isMobile = useIsMobile();
 
   const handleSliderChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
@@ -177,81 +203,48 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
 
   return (
     <Segment compact>
-      <Grid columns={2} verticalAlign="middle" centered>
-        <Grid.Column width={6}>
-          <Swatch
-            radius={50}
-            background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
-          />
-        </Grid.Column>
-        <Grid.Column width={10}>
-          <SwatchPicker compact>
-            <Grid columns={5}>
-              <Grid.Row>
-                {[
-                  "hsl(0, 100%, 50%)",
-                  "hsl(30, 100%, 50%)",
-                  "hsl(60, 100%, 50%)",
-                  "hsl(90, 100%, 50%)",
-                  "hsl(0, 0%, 0%)"
-                ].map((background) => (
-                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
-                    <Swatch
-                      radius={15}
-                      borderColor="rgba(0,0,0,0.3)"
-                      borderRadius="4px"
-                      background={background}
-                      onClick={() => setColor(CM(background))}
-                    />
-                  </Grid.Column>
-                ))}
-              </Grid.Row>
-              <Grid.Row>
-                {[
-                  "hsl(120, 100%, 50%)",
-                  "hsl(150, 100%, 50%)",
-                  "hsl(180, 100%, 50%)",
-                  "hsl(210, 100%, 50%)",
-                  "hsl(0, 0%,50%)"
-                ].map((background) => (
-                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
-                    <Swatch
-                      radius={15}
-                      borderColor="rgba(0,0,0,0.3)"
-                      borderRadius="4px"
-                      background={background}
-                      onClick={() => setColor(CM(background))}
-                    />
-                  </Grid.Column>
-                ))}
-              </Grid.Row>
-              <Grid.Row>
-                {[
-                  "hsl(240, 100%, 50%)",
-                  "hsl(270, 100%, 50%)",
-                  "hsl(300, 100%, 50%)",
-                  "hsl(330, 100%, 50%)",
-                  "hsl(0, 0%, 100%)"
-                ].map((background) => (
-                  <Grid.Column className="swatch-color" key={background + "-swatch"}>
-                    <Swatch
-                      radius={15}
-                      borderColor="rgba(0,0,0,0.3)"
-                      borderRadius="4px"
-                      background={background}
-                      onClick={() => setColor(CM(background))}
-                    />
-                  </Grid.Column>
-                ))}
-              </Grid.Row>
-            </Grid>
-          </SwatchPicker>
-        </Grid.Column>
-      </Grid>
+      <Swatch
+        radius={50}
+        background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
+      />
 
       <Divider hidden />
 
-      <Grid columns={3} verticalAlign="middle" stackable>
+      <SwatchSegment compact size="mini">
+        <Icon
+          className="left-swatch-arrow"
+          size="large"
+          name="angle left"
+          disabled={swatchIndex === 0}
+          onClick={() => setSwatchIndex(swatchIndex - 1)}
+        />
+
+        {SWATCH_COLORS.slice(swatchIndex, swatchIndex + 9).map((background) => (
+          <Swatch
+            className="swatch-color"
+            key={background + "-swatch"}
+            title={background}
+            radius={15}
+            borderColor="rgba(0,0,0,0.3)"
+            borderRadius="4px"
+            display="inline-block"
+            background={background}
+            onClick={() => setColor(CM(background))}
+          />
+        ))}
+
+        <Icon
+          className="right-swatch-arrow"
+          size="large"
+          name="angle right"
+          disabled={swatchIndex === SWATCH_COLORS.length - 9}
+          onClick={() => setSwatchIndex(swatchIndex + 1)}
+        />
+      </SwatchSegment>
+
+      <Divider hidden />
+
+      <Grid columns={3} verticalAlign="middle" centered>
         <Grid.Column width={1}>
           <StyledButton vertical>
             <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
@@ -259,7 +252,7 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
           </StyledButton>
         </Grid.Column>
 
-        <Grid.Column width={8}>
+        <Grid.Column width={9}>
           <StyledDropdown
             icon={<Icon name="paint brush" color="grey" />}
             value={picker}
@@ -272,17 +265,18 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
           />
         </Grid.Column>
 
-        <Grid.Column width={6}>
+        <Grid.Column>
           <Checkbox label="Show Alpha" checked={withAlpha} onChange={() => setWithAlpha(!withAlpha)} />
         </Grid.Column>
       </Grid>
 
       <Divider hidden />
 
-      <StatisticsContainer key={currentSliders.name}>
+      <StatisticsContainer>
         <StyledColorDisplay
           type="text"
           value={currentSliders.value}
+          mobile={isMobile.toString()}
           spellCheck={false}
           size="large"
           readOnly

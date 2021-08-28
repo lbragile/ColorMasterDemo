@@ -61,6 +61,8 @@ export default function App(): JSX.Element {
         title="https://www.npmjs.com/package/colormaster"
         onClick={() => location.assign("https://www.npmjs.com/package/colormaster")}
       />
+
+      <Divider hidden />
     </Container>
   );
 }

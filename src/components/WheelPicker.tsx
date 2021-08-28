@@ -37,6 +37,7 @@ export default function WheelPicker({
         ctx.clearRect(0, 0, radius * 2, radius * 2);
         const [x, y] = [radius, radius];
         const { l, a } = color.hsla();
+
         for (let hue = 0; hue < 360; hue++) {
           const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
           gradient.addColorStop(0, `hsla(${hue + rotate}, 0%, ${l}%, ${a})`);
@@ -48,6 +49,12 @@ export default function WheelPicker({
           ctx.fillStyle = gradient;
           ctx.fill();
         }
+
+        // draw a faint border around the color wheel so that it is "visible" at all times
+        ctx.beginPath();
+        ctx.strokeStyle = "hsla(0, 0%, 95%, 1)";
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.stroke();
       }
     }
   }, [radius, rotate, color]);

@@ -1,7 +1,14 @@
 import React from "react";
 import { TFormat } from "colormaster/types";
-import { Input } from "semantic-ui-react";
+import { Grid, Input } from "semantic-ui-react";
 import styled from "styled-components";
+import useIsMobile from "../hooks/useIsMobile";
+
+const StyledGrid = styled(Grid)`
+  &&& .slider-input-col {
+    padding: 0 0 0 8px;
+  }
+`;
 
 const SliderInput = styled.input.attrs((props) => {
   const val = Number(props.value ?? 0);
@@ -16,7 +23,7 @@ const SliderInput = styled.input.attrs((props) => {
   };
 })`
   -webkit-appearance: none;
-  width: 200px;
+  width: 100%;
   height: 8px;
   border-radius: 12px;
 
@@ -35,43 +42,32 @@ const SliderInput = styled.input.attrs((props) => {
 `;
 
 const NumberInput = styled(Input)`
-  margin-left: 10px;
+  && > input {
+    width: 100%;
+    height: 36px;
+    text-align: ${(props) => (props.format === "hex" || props.mobile === "true" ? "center" : "left")};
+    padding: 6px;
+    padding-left: ${(props) => (props.format === "hex" ? "" : props.mobile === "true" ? "0.2em" : "1.5em")};
+    font-size: ${(props) => (props.mobile === "true" ? "0.925em" : "1em")};
 
-  &.ui.input {
-    & > input {
-      width: 11ch;
-      text-align: ${(props) => (props.format === "hex" ? "center" : "left")};
-      padding-left: ${(props) => (props.format === "hex" ? "" : "2.2em")};
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      opacity: 1;
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
 
-      &::-webkit-outer-spin-button,
-      &::-webkit-inner-spin-button {
-        opacity: 1;
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        height: 50%;
-
-        &:hover {
-          cursor: pointer;
-        }
+      &:hover {
+        cursor: pointer;
       }
     }
   }
 
-  & .ui.label {
-    width: 4ch;
+  & .label {
+    width: 2.5ch;
     text-align: center;
-  }
-`;
-
-const SliderContainer = styled.div`
-  & > span {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-right: 10px;
-    display: inline-block;
-    width: 1ch;
+    padding: 1px;
   }
 `;
 
@@ -106,6 +102,8 @@ export default function RangeSlider({
     return format === "hex" && strVal.length === 1 ? "0" + strVal : strVal;
   }
 
+  const isMobile = useIsMobile();
+
   const CommonProps = {
     min,
     max,
@@ -129,12 +127,20 @@ export default function RangeSlider({
   };
 
   return (
-    <SliderContainer>
-      <span>{title}</span>
+    <StyledGrid verticalAlign="middle">
+      <Grid.Row>
+        <Grid.Column>
+          <h4>{title}</h4>
+        </Grid.Column>
 
-      <SliderInput {...SliderInputProps} />
+        <Grid.Column className="slider-input-col" width={10}>
+          <SliderInput {...SliderInputProps} />
+        </Grid.Column>
 
-      <NumberInput {...NumberInputProps} />
-    </SliderContainer>
+        <Grid.Column width={4}>
+          <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
+        </Grid.Column>
+      </Grid.Row>
+    </StyledGrid>
   );
 }
