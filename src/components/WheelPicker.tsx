@@ -35,14 +35,16 @@ export default function WheelPicker({
 
       if (ctx) {
         ctx.clearRect(0, 0, radius * 2, radius * 2);
+        const [x, y] = [radius, radius];
+        const { l, a } = color.hsla();
         for (let hue = 0; hue < 360; hue++) {
-          const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
-          gradient.addColorStop(0, `hsla(${hue + rotate}, 0%, ${color.lightness}%, ${color.alpha})`);
-          gradient.addColorStop(1, `hsla(${hue + rotate}, 100%, ${color.lightness}%, ${color.alpha})`);
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          gradient.addColorStop(0, `hsla(${hue + rotate}, 0%, ${l}%, ${a})`);
+          gradient.addColorStop(1, `hsla(${hue + rotate}, 100%, ${l}%, ${a})`);
 
           ctx.beginPath();
-          ctx.moveTo(radius, radius);
-          ctx.arc(radius, radius, radius, radScale * (hue - 1), radScale * (hue + 1));
+          ctx.moveTo(x, y);
+          ctx.arc(x, y, radius, radScale * (hue - 1), radScale * (hue + 1));
           ctx.fillStyle = gradient;
           ctx.fill();
         }
@@ -108,12 +110,12 @@ export default function WheelPicker({
     };
   }, [color, mouse, drawColorPicker]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
     canDrag.current = true;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (colorWheel.current && canDrag.current) {
       const { left, top } = colorWheel.current.getBoundingClientRect();
@@ -121,28 +123,28 @@ export default function WheelPicker({
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handlePointerUp = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleMouseMove(e);
+    handlePointerMove(e);
     canDrag.current = false;
   };
 
   return (
-    <Grid columns={2} verticalAlign="middle">
+    <Grid columns={2} verticalAlign="middle" stackable>
       <Grid.Column>
         <SliderGroupSelector color={color} setColor={setColor} initPicker={3} />
       </Grid.Column>
 
       <Grid.Column>
-        <CanvasContainer height={radius * 2}>
+        <CanvasContainer width={2 * radius} height={2 * radius}>
           <canvas width={2 * radius} height={2 * radius} ref={colorWheel}></canvas>
           <canvas
             width={2 * radius}
             height={2 * radius}
             ref={colorPicker}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
           ></canvas>
         </CanvasContainer>
 

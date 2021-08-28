@@ -68,12 +68,12 @@ export default function HuePicker({
     drawColorPicker();
   }, [drawColorPicker]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
     canDrag.current = true;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (colorHue.current && canDrag.current) {
       const ctx = colorHue.current.getContext("2d");
@@ -90,9 +90,9 @@ export default function HuePicker({
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handlePointerUp = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleMouseMove(e);
+    handlePointerMove(e);
     canDrag.current = false;
   };
 
@@ -104,9 +104,9 @@ export default function HuePicker({
           width={width}
           height={height}
           ref={colorPicker}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
         ></canvas>
       </CanvasContainer>
     </>

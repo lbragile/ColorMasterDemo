@@ -1,8 +1,13 @@
 import styled from "styled-components";
 
-export const CanvasContainer = styled.div.attrs((props: { height: number }) => props)`
+// * touch-action: none → https://stackoverflow.com/a/48254578/4298115
+
+export const CanvasContainer = styled.div.attrs((props: { width: number; height: number }) => props)`
   position: relative;
+  width: ${(props) => (props.width ?? 400) + "px"};
   height: ${(props) => (props.height ?? 400) + "px"};
+  touch-action: none;
+  background: transparent;
 
   & canvas {
     position: absolute;

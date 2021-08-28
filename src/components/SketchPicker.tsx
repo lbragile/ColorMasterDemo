@@ -69,12 +69,12 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
     drawColorPicker();
   }, [drawColorPicker]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
     canDrag.current = true;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (colorSketch.current && canDrag.current) {
       const ctx = colorSketch.current.getContext("2d");
@@ -92,32 +92,33 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handlePointerUp = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleMouseMove(e);
+    handlePointerMove(e);
     canDrag.current = false;
   };
 
   return (
-    <Grid columns={2} verticalAlign="middle">
+    <Grid columns={2} verticalAlign="middle" stackable>
       <Grid.Column>
         <SliderGroupSelector color={color} setColor={setColor} />
       </Grid.Column>
 
       <Grid.Column>
-        <CanvasContainer height={width}>
+        <CanvasContainer width={width} height={width}>
           <canvas width={width} height={width} ref={colorSketch}></canvas>
           <canvas
             width={width}
             height={width}
             ref={colorPicker}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
           ></canvas>
         </CanvasContainer>
 
         <HuePicker width={width} height={25} color={color} setColor={setColor} setSketchColor={setSketchColor} />
+
         <AlphaPicker width={width} height={25} color={color} setColor={setColor} />
       </Grid.Column>
     </Grid>
