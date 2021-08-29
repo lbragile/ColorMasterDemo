@@ -8,11 +8,13 @@ export const CanvasContainer = styled.div.attrs((props: { width: number; height:
   height: ${(props) => (props.height ?? 400) + "px"};
   touch-action: none;
   background: transparent;
+  margin: auto;
 
   & canvas {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
 
     &:first-child {
       z-index: 0;

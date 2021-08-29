@@ -2,21 +2,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import SliderGroupSelector from "./SliderGroupSelector";
-import { Grid } from "semantic-ui-react";
-import CM from "colormaster";
+import CM, { ColorMaster } from "colormaster";
+import { Divider } from "semantic-ui-react";
 
 interface ISketchPicker {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   width?: number;
   pickerRadius?: number;
 }
 
-export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchPicker): JSX.Element {
+export default function SketchPicker({ color, setColor, width = 400, pickerRadius = 5 }: ISketchPicker): JSX.Element {
   const colorSketch = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [color, setColor] = useState(CM("rgba(200, 125, 50, 1)"));
   const [sketchColor, setSketchColor] = useState(color);
   const [mouse, setMouse] = useState({ x: color.alpha * (width - 1), y: 0 });
 
@@ -39,6 +39,11 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
         blackGradient.addColorStop(1, "rgba(0,0,0,1)");
         ctx.fillStyle = blackGradient;
         ctx.fillRect(0, 0, width, width);
+
+        // draw a faint border around the sketch picker
+        ctx.beginPath();
+        ctx.strokeStyle = "hsla(0, 0%, 90%, 1)";
+        ctx.strokeRect(0, 0, width, width);
       }
     }
   }, [sketchColor, width]);
@@ -49,7 +54,7 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
 
       if (ctx) {
         if (mouse.x < width && mouse.y < width) {
-          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+          ctx.clearRect(0, 0, width, width);
           ctx.beginPath();
 
           ctx.lineWidth = 2;
@@ -99,28 +104,24 @@ export default function SketchPicker({ width = 400, pickerRadius = 5 }: ISketchP
   };
 
   return (
-    <Grid columns={2} verticalAlign="middle" stackable>
-      <Grid.Column>
-        <SliderGroupSelector color={color} setColor={setColor} />
-      </Grid.Column>
+    <>
+      <CanvasContainer width={width} height={width}>
+        <canvas width={width} height={width} ref={colorSketch}></canvas>
+        <canvas
+          width={width}
+          height={width}
+          ref={colorPicker}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        ></canvas>
+      </CanvasContainer>
 
-      <Grid.Column>
-        <CanvasContainer width={width} height={width}>
-          <canvas width={width} height={width} ref={colorSketch}></canvas>
-          <canvas
-            width={width}
-            height={width}
-            ref={colorPicker}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-          ></canvas>
-        </CanvasContainer>
+      <Divider hidden></Divider>
 
-        <HuePicker width={width} height={25} color={color} setColor={setColor} setSketchColor={setSketchColor} />
+      <HuePicker width={width} height={15} color={color} setColor={setColor} setSketchColor={setSketchColor} />
 
-        <AlphaPicker width={width} height={25} color={color} setColor={setColor} />
-      </Grid.Column>
-    </Grid>
+      <AlphaPicker width={width} height={15} color={color} setColor={setColor} />
+    </>
   );
 }

@@ -127,13 +127,13 @@ export default function RangeSlider({
   };
 
   return (
-    <StyledGrid verticalAlign="middle">
+    <StyledGrid verticalAlign="middle" centered>
       <Grid.Row>
         <Grid.Column>
           <h4>{title}</h4>
         </Grid.Column>
 
-        <Grid.Column className="slider-input-col" width={10}>
+        <Grid.Column className="slider-input-col" width={8}>
           <SliderInput {...SliderInputProps} />
         </Grid.Column>
 

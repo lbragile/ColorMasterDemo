@@ -2,26 +2,26 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CanvasContainer } from "../styles/Canvas";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import SliderGroupSelector from "./SliderGroupSelector";
-import { Divider, Grid } from "semantic-ui-react";
+import { Divider } from "semantic-ui-react";
 import { Ihsla } from "colormaster/types";
-import CM from "colormaster";
+import CM, { ColorMaster } from "colormaster";
 
 interface IWheelPicker {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   radius?: number;
   pickerRadius?: number;
   rotate?: number;
-  initRGB?: [number, number, number];
 }
 
 export default function WheelPicker({
+  color,
+  setColor,
   radius = 200,
   pickerRadius = 5,
-  rotate = 90,
-  initRGB = [200, 125, 50]
+  rotate = 90
 }: IWheelPicker): JSX.Element {
   const [mouse, setMouse] = useState({ x: radius, y: 50 });
-  const [color, setColor] = useState(CM(`rgba(${initRGB[0]}, ${initRGB[1]}, ${initRGB[2]}, 1)`));
 
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
@@ -96,7 +96,7 @@ export default function WheelPicker({
         }
       }
     },
-    [pickerRadius, radius, rotate]
+    [pickerRadius, radius, rotate, setColor]
   );
 
   useEffect(() => {
@@ -137,32 +137,24 @@ export default function WheelPicker({
   };
 
   return (
-    <Grid columns={2} verticalAlign="middle" stackable>
-      <Grid.Column>
-        <SliderGroupSelector color={color} setColor={setColor} initPicker={3} />
-      </Grid.Column>
+    <>
+      <CanvasContainer width={2 * radius} height={2 * radius}>
+        <canvas width={2 * radius} height={2 * radius} ref={colorWheel}></canvas>
+        <canvas
+          width={2 * radius}
+          height={2 * radius}
+          ref={colorPicker}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        ></canvas>
+      </CanvasContainer>
 
-      <Grid.Column>
-        <CanvasContainer width={2 * radius} height={2 * radius}>
-          <canvas width={2 * radius} height={2 * radius} ref={colorWheel}></canvas>
-          <canvas
-            width={2 * radius}
-            height={2 * radius}
-            ref={colorPicker}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-          ></canvas>
-        </CanvasContainer>
+      <Divider hidden></Divider>
 
-        <Divider hidden></Divider>
+      <HuePicker width={radius * 2} height={15} color={color} setColor={setColor} />
 
-        <HuePicker width={radius * 2} height={25} color={color} setColor={setColor} />
-
-        <Divider hidden></Divider>
-
-        <AlphaPicker width={radius * 2} height={25} color={color} setColor={setColor} />
-      </Grid.Column>
-    </Grid>
+      <AlphaPicker width={radius * 2} height={15} color={color} setColor={setColor} />
+    </>
   );
 }

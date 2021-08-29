@@ -21,7 +21,7 @@ export default function AlphaPicker({ color, setColor, width = 400, height = 25 
   function drawCheckeredBackground(ctx: CanvasRenderingContext2D) {
     let { width: w, height: h } = ctx.canvas;
 
-    const cols = 50;
+    const cols = 20;
 
     w /= cols; // width of a block
     h /= 2; // height of a block

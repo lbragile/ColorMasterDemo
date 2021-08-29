@@ -18,5 +18,5 @@ export const Swatch = styled.div.attrs(
   border-radius: ${(props) => props.borderRadius ?? "50%"};
   border: ${(props) => props.borderColor ?? "hsla(0, 0%, 95%, 1)"} 1px solid;
   display: ${(props) => props.display ?? "block"};
-  margin: 10px ${(props) => (props.display ? "2px" : "auto")};
+  margin: 0 ${(props) => (props.display ? "2px" : "auto")};
 `;

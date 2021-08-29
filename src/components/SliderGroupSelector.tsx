@@ -8,23 +8,20 @@ import RGBSliderGroup from "./RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
 import useIsMobile from "../hooks/useIsMobile";
+import SketchPicker from "./SketchPicker";
+import WheelPicker from "./WheelPicker";
 
-const options = [
+const colorspaceOptions = [
   { key: 1, text: "RGB", value: 1 },
   { key: 2, text: "HEX", value: 2 },
   { key: 3, text: "HSL", value: 3 }
 ];
 
-const StatisticsContainer = styled.div`
-  & > input {
-    display: block;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid black;
-    text-align: center;
-    width: 30ch;
-  }
-`;
+const pickerTypeOptions = [
+  { key: 1, text: "SLIDER", value: 1 },
+  { key: 2, text: "SKETCH", value: 2 },
+  { key: 3, text: "WHEEL", value: 3 }
+];
 
 const StyledColorDisplay = styled(Input)`
   && {
@@ -72,11 +69,11 @@ const SwatchSegment = styled(Segment)`
     .right-swatch-arrow {
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-60%);
     }
 
     .left-swatch-arrow {
-      transform: translate(-100%, -50%);
+      transform: translate(-100%, -60%);
     }
 
     .swatch-color:hover,
@@ -89,6 +86,8 @@ const SwatchSegment = styled(Segment)`
 interface ISliderGroupSelector {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  label: JSX.Element;
+  initColorspace?: number;
   initPicker?: number;
 }
 
@@ -112,11 +111,18 @@ const SWATCH_COLORS = [
   "hsla(0, 0%, 0%, 1)"
 ];
 
-export default function SliderGroupSelector({ color, setColor, initPicker = 1 }: ISliderGroupSelector): JSX.Element {
-  const [picker, setPicker] = useState(initPicker);
-  const [withAlpha, setWithAlpha] = useState(true);
+export default function SliderGroupSelector({
+  color,
+  setColor,
+  label,
+  initColorspace = 1,
+  initPicker = 1
+}: ISliderGroupSelector): JSX.Element {
+  const [alpha, setAlpha] = useState(true);
   const [copied, setCopied] = useState(false);
   const [swatchIndex, setSwatchIndex] = useState(0);
+  const [colorspace, setColorspace] = useState(initColorspace);
+  const [pickerType, setPickerType] = useState(initPicker);
 
   const isMobile = useIsMobile();
 
@@ -140,11 +146,11 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
             a: 1
           };
 
-      newColor.a = type === "alpha" ? val / (picker === 2 ? 255 : 100) : color.alpha;
+      newColor.a = type === "alpha" ? val / (colorspace === 2 ? 255 : 100) : color.alpha;
 
       setColor(CM(newColor));
     },
-    [color, picker, setColor]
+    [color, setColor, colorspace]
   );
 
   const copyAction = useMemo(
@@ -174,133 +180,177 @@ export default function SliderGroupSelector({ color, setColor, initPicker = 1 }:
     const possibleSliders = [
       {
         name: "rgb-sliders",
-        value: color.stringRGB({ alpha: withAlpha, precision: [2, 2, 2, 2] }),
+        value: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),
         sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
       },
       {
         name: "hex-sliders",
-        value: color.stringHEX({ alpha: withAlpha }),
+        value: color.stringHEX({ alpha }),
         sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} format="hex" />
       },
       {
         name: "hsl-sliders",
-        value: color.stringHSL({ alpha: withAlpha, precision: [2, 2, 2, 2] }),
+        value: color.stringHSL({ alpha, precision: [2, 2, 2, 2] }),
         sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
       }
     ];
 
-    return possibleSliders[picker - 1];
-  }, [picker, color, withAlpha, handleSliderChange]);
+    return possibleSliders[colorspace - 1];
+  }, [colorspace, color, alpha, handleSliderChange]);
+
+  const handleColorspaceAdjustment = (dir: "up" | "down") => {
+    const numOptions = Object.keys(colorspaceOptions).length;
+    if (dir === "down") {
+      setColorspace(colorspace === 1 ? numOptions : colorspace - 1);
+    } else {
+      setColorspace(colorspace === numOptions ? 1 : colorspace + 1);
+    }
+  };
 
   const handlePickerAdjustment = (dir: "up" | "down") => {
-    const numOptions = Object.keys(options).length;
+    const numOptions = Object.keys(pickerTypeOptions).length;
     if (dir === "down") {
-      setPicker(picker === 1 ? numOptions : picker - 1);
+      setPickerType(pickerType === 1 ? numOptions : pickerType - 1);
     } else {
-      setPicker(picker === numOptions ? 1 : picker + 1);
+      setPickerType(pickerType === numOptions ? 1 : pickerType + 1);
     }
   };
 
   return (
-    <Segment compact>
-      <Swatch
-        radius={50}
-        background={picker === 1 ? color.stringRGB() : picker === 2 ? color.stringHEX() : color.stringHSL()}
-      />
+    <Segment>
+      {label}
 
-      <Divider hidden />
-
-      <SwatchSegment compact size="mini">
-        <Icon
-          className="left-swatch-arrow"
-          size="large"
-          name="angle left"
-          disabled={swatchIndex === 0}
-          onClick={() => setSwatchIndex(swatchIndex - 1)}
-        />
-
-        {SWATCH_COLORS.slice(swatchIndex, swatchIndex + 9).map((background) => (
+      <Grid verticalAlign="middle" centered>
+        <Grid.Row>
           <Swatch
-            className="swatch-color"
-            key={background + "-swatch"}
-            title={background}
-            radius={15}
-            borderColor="rgba(0,0,0,0.3)"
-            borderRadius="4px"
-            display="inline-block"
-            background={background}
-            onClick={() => setColor(CM(background))}
+            radius={50}
+            background={colorspace === 1 ? color.stringRGB() : colorspace === 2 ? color.stringHEX() : color.stringHSL()}
           />
-        ))}
+        </Grid.Row>
+        <Grid.Row>
+          <SwatchSegment compact size="mini">
+            <Icon
+              className="left-swatch-arrow"
+              size="large"
+              name="angle left"
+              disabled={swatchIndex === 0}
+              onClick={() => setSwatchIndex(swatchIndex - 1)}
+            />
 
-        <Icon
-          className="right-swatch-arrow"
-          size="large"
-          name="angle right"
-          disabled={swatchIndex === SWATCH_COLORS.length - 9}
-          onClick={() => setSwatchIndex(swatchIndex + 1)}
-        />
-      </SwatchSegment>
+            {SWATCH_COLORS.slice(swatchIndex, swatchIndex + 7).map((background) => (
+              <Swatch
+                className="swatch-color"
+                key={background + "-swatch"}
+                title={background}
+                radius={15}
+                borderColor="rgba(0,0,0,0.3)"
+                borderRadius="4px"
+                display="inline-block"
+                background={background}
+                onClick={() => setColor(CM(background))}
+              />
+            ))}
 
-      <Divider hidden />
+            <Icon
+              className="right-swatch-arrow"
+              size="large"
+              name="angle right"
+              disabled={swatchIndex === SWATCH_COLORS.length - 7}
+              onClick={() => setSwatchIndex(swatchIndex + 1)}
+            />
+          </SwatchSegment>
+        </Grid.Row>
 
-      <Grid columns={3} verticalAlign="middle" centered>
-        <Grid.Column width={1}>
-          <StyledButton vertical>
-            <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
-            <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
-          </StyledButton>
-        </Grid.Column>
+        <Grid.Row>
+          <Grid.Column width={1}>
+            <StyledButton vertical>
+              <Button icon="angle up" basic onClick={() => handleColorspaceAdjustment("up")} />
+              <Button icon="angle down" basic onClick={() => handleColorspaceAdjustment("down")} />
+            </StyledButton>
+          </Grid.Column>
 
-        <Grid.Column width={9}>
-          <StyledDropdown
-            icon={<Icon name="paint brush" color="grey" />}
-            value={picker}
-            options={options}
-            labeled
-            selection
-            scrolling
-            fluid
-            onChange={(e: React.ChangeEvent, { value }: { value: number }) => setPicker(value)}
-          />
-        </Grid.Column>
+          <Grid.Column width={6}>
+            <StyledDropdown
+              icon={<Icon name="paint brush" color="grey" />}
+              value={colorspace}
+              options={colorspaceOptions}
+              labeled
+              selection
+              scrolling
+              fluid
+              onChange={(e: React.ChangeEvent, { value }: { value: number }) => setColorspace(value)}
+            />
+          </Grid.Column>
 
-        <Grid.Column>
-          <Checkbox label="Show Alpha" checked={withAlpha} onChange={() => setWithAlpha(!withAlpha)} />
-        </Grid.Column>
+          <Grid.Column width={1}>
+            <StyledButton vertical>
+              <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
+              <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
+            </StyledButton>
+          </Grid.Column>
+
+          <Grid.Column width={6}>
+            <StyledDropdown
+              icon={<Icon name="crosshairs" color="grey" />}
+              value={pickerType}
+              options={pickerTypeOptions}
+              labeled
+              selection
+              scrolling
+              fluid
+              onChange={(e: React.ChangeEvent, { value }: { value: number }) => setPickerType(value)}
+            />
+          </Grid.Column>
+        </Grid.Row>
+
+        <Grid.Row columns={2} centered>
+          <Grid.Column width={12}>
+            <StyledColorDisplay
+              type="text"
+              value={currentSliders.value}
+              mobile={isMobile.toString()}
+              spellCheck={false}
+              size="large"
+              readOnly
+              fluid
+              action={copyAction(currentSliders.value)}
+            />
+          </Grid.Column>
+
+          <Grid.Column width={2}>
+            <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
+          </Grid.Column>
+        </Grid.Row>
       </Grid>
 
-      <Divider hidden />
-
-      <StatisticsContainer>
-        <StyledColorDisplay
-          type="text"
-          value={currentSliders.value}
-          mobile={isMobile.toString()}
-          spellCheck={false}
-          size="large"
-          readOnly
-          fluid
-          action={copyAction(currentSliders.value)}
-        />
-
-        <Divider hidden />
-
-        {currentSliders.sliders}
-      </StatisticsContainer>
-
-      {withAlpha && (
+      {pickerType === 2 ? (
         <>
           <Divider hidden />
-          <RangeSlider
-            value={color.alpha * (picker === 2 ? 255 : 100)}
-            color="rgba(0,0,0,0.5)"
-            title="A"
-            max={picker === 2 ? "255" : "100"}
-            format={picker === 2 ? "hex" : undefined}
-            postfix={picker === 2 ? "" : "%"}
-            onChange={(e) => handleSliderChange(e, "alpha")}
-          />
+          <SketchPicker width={200} color={color} setColor={setColor} />
+        </>
+      ) : pickerType === 3 ? (
+        <>
+          <Divider hidden />
+          <WheelPicker radius={100} color={color} setColor={setColor} />
+        </>
+      ) : (
+        <>
+          {currentSliders.sliders}
+
+          {alpha && (
+            <>
+              <Divider hidden />
+              <RangeSlider
+                value={color.alpha * (colorspace === 2 ? 255 : 100)}
+                color="rgba(0,0,0,0.5)"
+                title="A"
+                max={colorspace === 2 ? "255" : "100"}
+                format={colorspace === 2 ? "hex" : undefined}
+                postfix={colorspace === 2 ? "" : "%"}
+                onChange={(e) => handleSliderChange(e, "alpha")}
+              />
+            </>
+          )}
         </>
       )}
     </Segment>

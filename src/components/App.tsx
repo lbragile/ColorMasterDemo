@@ -1,32 +1,40 @@
-import React, { lazy, Suspense, useState } from "react";
-import { Container, Divider, Icon, Menu, Segment } from "semantic-ui-react";
+import React, { lazy, Suspense } from "react";
+import { Container, Divider, Icon, Tab } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
 import { dependencies } from "../../package.json";
-
-const WheelPicker = lazy(() => import("./WheelPicker"));
-const SketchPicker = lazy(() => import("./SketchPicker"));
 import Loading from "./Loading";
+
+const ContrastAnalysis = lazy(() => import("./ContrastAnalysis"));
 
 const LinkIcon = styled(Icon)`
   cursor: pointer;
 `;
 
+const StyledContainer = styled(Container)`
+  && {
+    width: 90%;
+    max-width: 95%;
+  }
+`;
+
+const panes = [
+  {
+    menuItem: "Contrast",
+    // eslint-disable-next-line react/display-name
+    render: () => (
+      <Suspense fallback={<Loading />}>
+        <Tab.Pane>
+          <ContrastAnalysis />
+        </Tab.Pane>
+      </Suspense>
+    )
+  }
+];
+
 export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("WHEEL");
-
-  const MenuItemWrapper = ({ navName }: { navName: string }) => {
-    return (
-      <Menu.Item
-        name={navName.toUpperCase()}
-        active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "WHEEL")}
-      />
-    );
-  };
-
   return (
-    <Container>
+    <StyledContainer>
       <GlobalStyle />
 
       <Divider hidden />
@@ -35,13 +43,7 @@ export default function App(): JSX.Element {
 
       <Divider hidden />
 
-      <Menu attached="top" tabular>
-        <MenuItemWrapper navName="WHEEL" />
-        <MenuItemWrapper navName="SKETCH" />
-      </Menu>
-      <Segment attached="bottom">
-        <Suspense fallback={<Loading />}>{activeItem === "WHEEL" ? <WheelPicker /> : <SketchPicker />}</Suspense>
-      </Segment>
+      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} />
 
       <Divider hidden />
 
@@ -63,6 +65,6 @@ export default function App(): JSX.Element {
       />
 
       <Divider hidden />
-    </Container>
+    </StyledContainer>
   );
 }
