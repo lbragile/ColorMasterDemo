@@ -282,13 +282,6 @@ export default function SliderGroupSelector({
             />
           </Grid.Column>
 
-          <Grid.Column width={1}>
-            <StyledButton vertical>
-              <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
-              <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
-            </StyledButton>
-          </Grid.Column>
-
           <Grid.Column width={6}>
             <StyledDropdown
               icon={<Icon name="crosshairs" color="grey" />}
@@ -300,6 +293,13 @@ export default function SliderGroupSelector({
               fluid
               onChange={(e: React.ChangeEvent, { value }: { value: number }) => setPickerType(value)}
             />
+          </Grid.Column>
+
+          <Grid.Column width={1}>
+            <StyledButton vertical>
+              <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
+              <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
+            </StyledButton>
           </Grid.Column>
         </Grid.Row>
 
@@ -326,12 +326,12 @@ export default function SliderGroupSelector({
       {pickerType === 2 ? (
         <>
           <Divider hidden />
-          <SketchPicker width={200} color={color} setColor={setColor} />
+          <SketchPicker color={color} setColor={setColor} />
         </>
       ) : pickerType === 3 ? (
         <>
           <Divider hidden />
-          <WheelPicker radius={100} color={color} setColor={setColor} />
+          <WheelPicker color={color} setColor={setColor} />
         </>
       ) : (
         <>

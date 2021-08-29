@@ -1,79 +1,54 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { CanvasContainer } from "../styles/Canvas";
 import CM, { ColorMaster } from "colormaster";
+import useCanvasContext from "../hooks/useCanvasContext";
+import { drawCheckeredBackground } from "../utils/alphaBackground";
 
 interface IAlphaPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  width?: number;
   height?: number;
-  initRGB?: [number, number, number, number?];
 }
 
-export default function AlphaPicker({ color, setColor, width = 400, height = 25 }: IAlphaPicker): JSX.Element {
-  const colorHue = useRef<HTMLCanvasElement>(null);
+export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPicker): JSX.Element {
+  const colorAlpha = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [mouse, setMouse] = useState({ x: width / 2, y: height / 2 });
-
-  // https://stackoverflow.com/a/27667424/4298115
-  function drawCheckeredBackground(ctx: CanvasRenderingContext2D) {
-    let { width: w, height: h } = ctx.canvas;
-
-    const cols = 20;
-
-    w /= cols; // width of a block
-    h /= 2; // height of a block
-
-    for (let j = 0; j < cols; j++) {
-      ctx.rect(2 * j * w, 0, w, h); // first row
-      ctx.rect((2 * j + 1) * w, h, w, h); // second row
-    }
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.fill();
-  }
+  const [ctxAlpha, ctxPicker] = useCanvasContext(colorAlpha, colorPicker, height);
 
   const drawColorAlpha = useCallback(() => {
-    if (colorHue.current) {
-      const ctx = colorHue.current.getContext("2d");
-      if (ctx) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.beginPath();
-        drawCheckeredBackground(ctx);
+    if (ctxAlpha) {
+      const { width } = ctxAlpha.canvas;
+      ctxAlpha.clearRect(0, 0, width, height);
+      ctxAlpha.beginPath();
+      drawCheckeredBackground(ctxAlpha);
 
-        ctx.rect(0, 0, width, height);
-        const gradient = ctx.createLinearGradient(0, 0, width, 0);
-        const { r, g, b } = color.rgba();
-        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
+      ctxAlpha.rect(0, 0, width, height);
+      const gradient = ctxAlpha.createLinearGradient(0, 0, width, 0);
+      const { r, g, b } = color.rgba();
+      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+      ctxAlpha.fillStyle = gradient;
+      ctxAlpha.fill();
     }
-  }, [color, height, width]);
+  }, [height, color, ctxAlpha]);
 
   const drawColorPicker = useCallback(() => {
-    if (colorPicker.current) {
-      const ctx = colorPicker.current.getContext("2d");
+    if (ctxPicker) {
+      const { width } = ctxPicker.canvas;
 
-      if (ctx) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.beginPath();
+      ctxPicker.clearRect(0, 0, width, height);
+      ctxPicker.beginPath();
+      ctxPicker.arc(color.alpha * width, height / 2, height / 2, 0, 2 * Math.PI);
 
-        ctx.arc(color.alpha * width, height / 2, height / 2, 0, 2 * Math.PI);
-
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "hsla(0, 0%, 50%, 0.6)";
-        ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.stroke();
-
-        ctx.closePath();
-      }
+      ctxPicker.lineWidth = 2;
+      ctxPicker.fillStyle = "hsla(0, 0%, 50%, 0.6)";
+      ctxPicker.fill();
+      ctxPicker.strokeStyle = "#fff";
+      ctxPicker.stroke();
     }
-  }, [width, height, color]);
+  }, [height, color, ctxPicker]);
 
   useEffect(() => {
     drawColorAlpha();
@@ -81,7 +56,7 @@ export default function AlphaPicker({ color, setColor, width = 400, height = 25 
 
   useEffect(() => {
     drawColorPicker();
-  }, [mouse, drawColorPicker]);
+  }, [drawColorPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,15 +65,11 @@ export default function AlphaPicker({ color, setColor, width = 400, height = 25 
 
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (colorHue.current && canDrag.current) {
-      const ctx = colorHue.current.getContext("2d");
-
-      if (ctx) {
-        const { left, top } = colorHue.current.getBoundingClientRect();
-        const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
-        setMouse({ x, y });
-        setColor(CM(`rgba(${color.red}, ${color.green}, ${color.blue}, ${x / (width - 1)})`));
-      }
+    if (canDrag.current && ctxAlpha) {
+      const { width } = ctxAlpha.canvas;
+      const { left } = ctxAlpha.canvas.getBoundingClientRect();
+      const newAlpha = (e.clientX - Math.floor(left)) / (width - 1);
+      setColor(CM(`rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha})`));
     }
   };
 
@@ -111,10 +82,8 @@ export default function AlphaPicker({ color, setColor, width = 400, height = 25 
   return (
     <>
       <CanvasContainer height={height}>
-        <canvas width={width} height={height} ref={colorHue}></canvas>
+        <canvas ref={colorAlpha}></canvas>
         <canvas
-          width={width}
-          height={height}
           ref={colorPicker}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

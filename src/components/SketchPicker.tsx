@@ -4,67 +4,66 @@ import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
 import { Divider } from "semantic-ui-react";
+import useCanvasContext from "../hooks/useCanvasContext";
 
 interface ISketchPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  width?: number;
   pickerRadius?: number;
 }
 
-export default function SketchPicker({ color, setColor, width = 400, pickerRadius = 5 }: ISketchPicker): JSX.Element {
+export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISketchPicker): JSX.Element {
   const colorSketch = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
   const [sketchColor, setSketchColor] = useState(color);
-  const [mouse, setMouse] = useState({ x: color.alpha * (width - 1), y: 0 });
+  const [mouse, setMouse] = useState({ x: -1, y: -1 });
+
+  const [ctxSketch, ctxPicker] = useCanvasContext(colorSketch, colorPicker);
 
   const drawColorSketch = useCallback(() => {
-    if (colorSketch.current) {
-      const ctx = colorSketch.current.getContext("2d");
+    if (ctxSketch) {
+      const { width } = ctxSketch.canvas;
 
-      if (ctx) {
-        ctx.fillStyle = sketchColor.stringRGB();
-        ctx.fillRect(0, 0, width, width);
+      ctxSketch.fillStyle = sketchColor.stringRGB();
+      ctxSketch.fillRect(0, 0, width, width);
 
-        const whiteGradient = ctx.createLinearGradient(0, 0, width, 0);
-        whiteGradient.addColorStop(0, "rgba(255,255,255,1)");
-        whiteGradient.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = whiteGradient;
-        ctx.fillRect(0, 0, width, width);
+      const whiteGradient = ctxSketch.createLinearGradient(0, 0, width, 0);
+      whiteGradient.addColorStop(0, "rgba(255,255,255,1)");
+      whiteGradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctxSketch.fillStyle = whiteGradient;
+      ctxSketch.fillRect(0, 0, width, width);
 
-        const blackGradient = ctx.createLinearGradient(0, 0, 0, width);
-        blackGradient.addColorStop(0, "rgba(0,0,0,0)");
-        blackGradient.addColorStop(1, "rgba(0,0,0,1)");
-        ctx.fillStyle = blackGradient;
-        ctx.fillRect(0, 0, width, width);
+      const blackGradient = ctxSketch.createLinearGradient(0, 0, 0, width);
+      blackGradient.addColorStop(0, "rgba(0,0,0,0)");
+      blackGradient.addColorStop(1, "rgba(0,0,0,1)");
+      ctxSketch.fillStyle = blackGradient;
+      ctxSketch.fillRect(0, 0, width, width);
 
-        // draw a faint border around the sketch picker
-        ctx.beginPath();
-        ctx.strokeStyle = "hsla(0, 0%, 90%, 1)";
-        ctx.strokeRect(0, 0, width, width);
-      }
+      // draw a faint border around the sketch picker
+      ctxSketch.beginPath();
+      ctxSketch.strokeStyle = "hsla(0, 0%, 90%, 1)";
+      ctxSketch.strokeRect(0, 0, width, width);
     }
-  }, [sketchColor, width]);
+  }, [sketchColor, ctxSketch]);
 
   const drawColorPicker = useCallback(() => {
-    if (colorPicker.current) {
-      const ctx = colorPicker.current.getContext("2d");
+    if (ctxPicker) {
+      const { width } = ctxPicker.canvas;
 
-      if (ctx) {
-        if (mouse.x < width && mouse.y < width) {
-          ctx.clearRect(0, 0, width, width);
-          ctx.beginPath();
+      if (mouse.x === -1) setMouse({ x: width - 1, y: 0 });
+      if (mouse.x < width && mouse.y < width) {
+        ctxPicker.clearRect(0, 0, width, width);
+        ctxPicker.beginPath();
 
-          ctx.lineWidth = 2;
-          ctx.arc(mouse.x, mouse.y, pickerRadius * 2, 0, 2 * Math.PI);
-          ctx.strokeStyle = "white";
-          ctx.stroke();
-        }
+        ctxPicker.lineWidth = 2;
+        ctxPicker.arc(mouse.x, mouse.y, pickerRadius * 2, 0, 2 * Math.PI);
+        ctxPicker.strokeStyle = "white";
+        ctxPicker.stroke();
       }
     }
-  }, [mouse, pickerRadius, width]);
+  }, [mouse, pickerRadius, ctxPicker]);
 
   useEffect(() => {
     drawColorSketch();
@@ -81,19 +80,16 @@ export default function SketchPicker({ color, setColor, width = 400, pickerRadiu
 
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (colorSketch.current && canDrag.current) {
-      const ctx = colorSketch.current.getContext("2d");
-      if (ctx) {
-        const { left, top } = colorSketch.current.getBoundingClientRect();
-        const [x, y] = [e.clientX - left, e.clientY - top];
-        const data = ctx.getImageData(x, y, 1, 1).data.slice(0, -1);
-        setColor(
-          CM(`rgb(${data.join(", ")})`)
-            .hueTo(sketchColor.hue)
-            .alphaTo(color.alpha)
-        ); // maintain hue of the sketch
-        setMouse({ x, y });
-      }
+    if (canDrag.current && ctxSketch) {
+      const { left, top } = ctxSketch.canvas.getBoundingClientRect();
+      const [x, y] = [e.clientX - left, e.clientY - top];
+      const data = ctxSketch.getImageData(x, y, 1, 1).data.slice(0, -1);
+      setColor(
+        CM(`rgb(${data.join(", ")})`)
+          .hueTo(sketchColor.hue)
+          .alphaTo(color.alpha)
+      ); // maintain hue of the sketch
+      setMouse({ x, y });
     }
   };
 
@@ -105,11 +101,9 @@ export default function SketchPicker({ color, setColor, width = 400, pickerRadiu
 
   return (
     <>
-      <CanvasContainer width={width} height={width}>
-        <canvas width={width} height={width} ref={colorSketch}></canvas>
+      <CanvasContainer>
+        <canvas ref={colorSketch}></canvas>
         <canvas
-          width={width}
-          height={width}
           ref={colorPicker}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -119,9 +113,9 @@ export default function SketchPicker({ color, setColor, width = 400, pickerRadiu
 
       <Divider hidden></Divider>
 
-      <HuePicker width={width} height={15} color={color} setColor={setColor} setSketchColor={setSketchColor} />
+      <HuePicker height={15} color={color} setColor={setColor} setSketchColor={setSketchColor} />
 
-      <AlphaPicker width={width} height={15} color={color} setColor={setColor} />
+      <AlphaPicker height={15} color={color} setColor={setColor} />
     </>
   );
 }
