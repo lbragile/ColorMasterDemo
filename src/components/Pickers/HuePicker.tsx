@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { CanvasContainer } from "../styles/Canvas";
+import React, { useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../hooks/useCanvasContext";
+import useCanvasContext from "../../hooks/useCanvasContext";
+import CanvasGroup from "../CanvasGroup";
 
 interface IHuePicker {
   color: ColorMaster;
@@ -17,22 +17,7 @@ export default function HuePicker({ color, setColor, height = 25, setSketchColor
 
   const [ctxHue, ctxPicker] = useCanvasContext(colorHue, colorPicker, height);
 
-  const drawColorPicker = useCallback(() => {
-    if (ctxPicker) {
-      const { width } = ctxPicker.canvas;
-
-      ctxPicker.clearRect(0, 0, width, height);
-      ctxPicker.beginPath();
-
-      ctxPicker.arc((color.hue * width) / 360, height / 2, height / 2, 0, 2 * Math.PI);
-
-      ctxPicker.lineWidth = 2;
-      ctxPicker.strokeStyle = "#fff";
-      ctxPicker.stroke();
-    }
-  }, [height, color, ctxPicker]);
-
-  const drawHuePicker = useCallback(() => {
+  useEffect(() => {
     if (ctxHue) {
       const { width } = ctxHue.canvas;
 
@@ -53,12 +38,19 @@ export default function HuePicker({ color, setColor, height = 25, setSketchColor
   }, [height, color, ctxHue]);
 
   useEffect(() => {
-    drawHuePicker();
-  }, [drawHuePicker]);
+    if (ctxPicker) {
+      const { width } = ctxPicker.canvas;
 
-  useEffect(() => {
-    drawColorPicker();
-  }, [drawColorPicker]);
+      ctxPicker.clearRect(0, 0, width, height);
+      ctxPicker.beginPath();
+
+      ctxPicker.arc((color.hue * width) / 360, height / 2, height / 2 - 1, 0, 2 * Math.PI);
+
+      ctxPicker.lineWidth = 2;
+      ctxPicker.strokeStyle = "#fff";
+      ctxPicker.stroke();
+    }
+  }, [height, color, ctxPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -88,16 +80,15 @@ export default function HuePicker({ color, setColor, height = 25, setSketchColor
   };
 
   return (
-    <>
-      <CanvasContainer height={height}>
-        <canvas ref={colorHue}></canvas>
-        <canvas
-          ref={colorPicker}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        ></canvas>
-      </CanvasContainer>
-    </>
+    <CanvasGroup
+      height={height}
+      mainRef={colorHue}
+      picker={{
+        ref: colorPicker,
+        onPointerDown: handlePointerDown,
+        onPointerMove: handlePointerMove,
+        onPointerUp: handlePointerUp
+      }}
+    />
   );
 }

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { CanvasContainer } from "../styles/Canvas";
+import React, { useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../hooks/useCanvasContext";
-import { drawCheckeredBackground } from "../utils/alphaBackground";
+import useCanvasContext from "../../hooks/useCanvasContext";
+import { drawCheckeredBackground } from "../../utils/alphaBackground";
+import CanvasGroup from "../CanvasGroup";
 
 interface IAlphaPicker {
   color: ColorMaster;
@@ -17,7 +17,7 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
 
   const [ctxAlpha, ctxPicker] = useCanvasContext(colorAlpha, colorPicker, height);
 
-  const drawColorAlpha = useCallback(() => {
+  useEffect(() => {
     if (ctxAlpha) {
       const { width } = ctxAlpha.canvas;
       ctxAlpha.clearRect(0, 0, width, height);
@@ -34,13 +34,13 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
     }
   }, [height, color, ctxAlpha]);
 
-  const drawColorPicker = useCallback(() => {
+  useEffect(() => {
     if (ctxPicker) {
       const { width } = ctxPicker.canvas;
 
       ctxPicker.clearRect(0, 0, width, height);
       ctxPicker.beginPath();
-      ctxPicker.arc(color.alpha * width, height / 2, height / 2, 0, 2 * Math.PI);
+      ctxPicker.arc(color.alpha * width, height / 2, height / 2 - 1, 0, 2 * Math.PI);
 
       ctxPicker.lineWidth = 2;
       ctxPicker.fillStyle = "hsla(0, 0%, 50%, 0.6)";
@@ -49,14 +49,6 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
       ctxPicker.stroke();
     }
   }, [height, color, ctxPicker]);
-
-  useEffect(() => {
-    drawColorAlpha();
-  }, [drawColorAlpha]);
-
-  useEffect(() => {
-    drawColorPicker();
-  }, [drawColorPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -80,16 +72,15 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
   };
 
   return (
-    <>
-      <CanvasContainer height={height}>
-        <canvas ref={colorAlpha}></canvas>
-        <canvas
-          ref={colorPicker}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        ></canvas>
-      </CanvasContainer>
-    </>
+    <CanvasGroup
+      height={height}
+      mainRef={colorAlpha}
+      picker={{
+        ref: colorPicker,
+        onPointerDown: handlePointerDown,
+        onPointerMove: handlePointerMove,
+        onPointerUp: handlePointerUp
+      }}
+    />
   );
 }

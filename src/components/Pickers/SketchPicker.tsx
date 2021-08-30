@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { CanvasContainer } from "../styles/Canvas";
+import React, { useEffect, useRef, useState } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
 import { Divider } from "semantic-ui-react";
-import useCanvasContext from "../hooks/useCanvasContext";
+import useCanvasContext from "../../hooks/useCanvasContext";
+import CanvasGroup from "../CanvasGroup";
 
 interface ISketchPicker {
   color: ColorMaster;
@@ -22,7 +22,7 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
 
   const [ctxSketch, ctxPicker] = useCanvasContext(colorSketch, colorPicker);
 
-  const drawColorSketch = useCallback(() => {
+  useEffect(() => {
     if (ctxSketch) {
       const { width } = ctxSketch.canvas;
 
@@ -48,7 +48,7 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
     }
   }, [sketchColor, ctxSketch]);
 
-  const drawColorPicker = useCallback(() => {
+  useEffect(() => {
     if (ctxPicker) {
       const { width } = ctxPicker.canvas;
 
@@ -64,14 +64,6 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       }
     }
   }, [mouse, pickerRadius, ctxPicker]);
-
-  useEffect(() => {
-    drawColorSketch();
-  }, [drawColorSketch]);
-
-  useEffect(() => {
-    drawColorPicker();
-  }, [drawColorPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -101,15 +93,15 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
 
   return (
     <>
-      <CanvasContainer>
-        <canvas ref={colorSketch}></canvas>
-        <canvas
-          ref={colorPicker}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        ></canvas>
-      </CanvasContainer>
+      <CanvasGroup
+        mainRef={colorSketch}
+        picker={{
+          ref: colorPicker,
+          onPointerDown: handlePointerDown,
+          onPointerMove: handlePointerMove,
+          onPointerUp: handlePointerUp
+        }}
+      />
 
       <Divider hidden></Divider>
 

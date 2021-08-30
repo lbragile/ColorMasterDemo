@@ -2,14 +2,14 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Button, Checkbox, Divider, Dropdown, Grid, Icon, Input, Popup, Segment } from "semantic-ui-react";
 import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
-import HSLSliderGroup from "./HSLSliderGroup";
-import RangeSlider from "./RangeSlider";
-import RGBSliderGroup from "./RGBSliderGroup";
+import HSLSliderGroup from "./Sliders/HSLSliderGroup";
+import RGBSliderGroup from "./Sliders/RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
 import useIsMobile from "../hooks/useIsMobile";
-import SketchPicker from "./SketchPicker";
-import WheelPicker from "./WheelPicker";
+import SketchPicker from "./Pickers/SketchPicker";
+import WheelPicker from "./Pickers/WheelPicker";
+import HEXSliderGroup from "./Sliders/HEXSliderGroup";
 
 const colorspaceOptions = [
   { key: 1, text: "RGB", value: 1 },
@@ -83,10 +83,10 @@ const SwatchSegment = styled(Segment)`
   }
 `;
 
-interface ISliderGroupSelector {
+interface IColorSelectorWidget {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  label: JSX.Element;
+  children?: JSX.Element;
   initColorspace?: number;
   initPicker?: number;
 }
@@ -111,13 +111,13 @@ const SWATCH_COLORS = [
   "hsla(0, 0%, 0%, 1)"
 ];
 
-export default function SliderGroupSelector({
+export default function ColorSelectorWidget({
   color,
   setColor,
-  label,
+  children,
   initColorspace = 1,
   initPicker = 1
-}: ISliderGroupSelector): JSX.Element {
+}: IColorSelectorWidget): JSX.Element {
   const [alpha, setAlpha] = useState(true);
   const [copied, setCopied] = useState(false);
   const [swatchIndex, setSwatchIndex] = useState(0);
@@ -179,17 +179,14 @@ export default function SliderGroupSelector({
   const currentSliders = useMemo(() => {
     const possibleSliders = [
       {
-        name: "rgb-sliders",
         value: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),
         sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
       },
       {
-        name: "hex-sliders",
         value: color.stringHEX({ alpha }),
-        sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} format="hex" />
+        sliders: <HEXSliderGroup color={color} onChange={handleSliderChange} />
       },
       {
-        name: "hsl-sliders",
         value: color.stringHSL({ alpha, precision: [2, 2, 2, 2] }),
         sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
       }
@@ -218,15 +215,16 @@ export default function SliderGroupSelector({
 
   return (
     <Segment>
-      {label}
+      {children}
 
-      <Grid verticalAlign="middle" centered>
+      <Grid verticalAlign="middle" centered stackable>
         <Grid.Row>
           <Swatch
             radius={50}
             background={colorspace === 1 ? color.stringRGB() : colorspace === 2 ? color.stringHEX() : color.stringHSL()}
           />
         </Grid.Row>
+
         <Grid.Row>
           <SwatchSegment compact size="mini">
             <Icon
@@ -262,14 +260,16 @@ export default function SliderGroupSelector({
         </Grid.Row>
 
         <Grid.Row>
-          <Grid.Column width={1}>
-            <StyledButton vertical>
-              <Button icon="angle up" basic onClick={() => handleColorspaceAdjustment("up")} />
-              <Button icon="angle down" basic onClick={() => handleColorspaceAdjustment("down")} />
-            </StyledButton>
-          </Grid.Column>
+          {!isMobile && (
+            <Grid.Column computer={1}>
+              <StyledButton vertical>
+                <Button icon="angle up" basic onClick={() => handleColorspaceAdjustment("up")} />
+                <Button icon="angle down" basic onClick={() => handleColorspaceAdjustment("down")} />
+              </StyledButton>
+            </Grid.Column>
+          )}
 
-          <Grid.Column width={6}>
+          <Grid.Column computer={6}>
             <StyledDropdown
               icon={<Icon name="paint brush" color="grey" />}
               value={colorspace}
@@ -282,7 +282,7 @@ export default function SliderGroupSelector({
             />
           </Grid.Column>
 
-          <Grid.Column width={6}>
+          <Grid.Column computer={6}>
             <StyledDropdown
               icon={<Icon name="crosshairs" color="grey" />}
               value={pickerType}
@@ -295,16 +295,18 @@ export default function SliderGroupSelector({
             />
           </Grid.Column>
 
-          <Grid.Column width={1}>
-            <StyledButton vertical>
-              <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
-              <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
-            </StyledButton>
-          </Grid.Column>
+          {!isMobile && (
+            <Grid.Column computer={1}>
+              <StyledButton vertical>
+                <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
+                <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
+              </StyledButton>
+            </Grid.Column>
+          )}
         </Grid.Row>
 
-        <Grid.Row columns={2} centered>
-          <Grid.Column width={12}>
+        <Grid.Row columns={2}>
+          <Grid.Column computer={12}>
             <StyledColorDisplay
               type="text"
               value={currentSliders.value}
@@ -317,41 +319,20 @@ export default function SliderGroupSelector({
             />
           </Grid.Column>
 
-          <Grid.Column width={2}>
+          <Grid.Column computer={2}>
             <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
           </Grid.Column>
         </Grid.Row>
       </Grid>
 
-      {pickerType === 2 ? (
-        <>
-          <Divider hidden />
-          <SketchPicker color={color} setColor={setColor} />
-        </>
-      ) : pickerType === 3 ? (
-        <>
-          <Divider hidden />
-          <WheelPicker color={color} setColor={setColor} />
-        </>
-      ) : (
-        <>
-          {currentSliders.sliders}
+      <Divider hidden />
 
-          {alpha && (
-            <>
-              <Divider hidden />
-              <RangeSlider
-                value={color.alpha * (colorspace === 2 ? 255 : 100)}
-                color="rgba(0,0,0,0.5)"
-                title="A"
-                max={colorspace === 2 ? "255" : "100"}
-                format={colorspace === 2 ? "hex" : undefined}
-                postfix={colorspace === 2 ? "" : "%"}
-                onChange={(e) => handleSliderChange(e, "alpha")}
-              />
-            </>
-          )}
-        </>
+      {pickerType === 2 ? (
+        <SketchPicker color={color} setColor={setColor} />
+      ) : pickerType === 3 ? (
+        <WheelPicker color={color} setColor={setColor} />
+      ) : (
+        currentSliders.sliders
       )}
     </Segment>
   );

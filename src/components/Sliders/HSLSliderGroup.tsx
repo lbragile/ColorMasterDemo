@@ -1,18 +1,18 @@
-import { Ihsl, TChannelHSL } from "colormaster/types";
+import { Ihsla, TChannelHSL } from "colormaster/types";
 import React from "react";
-import { Divider } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
 import RangeSlider from "./RangeSlider";
 
 interface IHSLSliderGroup {
-  hsl: Ihsl;
+  hsl: Ihsla;
   onChange: (e: React.ChangeEvent<HTMLInputElement>, type: TChannelHSL) => void;
 }
 
 export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.Element {
-  const { h, s, l } = hsl;
+  const { h, s, l, a } = hsl;
 
   return (
-    <>
+    <Grid verticalAlign="middle" centered>
       <RangeSlider
         value={h}
         color={`hsla(${h}, 100%, 50%, 1)`}
@@ -21,8 +21,6 @@ export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.
         postfix="&deg;"
         onChange={(e) => onChange(e, "hue")}
       />
-
-      <Divider hidden />
 
       <RangeSlider
         value={s}
@@ -33,8 +31,6 @@ export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.
         onChange={(e) => onChange(e, "saturation")}
       />
 
-      <Divider hidden />
-
       <RangeSlider
         value={l}
         color={`hsla(0, 0%, ${l - 5}%, 1)`}
@@ -43,6 +39,15 @@ export default function HSLSliderGroup({ hsl, onChange }: IHSLSliderGroup): JSX.
         postfix="%"
         onChange={(e) => onChange(e, "lightness")}
       />
-    </>
+
+      <RangeSlider
+        value={a * 100}
+        color="rgba(0,0,0,0.5)"
+        title="A"
+        max="100"
+        postfix={"%"}
+        onChange={(e) => onChange(e, "alpha")}
+      />
+    </Grid>
   );
 }

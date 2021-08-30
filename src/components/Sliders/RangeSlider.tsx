@@ -1,14 +1,8 @@
 import React from "react";
 import { TFormat } from "colormaster/types";
-import { Grid, Input } from "semantic-ui-react";
+import { Grid, Header, Input } from "semantic-ui-react";
 import styled from "styled-components";
-import useIsMobile from "../hooks/useIsMobile";
-
-const StyledGrid = styled(Grid)`
-  &&& .slider-input-col {
-    padding: 0 0 0 8px;
-  }
-`;
+import useIsMobile from "../../hooks/useIsMobile";
 
 const SliderInput = styled.input.attrs((props) => {
   const val = Number(props.value ?? 0);
@@ -127,20 +121,18 @@ export default function RangeSlider({
   };
 
   return (
-    <StyledGrid verticalAlign="middle" centered>
-      <Grid.Row>
-        <Grid.Column>
-          <h4>{title}</h4>
-        </Grid.Column>
+    <Grid.Row>
+      <Grid.Column>
+        <Header as="h4">{title}</Header>
+      </Grid.Column>
 
-        <Grid.Column className="slider-input-col" width={8}>
-          <SliderInput {...SliderInputProps} />
-        </Grid.Column>
+      <Grid.Column className="slider-input-col" computer={10} mobile={7}>
+        <SliderInput {...SliderInputProps} />
+      </Grid.Column>
 
-        <Grid.Column width={4}>
-          <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
-        </Grid.Column>
-      </Grid.Row>
-    </StyledGrid>
+      <Grid.Column computer={3} mobile={5}>
+        <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
+      </Grid.Column>
+    </Grid.Row>
   );
 }

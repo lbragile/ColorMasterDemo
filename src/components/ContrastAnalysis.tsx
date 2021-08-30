@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Header, Label } from "semantic-ui-react";
-import SliderGroupSelector from "./SliderGroupSelector";
+import ColorSelectorWidget from "./ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import { CopyBlock, dracula } from "react-code-blocks";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../hooks/useDebounce";
+import useIsMobile from "../hooks/useIsMobile";
 extendPlugins([A11yPlugin]);
 
 export default function ContrastAnalysis(): JSX.Element {
@@ -18,24 +19,22 @@ export default function ContrastAnalysis(): JSX.Element {
   const contrastDebounce = useDebounce(contrast, 100);
   const readableOnDebounce = useDebounce(readableOn, 100);
 
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     setContrast(fgColor.contrast({ bgColor: bgColor, ratio: true, precision: 3 }) as string);
     setReadableOn(fgColor.readableOn({ bgColor: bgColor, ratio: "minimum", size: "body" }));
   }, [fgColor, bgColor]);
 
   return (
-    <Grid columns={3} verticalAlign="middle" stackable centered>
+    <Grid columns={3} verticalAlign="top" stackable centered>
       <Grid.Row>
         <Grid.Column width={6}>
-          <SliderGroupSelector
-            color={fgColor}
-            setColor={setFgColor}
-            label={
-              <Label size="big" color="black" ribbon>
-                Foreground (FG)
-              </Label>
-            }
-          />
+          <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
+            <Label size="big" color="black" attached="top left">
+              {isMobile ? "FG" : "Foreground (FG)"}
+            </Label>
+          </ColorSelectorWidget>
         </Grid.Column>
 
         <Grid.Column width={3}>
@@ -55,15 +54,11 @@ export default function ContrastAnalysis(): JSX.Element {
         </Grid.Column>
 
         <Grid.Column width={6}>
-          <SliderGroupSelector
-            color={bgColor}
-            setColor={setBgColor}
-            label={
-              <Label size="big" color="black" ribbon="right">
-                Background (BG)
-              </Label>
-            }
-          />
+          <ColorSelectorWidget color={bgColor} setColor={setBgColor}>
+            <Label size="big" color="black" attached="top right">
+              {isMobile ? "BG" : "Background (BG)"}
+            </Label>
+          </ColorSelectorWidget>
         </Grid.Column>
       </Grid.Row>
 
