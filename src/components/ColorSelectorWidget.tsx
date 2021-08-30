@@ -225,8 +225,10 @@ export default function ColorSelectorWidget({
           />
         </Grid.Row>
 
+        {isMobile && <Divider hidden />}
+
         <Grid.Row>
-          <SwatchSegment compact size="mini">
+          <SwatchSegment>
             <Icon
               className="left-swatch-arrow"
               size="large"
@@ -260,14 +262,12 @@ export default function ColorSelectorWidget({
         </Grid.Row>
 
         <Grid.Row>
-          {!isMobile && (
-            <Grid.Column computer={1}>
-              <StyledButton vertical>
-                <Button icon="angle up" basic onClick={() => handleColorspaceAdjustment("up")} />
-                <Button icon="angle down" basic onClick={() => handleColorspaceAdjustment("down")} />
-              </StyledButton>
-            </Grid.Column>
-          )}
+          <Grid.Column computer={1} only="computer">
+            <StyledButton vertical>
+              <Button icon="angle up" basic onClick={() => handleColorspaceAdjustment("up")} />
+              <Button icon="angle down" basic onClick={() => handleColorspaceAdjustment("down")} />
+            </StyledButton>
+          </Grid.Column>
 
           <Grid.Column computer={6}>
             <StyledDropdown
@@ -295,14 +295,12 @@ export default function ColorSelectorWidget({
             />
           </Grid.Column>
 
-          {!isMobile && (
-            <Grid.Column computer={1}>
-              <StyledButton vertical>
-                <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
-                <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
-              </StyledButton>
-            </Grid.Column>
-          )}
+          <Grid.Column computer={1} only="computer">
+            <StyledButton vertical>
+              <Button icon="angle up" basic onClick={() => handlePickerAdjustment("up")} />
+              <Button icon="angle down" basic onClick={() => handlePickerAdjustment("down")} />
+            </StyledButton>
+          </Grid.Column>
         </Grid.Row>
 
         <Grid.Row columns={2}>
