@@ -1,59 +1,77 @@
-import React, { lazy, Suspense, useState } from "react";
-import { Button, Container, Icon, Label, Menu, Segment } from "semantic-ui-react";
-
-const HEX = lazy(() => import("./HEX"));
-const HSL = lazy(() => import("./HSL"));
-const RGB = lazy(() => import("./RGB"));
-const Wheel = lazy(() => import("./Wheel"));
+import React, { lazy, Suspense, useMemo } from "react";
+import { Container, Divider, Icon, Tab } from "semantic-ui-react";
+import styled from "styled-components";
+import { GlobalStyle } from "../styles/Global";
+import { dependencies } from "../../package.json";
 import Loading from "./Loading";
 
-export default function App(): JSX.Element {
-  const [activeItem, setActiveItem] = useState("Wheel");
+const ContrastAnalysis = lazy(() => import("./ContrastAnalysis"));
+const HarmonyAnalysis = lazy(() => import("./HarmonyAnalysis"));
 
-  const MenuItemWrapper = ({ navName }: { navName: string }) => {
-    return (
-      <Menu.Item
-        name={navName.toUpperCase()}
-        active={activeItem === navName}
-        onClick={(e, { name }) => setActiveItem(name ?? "RGB")}
-      />
-    );
-  };
+const LinkIcon = styled(Icon)`
+  cursor: pointer;
+`;
+
+const StyledContainer = styled(Container)`
+  && {
+    width: 90%;
+    max-width: 95%;
+  }
+`;
+
+export default function App(): JSX.Element {
+  const panes = useMemo(
+    () =>
+      [
+        { menuItem: "Contrast", elem: <ContrastAnalysis /> },
+        { menuItem: "Harmony", elem: <HarmonyAnalysis /> }
+      ].map((item) => {
+        return {
+          menuItem: item.menuItem,
+          render: function renderElement() {
+            return (
+              <Suspense fallback={<Loading />}>
+                <Tab.Pane>{item.elem}</Tab.Pane>
+              </Suspense>
+            );
+          }
+        };
+      }),
+    []
+  );
 
   return (
-    <Container>
-      <Button
-        as="div"
-        labelPosition="right"
-        onClick={() => location.assign("https://www.github.com/lbragile/ColorMaster")}
-      >
-        <Button color="black">
-          <Icon name="github" size="large" /> GitHub
-        </Button>
-        <Label as="a" basic color="grey" pointing="left" content="ColorMaster" />
-      </Button>
-      <Button
-        as="div"
-        labelPosition="right"
-        onClick={() => location.assign("https://www.npmjs.com/package/colormaster")}
-      >
-        <Button color="red">
-          <Icon name="npm" size="large" /> NPM
-        </Button>
-        <Label as="a" basic color="grey" pointing="left" content="ColorMaster" />
-      </Button>
+    <StyledContainer>
+      <GlobalStyle />
 
-      <Menu attached="top" tabular>
-        <MenuItemWrapper navName="RGB" />
-        <MenuItemWrapper navName="HEX" />
-        <MenuItemWrapper navName="HSL" />
-        <MenuItemWrapper navName="Wheel" />
-      </Menu>
-      <Segment attached="bottom">
-        <Suspense fallback={<Loading />}>
-          {activeItem === "RGB" ? <RGB /> : activeItem === "HEX" ? <HEX /> : activeItem === "HSL" ? <HSL /> : <Wheel />}
-        </Suspense>
-      </Segment>
-    </Container>
+      <Divider hidden />
+
+      <h2>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h2>
+
+      <Divider hidden />
+
+      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={1} />
+
+      <Divider hidden />
+
+      <LinkIcon
+        name="github"
+        size="big"
+        circular
+        title="https://www.github.com/lbragile/ColorMaster"
+        onClick={() => location.assign("https://www.github.com/lbragile/ColorMaster")}
+      />
+
+      <LinkIcon
+        name="npm"
+        size="big"
+        color="red"
+        circular
+        title="https://www.npmjs.com/package/colormaster"
+        onClick={() => location.assign("https://www.npmjs.com/package/colormaster")}
+      />
+
+      <Divider hidden />
+    </StyledContainer>
   );
 }
