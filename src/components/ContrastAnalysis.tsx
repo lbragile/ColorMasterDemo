@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox, Grid, Header, Icon, Label, Table } from "semantic-ui-react";
+import { Button, Divider, Grid, Header, Icon, Label, Modal, Radio, Table } from "semantic-ui-react";
 import ColorSelectorWidget from "./ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import { CopyBlock, dracula } from "react-code-blocks";
@@ -7,6 +7,7 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../hooks/useDebounce";
 import useIsMobile from "../hooks/useIsMobile";
 import styled from "styled-components";
+import { ContrastSample } from "../utils/codeSamples";
 extendPlugins([A11yPlugin]);
 
 const SampleOutput = styled.div.attrs((props: { background: string; color: string; size: "body" | "large" }) => props)`
@@ -17,6 +18,11 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
   font-size: ${(props) => (props.size === "large" ? "1.2rem" : "1rem")};
   font-weight: ${(props) => (props.size === "large" ? "bold" : "normal")};
   border: 1px solid hsla(0, 0%, 95%, 1);
+  text-align: left;
+
+  & li {
+    padding: 4px 0;
+  }
 `;
 
 export default function ContrastAnalysis(): JSX.Element {
@@ -25,6 +31,7 @@ export default function ContrastAnalysis(): JSX.Element {
   const [contrast, setContrast] = useState("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
   const [isLarge, setIsLarge] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
@@ -54,35 +61,36 @@ export default function ContrastAnalysis(): JSX.Element {
           </ColorSelectorWidget>
         </Grid.Column>
 
-        <Grid.Column width={3}>
-          <Header as="h2" textAlign="center">
+        <Grid.Column width={3} textAlign="center">
+          <Header as="h2">
             Sample Output
+            <Divider hidden />
             <Header.Subheader>
-              <Grid>
-                <Grid.Row verticalAlign="middle">
-                  <Grid.Column width={12}>
-                    <SampleOutput
-                      background={bgDebounce.stringRGB()}
-                      color={fgDebounce.stringRGB()}
-                      size={isLarge ? "large" : "body"}
-                    >
-                      ColorMaster has all your coloring needs
-                    </SampleOutput>
-                  </Grid.Column>
-
+              <Grid centered>
+                <Grid.Row columns={2}>
                   <Grid.Column width={4}>
-                    <Checkbox
-                      label="Large"
-                      checked={isLarge}
-                      onChange={() => {
-                        setIsLarge(!isLarge);
-                      }}
-                    />
+                    <Radio label="Body" name="radioGroup" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
                   </Grid.Column>
+                  <Grid.Column width={4}>
+                    <Radio label="Large" name="radioGroup" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
+                  </Grid.Column>
+                </Grid.Row>
+
+                <Grid.Row>
+                  <SampleOutput
+                    background={bgDebounce.stringRGB()}
+                    color={fgDebounce.stringRGB()}
+                    size={isLarge ? "large" : "body"}
+                  >
+                    <li>The quick brown fox jumps over the lazy dog.</li>
+                    <li>The five boxing wizards jump quickly.</li>
+                  </SampleOutput>
                 </Grid.Row>
               </Grid>
             </Header.Subheader>
           </Header>
+
+          <Divider hidden />
 
           <Header as="h2" textAlign="center">
             Contrast
@@ -91,8 +99,11 @@ export default function ContrastAnalysis(): JSX.Element {
             </Header.Subheader>
           </Header>
 
+          <Divider hidden />
+
           <Header as="h2" textAlign="center">
             ReadableOn
+            <Divider hidden />
             <Header.Subheader>
               <Table definition celled textAlign="center">
                 <Table.Header>
@@ -129,6 +140,31 @@ export default function ContrastAnalysis(): JSX.Element {
               </Table>
             </Header.Subheader>
           </Header>
+
+          <Divider hidden />
+
+          <Modal
+            closeIcon
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+            open={open}
+            trigger={
+              <Button circular primary>
+                Code
+              </Button>
+            }
+          >
+            <Modal.Content>
+              <Modal.Description>
+                <CopyBlock
+                  text={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce)}
+                  language="typescript"
+                  theme={dracula}
+                  wrapLines={true}
+                />
+              </Modal.Description>
+            </Modal.Content>
+          </Modal>
         </Grid.Column>
 
         <Grid.Column width={6}>
@@ -137,31 +173,6 @@ export default function ContrastAnalysis(): JSX.Element {
               {isMobile ? "BG" : "Background (BG)"}
             </Label>
           </ColorSelectorWidget>
-        </Grid.Column>
-      </Grid.Row>
-
-      <Grid.Row>
-        <Grid.Column width={15}>
-          <CopyBlock
-            text={`import CM, { extendPlugins } from 'colormaster';\nimport A11yPlugin from "colormaster/plugins/accessibility";\n\nextendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin\n\nconst fgColor = CM("${fgDebounce.stringRGB(
-              {
-                precision: [2, 2, 2, 2]
-              }
-            )}");\nconst bgColor = CM("${bgDebounce.stringRGB({
-              precision: [2, 2, 2, 2]
-            })}");\n\nconsole.log(fgColor.contrast({ bgColor, ratio: true, precision: 3 })); // ${contrastDebounce}\nconsole.log(fgColor.readableOn({ bgColor, ratio: "minimum", size: "body" })); // ${
-              readableOnDebounce[0]
-            }\nconsole.log(fgColor.readableOn({ bgColor, ratio: "enhanced", size: "body" })); // ${
-              readableOnDebounce[1]
-            }\nconsole.log(fgColor.readableOn({ bgColor, ratio: "minimum", size: "large" })); // ${
-              readableOnDebounce[2]
-            }\nconsole.log(fgColor.readableOn({ bgColor, ratio: "enhanced", size: "large" })); // ${
-              readableOnDebounce[3]
-            }`}
-            language="typescript"
-            theme={dracula}
-            wrapLines={true}
-          />
         </Grid.Column>
       </Grid.Row>
     </Grid>

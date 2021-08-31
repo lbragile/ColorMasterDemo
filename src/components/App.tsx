@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useMemo } from "react";
 import { Container, Divider, Icon, Tab } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
@@ -6,6 +6,7 @@ import { dependencies } from "../../package.json";
 import Loading from "./Loading";
 
 const ContrastAnalysis = lazy(() => import("./ContrastAnalysis"));
+const HarmonyAnalysis = lazy(() => import("./HarmonyAnalysis"));
 
 const LinkIcon = styled(Icon)`
   cursor: pointer;
@@ -18,21 +19,27 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const panes = [
-  {
-    menuItem: "Contrast",
-    // eslint-disable-next-line react/display-name
-    render: () => (
-      <Suspense fallback={<Loading />}>
-        <Tab.Pane>
-          <ContrastAnalysis />
-        </Tab.Pane>
-      </Suspense>
-    )
-  }
-];
-
 export default function App(): JSX.Element {
+  const panes = useMemo(
+    () =>
+      [
+        { menuItem: "Contrast", elem: <ContrastAnalysis /> },
+        { menuItem: "Harmony", elem: <HarmonyAnalysis /> }
+      ].map((item) => {
+        return {
+          menuItem: item.menuItem,
+          render: function renderElement() {
+            return (
+              <Suspense fallback={<Loading />}>
+                <Tab.Pane>{item.elem}</Tab.Pane>
+              </Suspense>
+            );
+          }
+        };
+      }),
+    []
+  );
+
   return (
     <StyledContainer>
       <GlobalStyle />
@@ -43,7 +50,7 @@ export default function App(): JSX.Element {
 
       <Divider hidden />
 
-      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} />
+      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={1} />
 
       <Divider hidden />
 
