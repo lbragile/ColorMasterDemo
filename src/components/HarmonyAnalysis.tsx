@@ -35,7 +35,6 @@ export default function HarmonyAnalysis(): JSX.Element {
   const colorDebounce = useDebounce(color, 100);
 
   useEffect(() => {
-    console.log(type, effect, amount);
     setHarmony(colorDebounce.harmony({ type, effect, amount }).map((c) => c.stringHSL()));
   }, [colorDebounce, type, effect, amount]);
 

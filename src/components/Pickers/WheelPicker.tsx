@@ -92,9 +92,11 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
       const radius = ctxWheel.canvas.width / 2;
 
       // only update the color if the click occurred within the circle
-      if (Math.pow(x - radius, 2) + Math.pow(y - radius, 2) <= Math.pow(radius, 2)) {
-        const data = ctxWheel.getImageData(x, y, 1, 1).data.slice(0, -1);
-        setColor(CM(`rgba(${data.join(", ")}, ${color.alpha})`));
+      const pos = { x: x - radius, y: radius - y };
+      if (Math.pow(pos.x, 2) + Math.pow(pos.y, 2) <= Math.pow(radius, 2)) {
+        const hue = (Math.atan2(pos.x, pos.y) * 180) / Math.PI;
+        const sat = (Math.sqrt(Math.pow(pos.x, 2) + Math.pow(pos.y, 2)) * 100) / radius;
+        setColor(CM(`hsla(${hue}, ${sat}%, ${color.lightness}%, ${color.alpha})`));
       }
     }
   };
