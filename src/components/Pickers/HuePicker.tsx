@@ -7,10 +7,9 @@ interface IHuePicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   height?: number;
-  setSketchColor?: React.Dispatch<React.SetStateAction<ColorMaster>>;
 }
 
-export default function HuePicker({ color, setColor, height = 25, setSketchColor }: IHuePicker): JSX.Element {
+export default function HuePicker({ color, setColor, height = 25 }: IHuePicker): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -69,7 +68,6 @@ export default function HuePicker({ color, setColor, height = 25, setSketchColor
       const newColor = CM(`rgba(${data.join(", ")}, ${color.alpha})`);
 
       setColor(CM({ ...color.hsla(), h: newColor.hue }));
-      setSketchColor?.(CM(`hsla(${newColor.hue}, 100%, 50%, 1)`));
     }
   };
 

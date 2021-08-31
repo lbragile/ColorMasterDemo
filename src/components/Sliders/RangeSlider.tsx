@@ -31,7 +31,7 @@ const SliderInput = styled.input.attrs((props) => {
   }
 
   &:hover {
-    cursor: grab;
+    cursor: ew-resize;
   }
 `;
 

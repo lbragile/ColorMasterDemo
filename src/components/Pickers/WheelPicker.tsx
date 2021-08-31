@@ -13,6 +13,15 @@ interface IWheelPicker {
   rotate?: number;
 }
 
+/**
+ * To draw the color wheel:
+ * - Assign each degree it's corresponding hue, such that red is at the 0/360 degree position.
+ * - For each degree, get a radial-gradient by varying the saturation from 0%-100%.
+ * - Adjust lightness and alpha values as needed.
+ *
+ * @note To avoid visible gaps between the drawn segments (due to pixel resolution), interlace the segments → current segment is drawn in range [hue-1, hue+1]
+ * @note `radial-gradient` is used to be independent of quadrant. Using linear-gradient will have incorrect direction in some quadrants.
+ */
 export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate = 90 }: IWheelPicker): JSX.Element {
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);

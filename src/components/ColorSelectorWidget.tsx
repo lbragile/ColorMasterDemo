@@ -237,7 +237,7 @@ export default function ColorSelectorWidget({
               onClick={() => setSwatchIndex(swatchIndex - 1)}
             />
 
-            {SWATCH_COLORS.slice(swatchIndex, swatchIndex + 7).map((background) => (
+            {SWATCH_COLORS.slice(swatchIndex, swatchIndex + (isMobile ? 7 : 12)).map((background) => (
               <Swatch
                 className="swatch-color"
                 key={background + "-swatch"}
@@ -255,7 +255,7 @@ export default function ColorSelectorWidget({
               className="right-swatch-arrow"
               size="large"
               name="angle right"
-              disabled={swatchIndex === SWATCH_COLORS.length - 7}
+              disabled={swatchIndex === SWATCH_COLORS.length - (isMobile ? 7 : 12)}
               onClick={() => setSwatchIndex(swatchIndex + 1)}
             />
           </SwatchSegment>
