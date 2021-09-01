@@ -57,12 +57,6 @@ export default function WheelPicker({
         ctxWheel.fillStyle = gradient;
         ctxWheel.fill();
       }
-
-      // draw a faint border around the color wheel so that it is "visible" at all times
-      ctxWheel.beginPath();
-      ctxWheel.strokeStyle = "hsla(0, 0%, 95%, 1)";
-      ctxWheel.arc(x, y, radius, 0, 2 * Math.PI);
-      ctxWheel.stroke();
     }
   }, [rotate, color, ctxWheel]);
 
@@ -131,6 +125,7 @@ export default function WheelPicker({
           onPointerMove: handlePointerMove,
           onPointerUp: handlePointerUp
         }}
+        borderRadius="50%"
       />
 
       <Divider hidden></Divider>

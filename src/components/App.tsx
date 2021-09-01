@@ -5,8 +5,9 @@ import { GlobalStyle } from "../styles/Global";
 import { dependencies } from "../../package.json";
 import Loading from "./Loading";
 
-const ContrastAnalysis = lazy(() => import("./ContrastAnalysis"));
-const HarmonyAnalysis = lazy(() => import("./HarmonyAnalysis"));
+const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
+const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
+const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
 
 const LinkIcon = styled(Icon)`
   cursor: pointer;
@@ -24,7 +25,8 @@ export default function App(): JSX.Element {
     () =>
       [
         { menuItem: "Contrast", elem: <ContrastAnalysis /> },
-        { menuItem: "Harmony", elem: <HarmonyAnalysis /> }
+        { menuItem: "Harmony", elem: <HarmonyAnalysis /> },
+        { menuItem: "Mix", elem: <MixAnalysis /> }
       ].map((item) => {
         return {
           menuItem: item.menuItem,
@@ -50,7 +52,7 @@ export default function App(): JSX.Element {
 
       <Divider hidden />
 
-      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={1} />
+      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={2} />
 
       <Divider hidden />
 

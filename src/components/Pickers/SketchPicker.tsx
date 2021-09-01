@@ -48,11 +48,6 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       blackGradient.addColorStop(1, "rgba(0,0,0,1)");
       ctxSketch.fillStyle = blackGradient;
       ctxSketch.fillRect(0, 0, width, width);
-
-      // draw a faint border around the sketch picker
-      ctxSketch.beginPath();
-      ctxSketch.strokeStyle = "hsla(0, 0%, 90%, 1)";
-      ctxSketch.strokeRect(0, 0, width, width);
     }
   }, [color, ctxSketch]);
 

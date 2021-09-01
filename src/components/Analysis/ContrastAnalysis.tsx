@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, Divider, Grid, Header, Icon, Label, Modal, Radio, Table } from "semantic-ui-react";
-import ColorSelectorWidget from "./ColorSelectorWidget";
+import { Divider, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
+import ColorSelectorWidget from "../ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
-import { CopyBlock, dracula } from "react-code-blocks";
 import A11yPlugin from "colormaster/plugins/accessibility";
-import useDebounce from "../hooks/useDebounce";
-import useIsMobile from "../hooks/useIsMobile";
+import useDebounce from "../../hooks/useDebounce";
+import useIsMobile from "../../hooks/useIsMobile";
 import styled from "styled-components";
-import { ContrastSample } from "../utils/codeSamples";
+import { ContrastSample } from "../../utils/codeSamples";
+import CodeModal from "./CodeModal";
 extendPlugins([A11yPlugin]);
 
 const SampleOutput = styled.div.attrs((props: { background: string; color: string; size: "body" | "large" }) => props)`
@@ -15,23 +15,19 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
   color: ${(props) => props.color};
   border-radius: 4px;
   padding: 12px;
-  font-size: ${(props) => (props.size === "large" ? "1.2rem" : "1rem")};
+  font-size: ${(props) => (props.size === "large" ? "14pt" : "1rem")};
   font-weight: ${(props) => (props.size === "large" ? "bold" : "normal")};
-  border: 1px solid hsla(0, 0%, 95%, 1);
+  border: 1px solid hsla(0, 0%, 90%, 1);
   text-align: left;
-
-  & li {
-    padding: 4px 0;
-  }
+  line-height: 2rem;
 `;
 
 export default function ContrastAnalysis(): JSX.Element {
-  const [fgColor, setFgColor] = useState(CM("hsla(0, 100%, 50%, 1)"));
-  const [bgColor, setBgColor] = useState(CM("hsla(180, 100%, 50%, 1)"));
+  const [fgColor, setFgColor] = useState(CM("hsla(60, 100%, 50%, 1)"));
+  const [bgColor, setBgColor] = useState(CM("hsla(0, 0%, 50%, 1)"));
   const [contrast, setContrast] = useState("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
   const [isLarge, setIsLarge] = useState(false);
-  const [open, setOpen] = useState(false);
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
@@ -61,7 +57,9 @@ export default function ContrastAnalysis(): JSX.Element {
           </ColorSelectorWidget>
         </Grid.Column>
 
-        <Grid.Column width={3} textAlign="center">
+        <Grid.Column width={4} textAlign="center">
+          {!isMobile && <Divider hidden />}
+
           <Header as="h2">
             Sample Output
             <Divider hidden />
@@ -82,8 +80,7 @@ export default function ContrastAnalysis(): JSX.Element {
                     color={fgDebounce.stringRGB()}
                     size={isLarge ? "large" : "body"}
                   >
-                    <li>The quick brown fox jumps over the lazy dog.</li>
-                    <li>The five boxing wizards jump quickly.</li>
+                    The quick brown fox jumps over the lazy dog.
                   </SampleOutput>
                 </Grid.Row>
               </Grid>
@@ -143,28 +140,7 @@ export default function ContrastAnalysis(): JSX.Element {
 
           <Divider hidden />
 
-          <Modal
-            closeIcon
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
-            open={open}
-            trigger={
-              <Button circular primary>
-                Code
-              </Button>
-            }
-          >
-            <Modal.Content>
-              <Modal.Description>
-                <CopyBlock
-                  text={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce)}
-                  language="typescript"
-                  theme={dracula}
-                  wrapLines={true}
-                />
-              </Modal.Description>
-            </Modal.Content>
-          </Modal>
+          <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce)} />
         </Grid.Column>
 
         <Grid.Column width={6}>

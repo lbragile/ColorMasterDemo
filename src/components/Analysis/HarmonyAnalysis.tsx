@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, Divider, Grid, Icon, Label, Menu, Modal } from "semantic-ui-react";
-import ColorSelectorWidget from "./ColorSelectorWidget";
-import { CopyBlock, dracula } from "react-code-blocks";
-import useDebounce from "../hooks/useDebounce";
-import { Swatch } from "../styles/Swatch";
-import RangeSlider from "./Sliders/RangeSlider";
-import { HarmonySample } from "../utils/codeSamples";
+import { Divider, Grid, Icon, Label, Menu } from "semantic-ui-react";
+import ColorSelectorWidget from "../ColorSelectorWidget";
+import useDebounce from "../../hooks/useDebounce";
+import { Swatch } from "../../styles/Swatch";
+import RangeSlider from "../Sliders/RangeSlider";
+import { HarmonySample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 import { THarmony, TMonoEffect } from "colormaster/types";
 import styled from "styled-components";
+import CodeModal from "./CodeModal";
+import A11yPlugin from "colormaster/plugins/accessibility";
 
-extendPlugins([HarmonyPlugin]);
+extendPlugins([HarmonyPlugin, A11yPlugin]);
 
 const typeOptions = [
   "analogous",
@@ -39,22 +40,27 @@ const SwatchCounter = styled(Label)`
   && {
     border-radius: 2px 0;
     color: black;
+    position: absolute;
+    left: 0;
   }
 `;
 
 export default function HarmonyAnalysis(): JSX.Element {
   const [color, setColor] = useState(CM("hsla(0, 100%, 50%, 1)"));
-  const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL()));
+  const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
   const [type, setType] = useState<THarmony>("analogous");
   const [effect, setEffect] = useState<TMonoEffect>("shades");
   const [amount, setAmount] = useState(7);
 
-  const [open, setOpen] = useState(false);
-
   const colorDebounce = useDebounce(color, 100);
 
   useEffect(() => {
-    setHarmony(colorDebounce.harmony({ type, effect, amount }).map((c) => c.stringHSL()));
+    setHarmony(
+      colorDebounce
+        .harmony({ type, effect, amount })
+        .map((c) => c.stringHSL({ precision: [2, 2, 2, 2] }))
+        .filter((val, i, arr) => arr.indexOf(val) === i) // filter duplicates in case of picker overlap
+    );
   }, [colorDebounce, type, effect, amount]);
 
   return (
@@ -66,9 +72,8 @@ export default function HarmonyAnalysis(): JSX.Element {
             setColor={setColor}
             initPicker={3}
             harmony={
-              // only show harmonies if not shades or tints. For tones, make sure gap between pickers is at least 2% saturation
-              type !== "monochromatic" ||
-              (type === "monochromatic" && effect === "tones" && color.saturation / amount > 2)
+              // only show harmonies if not shades or tints
+              type !== "monochromatic" || (type === "monochromatic" && effect === "tones")
                 ? color.harmony({ type, effect, amount })
                 : undefined
             }
@@ -97,6 +102,7 @@ export default function HarmonyAnalysis(): JSX.Element {
                       {effectOptions.map((e) => {
                         return (
                           <Menu.Item
+                            as="span"
                             key={e.text + "-monochromatic-effect"}
                             active={e.text === effect}
                             onClick={() => {
@@ -133,32 +139,9 @@ export default function HarmonyAnalysis(): JSX.Element {
           </Menu>
 
           <Divider hidden />
-
-          <Modal
-            closeIcon
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
-            open={open}
-            trigger={
-              <Button circular primary>
-                Code
-              </Button>
-            }
-          >
-            <Modal.Content>
-              <Modal.Description>
-                <CopyBlock
-                  text={HarmonySample(color, type, effect, amount)}
-                  language="typescript"
-                  theme={dracula}
-                  wrapLines={true}
-                />
-              </Modal.Description>
-            </Modal.Content>
-          </Modal>
         </Grid.Column>
 
-        <Grid.Column columns="equal">
+        <Grid.Column columns="equal" textAlign="center">
           <Grid.Row>
             {harmony.map((swatch, i) => (
               <Swatch
@@ -172,10 +155,15 @@ export default function HarmonyAnalysis(): JSX.Element {
                 onClick={() => setColor(CM(swatch))}
               >
                 {type === "monochromatic" && <SwatchCounter>{i + 1}</SwatchCounter>}
-                {swatch === color.stringHSL() && <CurrentColorIcon name="check circle" size="large" />}
+                {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
+                  <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
+                )}
               </Swatch>
             ))}
           </Grid.Row>
+
+          <Divider hidden />
+          <CodeModal code={HarmonySample(color, type, effect, amount)} />
         </Grid.Column>
       </Grid.Row>
     </Grid>
