@@ -68,25 +68,27 @@ const NumberInput = styled(Input)`
 interface IRangeSlider {
   value: number;
   color: string;
-  title: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  title?: string;
   min?: string;
   max?: string;
   step?: string;
   postfix?: string;
   format?: Exclude<TFormat, "name" | "invalid">;
+  showNum?: boolean;
 }
 
 export default function RangeSlider({
   value,
   color,
-  title,
   onChange,
+  title = undefined,
   min = "0",
   max = "100",
   step = "any",
   postfix = "",
-  format = undefined
+  format = undefined,
+  showNum = true
 }: IRangeSlider): JSX.Element {
   // formats the input when typing to avoid "jumpy" behavior
   function clamp(val: number, adjustBase = false): string {
@@ -110,7 +112,7 @@ export default function RangeSlider({
     ...CommonProps,
     value: clamp(value, false),
     type: "range",
-    step: "0.01",
+    step: format === "hex" ? "1" : "0.01",
     color,
     draggable: false
   };
@@ -130,9 +132,11 @@ export default function RangeSlider({
         <SliderInput {...SliderInputProps} />
       </Grid.Column>
 
-      <Grid.Column computer={3} mobile={5}>
-        <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
-      </Grid.Column>
+      {showNum && (
+        <Grid.Column computer={3} mobile={5}>
+          <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
+        </Grid.Column>
+      )}
     </Grid.Row>
   );
 }

@@ -11,6 +11,7 @@ interface IWheelPicker {
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   pickerRadius?: number;
   rotate?: number;
+  harmony?: ColorMaster[];
 }
 
 /**
@@ -22,7 +23,13 @@ interface IWheelPicker {
  * @note To avoid visible gaps between the drawn segments (due to pixel resolution), interlace the segments → current segment is drawn in range [hue-1, hue+1]
  * @note `radial-gradient` is used to be independent of quadrant. Using linear-gradient will have incorrect direction in some quadrants.
  */
-export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate = 90 }: IWheelPicker): JSX.Element {
+export default function WheelPicker({
+  color,
+  setColor,
+  pickerRadius = 5,
+  rotate = 90,
+  harmony = undefined
+}: IWheelPicker): JSX.Element {
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -62,22 +69,29 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
   useEffect(() => {
     if (ctxPicker) {
       const radius = ctxPicker.canvas.width / 2;
-
-      const { h, s } = color.hsla();
       ctxPicker.clearRect(0, 0, radius * 2, radius * 2);
-      ctxPicker.beginPath();
 
-      const cos0 = Math.cos(((h - rotate) * Math.PI) / 180);
-      const hyp = (s * radius) / 100;
-      const x = radius + hyp * cos0;
-      const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
+      const colorArr = harmony ?? [color];
+      colorArr.forEach((c) => {
+        const { h, s } = c.hsla();
+        ctxPicker.beginPath();
 
-      ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+        const cos0 = Math.cos(((h - rotate) * Math.PI) / 180);
+        const hyp = (s * radius) / 100;
+        const x = radius + hyp * cos0;
+        const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
-      ctxPicker.fillStyle = "rgba(0,0,0,0.6)";
-      ctxPicker.fill();
+        ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+
+        const pickerColor = "rgba(0,0,0,0.6)";
+        ctxPicker.fillStyle = c.stringHSL() === color.stringHSL() ? pickerColor : "transparent";
+        ctxPicker.strokeStyle = pickerColor;
+        ctxPicker.lineWidth = 1;
+        ctxPicker.fill();
+        ctxPicker.stroke();
+      });
     }
-  }, [pickerRadius, rotate, color, ctxPicker]);
+  }, [pickerRadius, rotate, color, harmony, ctxPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();

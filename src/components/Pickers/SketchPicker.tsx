@@ -82,7 +82,7 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       const { left, top } = ctxSketch.canvas.getBoundingClientRect();
       const [s, v] = [e.clientX - left, e.clientY - top].map((val) => (val * 100) / ctxSketch.canvas.width);
 
-      setColor(CM(`hsva(${color.hue}, ${s}%, ${100 - v}%, 1)`));
+      setColor(CM(`hsva(${color.hue}, ${s}%, ${100 - v}%, ${color.alpha})`));
     }
   };
 

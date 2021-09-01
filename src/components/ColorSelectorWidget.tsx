@@ -23,6 +23,26 @@ const pickerTypeOptions = [
   { key: 3, text: "WHEEL", value: 3 }
 ];
 
+const SWATCH_COLORS = [
+  "hsla(0, 100%, 50%, 1)",
+  "hsla(30, 100%, 50%, 1)",
+  "hsla(60, 100%, 50%, 1)",
+  "hsla(90, 100%, 50%, 1)",
+  "hsla(120, 100%, 50%, 1)",
+  "hsla(150, 100%, 50%, 1)",
+  "hsla(180, 100%, 50%, 1)",
+  "hsla(210, 100%, 50%, 1)",
+  "hsla(240, 100%, 50%, 1)",
+  "hsla(270, 100%, 50%, 1)",
+  "hsla(300, 100%, 50%, 1)",
+  "hsla(330, 100%, 50%, 1)",
+  "hsla(0, 0%, 100%, 1)",
+  "hsla(0, 0%, 75%, 1)",
+  "hsla(0, 0%,50%, 1)",
+  "hsla(0, 0%,25%, 1)",
+  "hsla(0, 0%, 0%, 1)"
+];
+
 const StyledColorDisplay = styled(Input)`
   && {
     & > input {
@@ -89,34 +109,16 @@ interface IColorSelectorWidget {
   children?: JSX.Element;
   initColorspace?: number;
   initPicker?: number;
+  harmony?: ColorMaster[];
 }
-
-const SWATCH_COLORS = [
-  "hsla(0, 100%, 50%, 1)",
-  "hsla(30, 100%, 50%, 1)",
-  "hsla(60, 100%, 50%, 1)",
-  "hsla(90, 100%, 50%, 1)",
-  "hsla(120, 100%, 50%, 1)",
-  "hsla(150, 100%, 50%, 1)",
-  "hsla(180, 100%, 50%, 1)",
-  "hsla(210, 100%, 50%, 1)",
-  "hsla(240, 100%, 50%, 1)",
-  "hsla(270, 100%, 50%, 1)",
-  "hsla(300, 100%, 50%, 1)",
-  "hsla(330, 100%, 50%, 1)",
-  "hsla(0, 0%, 100%, 1)",
-  "hsla(0, 0%, 75%, 1)",
-  "hsla(0, 0%,50%, 1)",
-  "hsla(0, 0%,25%, 1)",
-  "hsla(0, 0%, 0%, 1)"
-];
 
 export default function ColorSelectorWidget({
   color,
   setColor,
   children,
   initColorspace = 1,
-  initPicker = 1
+  initPicker = 1,
+  harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
   const [alpha, setAlpha] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -328,7 +330,7 @@ export default function ColorSelectorWidget({
       {pickerType === 2 ? (
         <SketchPicker color={color} setColor={setColor} />
       ) : pickerType === 3 ? (
-        <WheelPicker color={color} setColor={setColor} />
+        <WheelPicker color={color} setColor={setColor} harmony={harmony} />
       ) : (
         currentSliders.sliders
       )}

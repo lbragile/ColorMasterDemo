@@ -8,6 +8,7 @@ export const Swatch = styled.div.attrs(
     borderColor: string;
     borderRadius?: string;
     display?: string;
+    position?: string;
   }) => ({
     ...props,
     style: { background: props.background } // this changes a lot
@@ -19,4 +20,5 @@ export const Swatch = styled.div.attrs(
   border: ${(props) => props.borderColor ?? "hsla(0, 0%, 95%, 1)"} 1px solid;
   display: ${(props) => props.display ?? "block"};
   margin: 0 ${(props) => (props.display ? "2px" : "auto")};
+  position: ${(props) => props.position ?? ""};
 `;
