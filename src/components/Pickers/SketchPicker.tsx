@@ -74,10 +74,10 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (canDrag.current && ctxSketch) {
+      const { width } = ctxSketch.canvas;
       const { left, top } = ctxSketch.canvas.getBoundingClientRect();
-      const [s, v] = [e.clientX - left, e.clientY - top].map((val) => (val * 100) / ctxSketch.canvas.width);
-
-      setColor(CM(`hsva(${color.hue}, ${s}%, ${100 - v}%, ${color.alpha})`));
+      const [s, v] = [e.clientX - left, e.clientY - top].map((val) => (val * 100) / width);
+      setColor(CM({ ...color.hsva(), s, v: 100 - v }));
     }
   };
 

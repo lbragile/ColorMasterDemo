@@ -9,6 +9,7 @@ export const Swatch = styled.div.attrs(
     borderRadius?: string;
     display?: string;
     position?: string;
+    $clickable?: boolean;
   }) => ({
     ...props,
     style: { background: props.background } // this changes a lot
@@ -21,4 +22,5 @@ export const Swatch = styled.div.attrs(
   display: ${(props) => props.display ?? "block"};
   margin: 0 ${(props) => (props.display ? "2px" : "auto")};
   position: ${(props) => props.position ?? ""};
+  cursor: ${(props) => (props.$clickable ? "pointer" : "help")};
 `;

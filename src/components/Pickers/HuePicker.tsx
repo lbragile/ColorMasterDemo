@@ -61,13 +61,10 @@ export default function HuePicker({ color, setColor, height = 25 }: IHuePicker):
     if (canDrag.current && ctxHue) {
       const { width } = ctxHue.canvas;
 
-      const { left, top } = ctxHue.canvas.getBoundingClientRect();
-      const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
+      const { left } = ctxHue.canvas.getBoundingClientRect();
+      const x = e.clientX - Math.floor(left);
 
-      const data = ctxHue.getImageData(x === width ? x - 1 : x, y === height ? y - 1 : y, 1, 1).data.slice(0, -1);
-      const newColor = CM(`rgba(${data.join(", ")}, ${color.alpha})`);
-
-      setColor(CM({ ...color.hsla(), h: newColor.hue }));
+      setColor(CM({ ...color.hsla(), h: (x / width) * 360 }));
     }
   };
 

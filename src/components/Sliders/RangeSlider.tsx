@@ -4,22 +4,27 @@ import { Grid, Header, Input } from "semantic-ui-react";
 import styled from "styled-components";
 import useIsMobile from "../../hooks/useIsMobile";
 
-const SliderInput = styled.input.attrs((props) => {
-  const val = Number(props.value ?? 0);
-  const min = Number(props.min ?? 0);
-  const max = Number(props.max ?? 100);
-  const breakpoint = 100 * ((val - min) / (max - min));
+const SliderInput = styled.input.attrs(
+  (props: { value: string; min: string; max: string; color: string; $colorRight: string }) => {
+    const val = Number(props.value ?? 0);
+    const min = Number(props.min ?? 0);
+    const max = Number(props.max ?? 100);
+    const breakpoint = 100 * ((val - min) / (max - min));
+    const colorRight = props.$colorRight ?? "hsla(0, 0%, 90%, 1)";
 
-  return {
-    style: {
-      background: `linear-gradient(to right, ${props.color} 0%, ${props.color} ${breakpoint}%, hsla(0, 0%, 90%, 1) ${breakpoint}%, hsla(0, 0%, 90%, 1) 100%)`
-    }
-  };
-})`
+    return {
+      style: {
+        background: `linear-gradient(to right, ${props.color} 0%, ${props.color} ${breakpoint}%, ${colorRight} ${breakpoint}%, ${colorRight} 100%)`
+      },
+      colorRight
+    };
+  }
+)`
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: 12px;
+  border: ${(props) => (props.colorRight ? "1px solid hsla(0, 0%, 80%, 1)" : "")};
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -76,6 +81,7 @@ interface IRangeSlider {
   postfix?: string;
   format?: Exclude<TFormat, "name" | "invalid">;
   showNum?: boolean;
+  colorRight?: string;
 }
 
 export default function RangeSlider({
@@ -88,7 +94,8 @@ export default function RangeSlider({
   step = "any",
   postfix = "",
   format = undefined,
-  showNum = true
+  showNum = true,
+  colorRight = undefined
 }: IRangeSlider): JSX.Element {
   // formats the input when typing to avoid "jumpy" behavior
   function clamp(val: number, adjustBase = false): string {
@@ -100,22 +107,19 @@ export default function RangeSlider({
 
   const isMobile = useIsMobile();
 
-  const CommonProps = {
-    min,
-    max,
-    type: format === "hex" ? "text" : "number",
-    format,
-    step,
-    onChange
-  };
+  const type = format === "hex" ? "text" : "number";
+  const CommonProps = { min, max, type, format, step, onChange };
+
   const SliderInputProps = {
     ...CommonProps,
     value: clamp(value, false),
     type: "range",
     step: format === "hex" ? "1" : "0.01",
     color,
-    draggable: false
+    draggable: false,
+    $colorRight: colorRight
   };
+
   const NumberInputProps = {
     ...CommonProps,
     value: clamp(value, true),
@@ -133,7 +137,7 @@ export default function RangeSlider({
       </Grid.Column>
 
       {showNum && (
-        <Grid.Column computer={3} mobile={5}>
+        <Grid.Column computer={colorRight ? 4 : 3} mobile={5}>
           <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
         </Grid.Column>
       )}

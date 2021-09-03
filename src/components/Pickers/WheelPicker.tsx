@@ -104,7 +104,8 @@ export default function WheelPicker({
       if (Math.pow(pos.x, 2) + Math.pow(pos.y, 2) <= Math.pow(radius, 2)) {
         const hue = (Math.atan2(pos.x, pos.y) * 180) / Math.PI;
         const sat = (Math.sqrt(Math.pow(pos.x, 2) + Math.pow(pos.y, 2)) * 100) / radius;
-        setColor(CM(`hsla(${hue}, ${sat}%, ${color.lightness}%, ${color.alpha})`));
+        const currentColor = CM(color.rgba()); // deep clone the `color` state variable
+        setColor(currentColor.hueTo(hue).saturationTo(sat));
       }
     }
   };

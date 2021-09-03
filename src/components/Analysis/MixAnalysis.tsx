@@ -1,39 +1,45 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Divider, Grid, Header, Label, Table } from "semantic-ui-react";
+import React, { useEffect, useState } from "react";
+import { Divider, Dropdown, Grid, Header, Icon, Label, Message, Popup } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import CodeModal from "./CodeModal";
 import { Swatch } from "../../styles/Swatch";
 import RangeSlider from "../Sliders/RangeSlider";
 import { MixSample } from "../../utils/codeSamples";
-import tinycolor from "tinycolor2";
-import { colord, extend } from "colord";
-import { default as colordMixPlugin } from "colord/plugins/mix";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
+import { TFormat } from "colormaster/types";
+import useCopyToClipboard from "../../hooks/useCopytoClipboard";
+import styled from "styled-components";
 
-extendPlugins([MixPlugin]); // colormaster
-extend([colordMixPlugin]); // colord
+extendPlugins([MixPlugin]);
+
+const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"].map(
+  (value, i) => ({ key: i, text: value.toUpperCase(), value })
+);
+
+const StyledDropdown = styled(Dropdown)`
+  && {
+    margin: 0 6px;
+  }
+`;
 
 export default function MixAnalysis(): JSX.Element {
-  const [color1, setColor1] = useState(CM("hsla(0, 0%, 100%, 1)"));
-  const [color2, setColor2] = useState(CM("hsla(0, 0%, 0%, 1)"));
+  const [color1, setColor1] = useState(CM("hsla(30, 100%, 50%, 1)"));
+  const [color2, setColor2] = useState(CM("hsla(0, 0%, 50%, 1)"));
   const [ratio, setRatio] = useState(0.5);
-  const [mix, setMix] = useState(color1.mix(color2, ratio).stringHSL());
-  const otherMix = useRef({ colord: mix, tiny: mix });
+  const [colorspace, setColorspace] = useState<Exclude<TFormat, "invalid" | "name">>("luv");
+  const [mix, setMix] = useState(color1.mix({ color: color2, ratio, colorspace }).stringHSL());
 
   const color1Debounce = useDebounce(color1, 100);
   const color2Debounce = useDebounce(color2, 100);
   const ratioDebounce = useDebounce(ratio, 100);
 
-  useEffect(() => {
-    setMix(color1.mix(color2, ratio).stringHSL());
+  const [copy, setCopy] = useCopyToClipboard();
 
-    const rgb = [color1, color2].map((c) => c.stringRGB({ precision: [5, 5, 5, 5] }));
-    const colordMix = colord(rgb[0]).mix(rgb[1], ratio);
-    const tinyMix = tinycolor.mix(rgb[0], rgb[1], ratio * 100);
-    otherMix.current = { colord: colordMix.toHslString(), tiny: tinyMix.toHslString() };
-  }, [color1, color2, ratio]);
+  useEffect(() => {
+    setMix(color1.mix({ color: color2, ratio, colorspace }).stringHSL());
+  }, [color1, color2, ratio, colorspace]);
 
   return (
     <Grid columns={3} verticalAlign="middle" stackable centered>
@@ -47,12 +53,14 @@ export default function MixAnalysis(): JSX.Element {
         </Grid.Column>
 
         <Grid.Column width={4} textAlign="center">
+          <Label size="huge" color="teal" horizontal>
+            Ratio
+          </Label>
+          <Divider hidden />
           <Grid verticalAlign="middle" textAlign="center">
-            <Label size="huge" color="teal" pointing="below">
-              Ratio
-            </Label>
             <RangeSlider
-              color="hsl(180,100%,35%)"
+              color={color2.stringHSL()}
+              colorRight={color1.stringHSL()}
               min="0"
               max="100"
               value={ratio * 100}
@@ -63,45 +71,68 @@ export default function MixAnalysis(): JSX.Element {
 
           <Divider hidden />
 
-          <Table celled textAlign="center">
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>
-                  <Header as="h3" color="blue">
-                    ColorMaster
-                  </Header>
-                </Table.HeaderCell>
-                <Table.HeaderCell>
-                  <Header as="h3">colord</Header>
-                </Table.HeaderCell>
-                <Table.HeaderCell>
-                  <Header as="h3">TinyColor2</Header>
-                </Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
+          <Divider horizontal>
+            <Header as="h2">
+              <Icon name="arrow circle down" color="teal" size="massive" />
+            </Header>
+          </Divider>
 
-            <Table.Body>
-              <Table.Row>
-                {[mix, otherMix.current.colord, otherMix.current.tiny].map((val, i) => {
-                  const lib = i === 0 ? "CM" : i === 1 ? "colord" : "TinyColor";
-                  return (
-                    <Table.Cell key={val + "-" + lib}>
-                      <Swatch
-                        title={val}
-                        radius={50}
-                        borderRadius="4px"
-                        display="inline-block"
-                        position="relative"
-                        background={val}
-                      />
-                    </Table.Cell>
-                  );
-                })}
-              </Table.Row>
-            </Table.Body>
-          </Table>
+          <Divider hidden />
 
-          <CodeModal code={MixSample(color1Debounce, color2Debounce, ratioDebounce, otherMix.current)} />
+          <Grid.Row>
+            <Swatch
+              title={mix}
+              radius={75}
+              borderRadius="4px"
+              display="inline-block"
+              position="relative"
+              background={mix}
+              $clickable
+              tabIndex={0}
+              onClick={() => setCopy(mix)}
+              onBlur={() => setCopy("")}
+            />
+          </Grid.Row>
+
+          <Grid.Row>
+            {copy && (
+              <Message compact positive>
+                <b>Copied to clipboard!</b>
+              </Message>
+            )}
+          </Grid.Row>
+
+          <Divider hidden />
+
+          <Grid.Row textAlign="left">
+            <Header>
+              <Label color="teal" size="big">
+                Color Space
+              </Label>
+            </Header>
+
+            <StyledDropdown
+              compact
+              search
+              selection
+              options={colorspaceOpts}
+              value={colorspace}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement>,
+                { value }: { value: Exclude<TFormat, "invalid" | "name"> }
+              ) => setColorspace(value)}
+            />
+
+            <Popup
+              content="The two colors will be converted to this color space when mixing"
+              position="right center"
+              trigger={<Icon name="info circle" color="teal" size="large" />}
+            />
+          </Grid.Row>
+
+          <Divider hidden />
+
+          <CodeModal code={MixSample(color1Debounce, color2Debounce, ratioDebounce, colorspace)} />
         </Grid.Column>
 
         <Grid.Column width={6}>

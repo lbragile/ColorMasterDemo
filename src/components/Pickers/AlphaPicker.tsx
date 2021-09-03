@@ -61,7 +61,8 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
       const { width } = ctxAlpha.canvas;
       const { left } = ctxAlpha.canvas.getBoundingClientRect();
       const newAlpha = (e.clientX - Math.floor(left)) / (width - 1);
-      setColor(CM(`rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha})`));
+      const currentColor = CM(color.rgba()); // deep clone the `color` state variable
+      setColor(currentColor.alphaTo(newAlpha));
     }
   };
 

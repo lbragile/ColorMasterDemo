@@ -10,6 +10,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
 import HEXSliderGroup from "./Sliders/HEXSliderGroup";
+import useCopyToClipboard from "../hooks/useCopytoClipboard";
 
 const colorspaceOptions = [
   { key: 1, text: "RGB", value: 1 },
@@ -51,8 +52,8 @@ const StyledColorDisplay = styled(Input)`
       padding: 0;
     }
 
-    &.action button:hover,
-    &.action button:focus {
+    & .button:hover,
+    & .button:focus {
       background-color: ${(props) => (props.action.color === "teal" ? "rgba(0, 196, 196, 1)" : "rgba(0, 196, 0, 1)")};
     }
   }
@@ -121,12 +122,12 @@ export default function ColorSelectorWidget({
   harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
   const [alpha, setAlpha] = useState(true);
-  const [copied, setCopied] = useState(false);
   const [swatchIndex, setSwatchIndex] = useState(0);
   const [colorspace, setColorspace] = useState(initColorspace);
   const [pickerType, setPickerType] = useState(initPicker);
 
   const isMobile = useIsMobile();
+  const [copy, setCopy] = useCopyToClipboard();
 
   const handleSliderChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
@@ -164,18 +165,15 @@ export default function ColorSelectorWidget({
               content="Copy to clipboard"
               position="top center"
               inverted
-              trigger={<Icon name={copied ? "check circle" : "copy"} />}
+              trigger={<Icon name={copy ? "check circle" : "copy"} />}
             />
           ),
-          color: copied ? "green" : "teal",
-          onClick: () => {
-            navigator.clipboard.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 3000);
-          }
+          color: copy ? "green" : "teal",
+          onClick: () => setCopy(text),
+          onBlur: () => setCopy("")
         };
       },
-    [copied]
+    [copy, setCopy]
   );
 
   const currentSliders = useMemo(() => {
@@ -224,6 +222,7 @@ export default function ColorSelectorWidget({
           <Swatch
             radius={50}
             background={colorspace === 1 ? color.stringRGB() : colorspace === 2 ? color.stringHEX() : color.stringHSL()}
+            title={color.stringHSL()}
           />
         </Grid.Row>
 

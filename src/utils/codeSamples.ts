@@ -1,5 +1,9 @@
-import { ColorMaster } from "colormaster";
-import { THarmony, TMonoEffect, TNumArr } from "colormaster/types";
+import { ColorMaster, extendPlugins } from "colormaster";
+import MixPlugin from "colormaster/plugins/mix";
+import HarmonyPlugin from "colormaster/plugins/harmony";
+import { TFormat, THarmony, TMonoEffect, TNumArr } from "colormaster/types";
+
+extendPlugins([MixPlugin, HarmonyPlugin]);
 
 export function ContrastSample(
   fgColor: ColorMaster,
@@ -48,7 +52,7 @@ export function MixSample(
   color1: ColorMaster,
   color2: ColorMaster,
   ratio: number,
-  otherMix: { colord: string; tiny: string }
+  colorspace: Exclude<TFormat, "invalid" | "name">
 ): string {
   const precision = [2, 2, 2, 2] as Required<TNumArr>;
   return `import CM, { extendPlugins } from 'colormaster';
@@ -58,26 +62,10 @@ extendPlugins([MixPlugin]); // add ColorMaster's mix plugin
 
 const color1 = CM("${color1.stringRGB({ precision })}");
 const color2 = CM("${color2.stringRGB({ precision })}");
-const ratio = ${ratio};
+const ratio = ${ratio}; ${ratio === 0.5 ? "// default" : ""}
+const colorspace = "${colorspace}"; ${colorspace === "luv" ? "// default" : ""}
 
-const mix = color1.mix(color2, ratio);
-console.log(mix.stringHSL()); // ${color1.mix(color2, ratio).stringHSL()}
-
-/**
- * COLORD
- * import { colord, extend } from "colord";
- * extend([colordMixPlugin]);
- * 
- * const colordMix = colord(${color1.stringRGB({ precision })}).mix(${color2.stringRGB({ precision })}, ${ratio});
- * console.log(colordMix.toHslString()); // ${otherMix.colord}
- * 
- * TINYCOLOR2
- * import tinycolor from "tinycolor2";
- * 
- * const tinyMix = tinycolor.mix(${color1.stringRGB({ precision })}, ${color2.stringRGB({ precision })}, ${
-    ratio * 100
-  });
- * console.log(tinyMix.toHslString()); // ${otherMix.tiny}
- */
+const mix = color1.mix({color: color2, ratio, colorspace});
+console.log(mix.stringHSL()); // ${color1.mix({ color: color2, ratio, colorspace }).stringHSL()}
 `;
 }

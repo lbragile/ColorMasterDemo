@@ -2,7 +2,6 @@ import React, { lazy, Suspense, useMemo } from "react";
 import { Container, Divider, Icon, Tab } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
-import { dependencies } from "../../package.json";
 import Loading from "./Loading";
 
 const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
@@ -48,7 +47,7 @@ export default function App(): JSX.Element {
 
       <Divider hidden />
 
-      <h2>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h2>
+      <h2>ColorMaster v1.2.0</h2>
 
       <Divider hidden />
 
