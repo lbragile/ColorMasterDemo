@@ -11,8 +11,11 @@ import MixPlugin from "colormaster/plugins/mix";
 import { TFormat } from "colormaster/types";
 import useCopyToClipboard from "../../hooks/useCopytoClipboard";
 import styled from "styled-components";
+import { useHistory } from "react-router";
 
 extendPlugins([MixPlugin]);
+
+type TFormatDropdown = Exclude<TFormat, "invalid" | "name">;
 
 const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"].map(
   (value, i) => ({ key: i, text: value.toUpperCase(), value })
@@ -36,15 +39,25 @@ export default function MixAnalysis(): JSX.Element {
   const ratioDebounce = useDebounce(ratio, 100);
 
   const [copy, setCopy] = useCopyToClipboard();
+  const history = useHistory();
 
   useEffect(() => {
     setMix(color1.mix({ color: color2, ratio, colorspace }).stringHSL());
   }, [color1, color2, ratio, colorspace]);
 
+  useEffect(() => {
+    history.replace({
+      pathname: "/mix",
+      search: `?primary=${color1Debounce.stringHEX().toLowerCase()}&secondary=${color2Debounce
+        .stringHEX()
+        .toLowerCase()}&ratio=${ratioDebounce}`
+    });
+  }, [history, color1Debounce, color2Debounce, ratioDebounce]);
+
   return (
     <Grid columns={3} verticalAlign="middle" stackable centered>
       <Grid.Row>
-        <Grid.Column width={6}>
+        <Grid.Column width={5}>
           <ColorSelectorWidget color={color1} setColor={setColor1}>
             <Label size="big" color="black" attached="top left">
               Primary
@@ -52,11 +65,13 @@ export default function MixAnalysis(): JSX.Element {
           </ColorSelectorWidget>
         </Grid.Column>
 
-        <Grid.Column width={4} textAlign="center">
+        <Grid.Column width={6} textAlign="center">
           <Label size="huge" color="teal" horizontal>
             Ratio
           </Label>
+
           <Divider hidden />
+
           <Grid verticalAlign="middle" textAlign="center">
             <RangeSlider
               color={color2.stringHSL()}
@@ -117,10 +132,9 @@ export default function MixAnalysis(): JSX.Element {
               selection
               options={colorspaceOpts}
               value={colorspace}
-              onChange={(
-                e: React.ChangeEvent<HTMLInputElement>,
-                { value }: { value: Exclude<TFormat, "invalid" | "name"> }
-              ) => setColorspace(value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>, { value }: { value: TFormatDropdown }) =>
+                setColorspace(value)
+              }
             />
 
             <Popup
@@ -135,7 +149,7 @@ export default function MixAnalysis(): JSX.Element {
           <CodeModal code={MixSample(color1Debounce, color2Debounce, ratioDebounce, colorspace)} />
         </Grid.Column>
 
-        <Grid.Column width={6}>
+        <Grid.Column width={5}>
           <ColorSelectorWidget color={color2} setColor={setColor2}>
             <Label size="big" color="black" attached="top right">
               Secondary

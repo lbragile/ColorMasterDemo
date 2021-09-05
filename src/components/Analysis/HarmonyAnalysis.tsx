@@ -11,6 +11,7 @@ import { THarmony, TMonoEffect } from "colormaster/types";
 import styled from "styled-components";
 import CodeModal from "./CodeModal";
 import A11yPlugin from "colormaster/plugins/accessibility";
+import { useHistory } from "react-router";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -53,6 +54,7 @@ export default function HarmonyAnalysis(): JSX.Element {
   const [amount, setAmount] = useState(7);
 
   const colorDebounce = useDebounce(color, 100);
+  const history = useHistory();
 
   useEffect(() => {
     setHarmony(
@@ -63,10 +65,19 @@ export default function HarmonyAnalysis(): JSX.Element {
     );
   }, [colorDebounce, type, effect, amount]);
 
+  useEffect(() => {
+    const baseSearch = `?color=${colorDebounce.stringHEX().toLowerCase()}&type=${type}`;
+
+    history.replace({
+      pathname: "/harmony",
+      search: type !== "monochromatic" ? baseSearch : `${baseSearch}&effect=${effect}&amount=${amount}`
+    });
+  }, [history, colorDebounce, type, effect, amount]);
+
   return (
     <Grid columns={3} verticalAlign="middle" stackable centered>
       <Grid.Row>
-        <Grid.Column width={6}>
+        <Grid.Column width={5}>
           <ColorSelectorWidget
             color={color}
             setColor={setColor}

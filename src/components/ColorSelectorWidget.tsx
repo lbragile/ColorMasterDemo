@@ -44,11 +44,13 @@ const SWATCH_COLORS = [
   "hsla(0, 0%, 0%, 1)"
 ];
 
-const StyledColorDisplay = styled(Input)`
+const StyledColorDisplay = styled(Input).attrs(
+  (props: { $mobile: boolean; action: { color: string; [key: string]: unknown } }) => props
+)`
   && {
     & > input {
       text-align: center;
-      font-size: ${(props) => (props.mobile === "true" ? "0.95em" : "1em")};
+      font-size: ${(props) => (props.$mobile ? "0.95em" : "1em")};
       padding: 0;
     }
 
@@ -309,12 +311,12 @@ export default function ColorSelectorWidget({
             <StyledColorDisplay
               type="text"
               value={currentSliders.value}
-              mobile={isMobile.toString()}
               spellCheck={false}
               size="large"
               readOnly
               fluid
               action={copyAction(currentSliders.value)}
+              $mobile={isMobile}
             />
           </Grid.Column>
 

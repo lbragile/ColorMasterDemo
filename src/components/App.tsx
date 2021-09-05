@@ -1,16 +1,14 @@
-import React, { lazy, Suspense, useMemo } from "react";
-import { Container, Divider, Icon, Tab } from "semantic-ui-react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
+import { Container, Menu } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
 import Loading from "./Loading";
+import { Switch, Route, NavLink, useLocation, Redirect } from "react-router-dom";
+import SocialMedia from "./SocialMedia";
 
 const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
 const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
 const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
-
-const LinkIcon = styled(Icon)`
-  cursor: pointer;
-`;
 
 const StyledContainer = styled(Container)`
   && {
@@ -19,60 +17,49 @@ const StyledContainer = styled(Container)`
   }
 `;
 
+const StyledNavLink = styled(NavLink)`
+  && {
+    color: black;
+  }
+`;
+
+const MENU_TABS = ["contrast", "harmony", "mix"];
+
 export default function App(): JSX.Element {
-  const panes = useMemo(
-    () =>
-      [
-        { menuItem: "Contrast", elem: <ContrastAnalysis /> },
-        { menuItem: "Harmony", elem: <HarmonyAnalysis /> },
-        { menuItem: "Mix", elem: <MixAnalysis /> }
-      ].map((item) => {
-        return {
-          menuItem: item.menuItem,
-          render: function renderElement() {
-            return (
-              <Suspense fallback={<Loading />}>
-                <Tab.Pane>{item.elem}</Tab.Pane>
-              </Suspense>
-            );
-          }
-        };
-      }),
-    []
-  );
+  const location = useLocation();
+  const [active, setActive] = useState("");
+
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location]);
 
   return (
     <StyledContainer>
       <GlobalStyle />
 
-      <Divider hidden />
+      <Menu pointing secondary>
+        {MENU_TABS.map((item) => {
+          const path = "/" + item;
+          return (
+            <Menu.Item as={StyledNavLink} key={path} to={path} active={active === path} onClick={() => setActive(path)}>
+              {item[0].toUpperCase() + item.slice(1)}
+            </Menu.Item>
+          );
+        })}
 
-      <h2>ColorMaster v1.2.0</h2>
+        <Menu.Item position="right">
+          <SocialMedia />
+        </Menu.Item>
+      </Menu>
 
-      <Divider hidden />
-
-      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={2} />
-
-      <Divider hidden />
-
-      <LinkIcon
-        name="github"
-        size="big"
-        circular
-        title="https://www.github.com/lbragile/ColorMaster"
-        onClick={() => location.assign("https://www.github.com/lbragile/ColorMaster")}
-      />
-
-      <LinkIcon
-        name="npm"
-        size="big"
-        color="red"
-        circular
-        title="https://www.npmjs.com/package/colormaster"
-        onClick={() => location.assign("https://www.npmjs.com/package/colormaster")}
-      />
-
-      <Divider hidden />
+      <Suspense fallback={<Loading />}>
+        <Switch>
+          <Route path="/contrast" component={ContrastAnalysis} />
+          <Route path="/harmony" component={HarmonyAnalysis} />
+          <Route path="/mix" component={MixAnalysis} />
+          <Redirect from="/" to="/mix" />
+        </Switch>
+      </Suspense>
     </StyledContainer>
   );
 }

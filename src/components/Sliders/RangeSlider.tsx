@@ -134,7 +134,7 @@ export default function RangeSlider({
       </Grid.Column>
 
       {showNum && (
-        <Grid.Column computer={colorRight ? 4 : 3} mobile={5}>
+        <Grid.Column computer={colorRight ? 3 : 4} mobile={5}>
           <NumberInput {...NumberInputProps} $mobile={isMobile} />
         </Grid.Column>
       )}
