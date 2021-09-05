@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import { Divider } from "semantic-ui-react";
 import CM, { ColorMaster } from "colormaster";
 import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
+import { CanvasContainer } from "../../styles/Canvas";
 
 interface IWheelPicker {
   color: ColorMaster;
@@ -12,6 +12,7 @@ interface IWheelPicker {
   pickerRadius?: number;
   rotate?: number;
   harmony?: ColorMaster[];
+  verticalPickers?: boolean;
 }
 
 /**
@@ -28,7 +29,8 @@ export default function WheelPicker({
   setColor,
   pickerRadius = 5,
   rotate = 90,
-  harmony = undefined
+  harmony = undefined,
+  verticalPickers = true
 }: IWheelPicker): JSX.Element {
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
@@ -63,7 +65,7 @@ export default function WheelPicker({
   useEffect(() => {
     if (ctxPicker) {
       const radius = ctxPicker.canvas.width / 2;
-      ctxPicker.clearRect(0, 0, radius * 2, radius * 2);
+      ctxPicker.clearRect(0, 0, radius * 2 + 5, radius * 2 + 5);
 
       const colorArr = harmony ?? [color];
       colorArr.forEach((c) => {
@@ -116,11 +118,12 @@ export default function WheelPicker({
     canDrag.current = false;
   };
 
-  const CommonProps = { thickness: 15, vertical: false, color, setColor };
+  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
 
   return (
-    <>
+    <CanvasContainer $vertical={verticalPickers}>
       <CanvasGroup
+        className="main wheel"
         mainRef={colorWheel}
         picker={{
           ref: colorPicker,
@@ -128,13 +131,10 @@ export default function WheelPicker({
           onPointerMove: handlePointerMove,
           onPointerUp: handlePointerUp
         }}
-        borderRadius="50%"
       />
-
-      <Divider hidden></Divider>
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </>
+    </CanvasContainer>
   );
 }

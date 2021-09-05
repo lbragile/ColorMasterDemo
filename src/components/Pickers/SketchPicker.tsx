@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import { Divider } from "semantic-ui-react";
 import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import HSVPlugin from "colormaster/plugins/hsv";
+import { CanvasContainer } from "../../styles/Canvas";
 
 extendPlugins([HSVPlugin]);
 
@@ -13,6 +13,7 @@ interface ISketchPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   pickerRadius?: number;
+  verticalPickers?: boolean;
 }
 
 /**
@@ -23,7 +24,12 @@ interface ISketchPicker {
  *
  * Thus, HSB/HSV colorspace is used to calculate the position of the cursor on the canvas
  */
-export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISketchPicker): JSX.Element {
+export default function SketchPicker({
+  color,
+  setColor,
+  pickerRadius = 5,
+  verticalPickers = true
+}: ISketchPicker): JSX.Element {
   const colorSketch = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -87,11 +93,12 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
     canDrag.current = false;
   };
 
-  const CommonProps = { thickness: 15, vertical: false, color, setColor };
+  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
 
   return (
-    <>
+    <CanvasContainer $vertical={verticalPickers}>
       <CanvasGroup
+        className="main"
         mainRef={colorSketch}
         picker={{
           ref: colorPicker,
@@ -101,10 +108,8 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
         }}
       />
 
-      <Divider hidden></Divider>
-
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </>
+    </CanvasContainer>
   );
 }

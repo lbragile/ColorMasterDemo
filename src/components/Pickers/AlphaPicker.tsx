@@ -81,6 +81,7 @@ export default function AlphaPicker({ color, setColor, thickness = 15, vertical 
 
   return (
     <CanvasGroup
+      className="alpha"
       mainRef={colorAlpha}
       picker={{
         ref: colorPicker,

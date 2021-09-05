@@ -80,6 +80,7 @@ export default function HuePicker({ color, setColor, thickness = 25, vertical = 
 
   return (
     <CanvasGroup
+      className="hue"
       mainRef={colorHue}
       picker={{
         ref: colorPicker,

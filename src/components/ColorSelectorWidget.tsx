@@ -327,9 +327,9 @@ export default function ColorSelectorWidget({
       <Divider hidden />
 
       {pickerType === 2 ? (
-        <SketchPicker color={color} setColor={setColor} />
+        <SketchPicker color={color} setColor={setColor} verticalPickers={!isMobile} />
       ) : pickerType === 3 ? (
-        <WheelPicker color={color} setColor={setColor} harmony={harmony} />
+        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers={!isMobile} />
       ) : (
         currentSliders.sliders
       )}

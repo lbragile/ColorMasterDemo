@@ -1,11 +1,13 @@
 import { RefObject, useEffect, useState } from "react";
+import useIsMobile from "./useIsMobile";
 
 type TRefCanvas = RefObject<HTMLCanvasElement>;
 
 function fitCanvasContainer(
   ctx: CanvasRenderingContext2D,
   thickness?: number,
-  vertical?: boolean
+  vertical?: boolean,
+  isMobile?: boolean
 ): CanvasRenderingContext2D {
   // vertical hue & alpha pickers
   if (thickness && vertical) {
@@ -15,13 +17,22 @@ function fitCanvasContainer(
     ctx.canvas.height = ctx.canvas.offsetHeight;
   } else {
     // non-vertical pickers (hue, alpha, sketch, wheel)
-    ctx.canvas.style.width = "50%";
+    ctx.canvas.style.width = isMobile ? "75%" : "";
     ctx.canvas.width = ctx.canvas.offsetWidth;
     ctx.canvas.height = thickness ?? ctx.canvas.offsetWidth;
   }
   return ctx;
 }
 
+/**
+ * Hook to set the main & picker context from the corresponding reference canvas.
+ * Also adjusts the scale so that it fits the parent container nicely (useful for vertical vs horizontal pickers).
+ * @param refMain This corresponds to the canvas that displays the UI of a picker background
+ * @param refPicker This corresponds to the canvas that displays the actual picker location (user can drag this)
+ * @param thickness Only relevant for Hue & Alpha pickers - determines how thick they are depending on the orientation
+ * @param vertical Only relevant for Hue & Alpha pickers - whether or not the picker will be upright or not (horizontal saves space in mobile)
+ * @returns The scaled context of an input canvas background and picker
+ */
 export default function useCanvasContext(
   refMain: TRefCanvas,
   refPicker: TRefCanvas,
@@ -31,14 +42,16 @@ export default function useCanvasContext(
   const [main, setMain] = useState<CanvasRenderingContext2D>();
   const [picker, setPicker] = useState<CanvasRenderingContext2D>();
 
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     const ctxMain = refMain.current?.getContext("2d");
     const ctxPicker = refPicker.current?.getContext("2d");
     if (ctxMain && ctxPicker) {
-      setMain(fitCanvasContainer(ctxMain, thickness, vertical));
-      setPicker(fitCanvasContainer(ctxPicker, thickness, vertical));
+      setMain(fitCanvasContainer(ctxMain, thickness, vertical, isMobile));
+      setPicker(fitCanvasContainer(ctxPicker, thickness, vertical, isMobile));
     }
-  }, [refMain, refPicker, thickness, vertical]);
+  }, [refMain, refPicker, thickness, vertical, isMobile]);
 
   return [main, picker];
 }

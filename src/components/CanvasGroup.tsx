@@ -1,5 +1,4 @@
 import React from "react";
-import { CanvasContainer } from "../styles/Canvas";
 
 type TCanvasRef = React.RefObject<HTMLCanvasElement>;
 
@@ -13,14 +12,14 @@ interface IPicker {
 interface ICanvasGroup {
   mainRef: TCanvasRef;
   picker: IPicker;
-  borderRadius?: string;
+  className?: string;
 }
 
-export default function CanvasGroup({ mainRef, picker, borderRadius }: ICanvasGroup): JSX.Element {
+export default function CanvasGroup({ className, mainRef, picker }: ICanvasGroup): JSX.Element {
   return (
-    <CanvasContainer $borderRadius={borderRadius}>
-      <canvas ref={mainRef}></canvas>
-      <canvas {...picker}></canvas>
-    </CanvasContainer>
+    <>
+      <canvas className={className} ref={mainRef}></canvas>
+      <canvas className={className} {...picker}></canvas>
+    </>
   );
 }
