@@ -25,8 +25,8 @@ const StyledDropdown = styled(Dropdown)`
 `;
 
 export default function MixAnalysis(): JSX.Element {
-  const [color1, setColor1] = useState(CM("hsla(30, 100%, 50%, 1)"));
-  const [color2, setColor2] = useState(CM("hsla(0, 0%, 50%, 1)"));
+  const [color1, setColor1] = useState(CM("hsla(180, 100%, 50%, 1)"));
+  const [color2, setColor2] = useState(CM("hsla(0, 100%, 50%, 1)"));
   const [ratio, setRatio] = useState(0.5);
   const [colorspace, setColorspace] = useState<Exclude<TFormat, "invalid" | "name">>("luv");
   const [mix, setMix] = useState(color1.mix({ color: color2, ratio, colorspace }).stringHSL());

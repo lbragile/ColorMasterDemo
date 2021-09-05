@@ -59,7 +59,7 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       ctxPicker.beginPath();
 
       const { s, v } = color.hsva();
-      ctxPicker.arc((s / 100) * (width - 1), (1 - v / 100) * (width - 1), pickerRadius * 2, 0, 2 * Math.PI);
+      ctxPicker.arc((s * width) / 100, ((100 - v) * width) / 100, pickerRadius * 1.5, 0, 2 * Math.PI);
       ctxPicker.lineWidth = 2;
       ctxPicker.strokeStyle = "white";
       ctxPicker.stroke();
@@ -87,6 +87,8 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
     canDrag.current = false;
   };
 
+  const CommonProps = { thickness: 15, vertical: false, color, setColor };
+
   return (
     <>
       <CanvasGroup
@@ -101,9 +103,8 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
 
       <Divider hidden></Divider>
 
-      <HuePicker height={15} color={color} setColor={setColor} />
-
-      <AlphaPicker height={15} color={color} setColor={setColor} />
+      <HuePicker {...CommonProps} />
+      <AlphaPicker {...CommonProps} />
     </>
   );
 }

@@ -96,14 +96,14 @@ export default function WheelPicker({
     e.preventDefault();
     if (canDrag.current && ctxWheel) {
       const { left, top } = ctxWheel.canvas.getBoundingClientRect();
-      const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
-      const radius = ctxWheel.canvas.width / 2;
+      const [x, y] = [e.clientX - left, e.clientY - top];
+      const r = ctxWheel.canvas.width / 2;
 
       // only update the color if the click occurred within the circle
-      const pos = { x: x - radius, y: radius - y };
-      if (Math.pow(pos.x, 2) + Math.pow(pos.y, 2) <= Math.pow(radius, 2)) {
+      const pos = { x: x - r, y: r - y };
+      if (Math.pow(pos.x, 2) + Math.pow(pos.y, 2) <= Math.pow(r, 2)) {
         const hue = (Math.atan2(pos.x, pos.y) * 180) / Math.PI;
-        const sat = (Math.sqrt(Math.pow(pos.x, 2) + Math.pow(pos.y, 2)) * 100) / radius;
+        const sat = (Math.sqrt(Math.pow(pos.x, 2) + Math.pow(pos.y, 2)) * 100) / r;
         const currentColor = CM(color.rgba()); // deep clone the `color` state variable
         setColor(currentColor.hueTo(hue).saturationTo(sat));
       }
@@ -115,6 +115,8 @@ export default function WheelPicker({
     handlePointerMove(e);
     canDrag.current = false;
   };
+
+  const CommonProps = { thickness: 15, vertical: false, color, setColor };
 
   return (
     <>
@@ -131,9 +133,8 @@ export default function WheelPicker({
 
       <Divider hidden></Divider>
 
-      <HuePicker height={15} color={color} setColor={setColor} />
-
-      <AlphaPicker height={15} color={color} setColor={setColor} />
+      <HuePicker {...CommonProps} />
+      <AlphaPicker {...CommonProps} />
     </>
   );
 }

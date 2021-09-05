@@ -13,13 +13,12 @@ interface IPicker {
 interface ICanvasGroup {
   mainRef: TCanvasRef;
   picker: IPicker;
-  height?: number;
   borderRadius?: string;
 }
 
-export default function CanvasGroup({ mainRef, picker, height, borderRadius }: ICanvasGroup): JSX.Element {
+export default function CanvasGroup({ mainRef, picker, borderRadius }: ICanvasGroup): JSX.Element {
   return (
-    <CanvasContainer height={height} borderRadius={borderRadius}>
+    <CanvasContainer $borderRadius={borderRadius}>
       <canvas ref={mainRef}></canvas>
       <canvas {...picker}></canvas>
     </CanvasContainer>

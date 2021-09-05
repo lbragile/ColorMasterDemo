@@ -5,19 +5,14 @@ import styled from "styled-components";
 import useIsMobile from "../../hooks/useIsMobile";
 
 const SliderInput = styled.input.attrs(
-  (props: { value: string; min: string; max: string; color: string; $colorRight: string }) => {
+  (props: { value: string; min: string; max: string; $color: string; $colorRight: string }) => {
     const val = Number(props.value ?? 0);
     const min = Number(props.min ?? 0);
     const max = Number(props.max ?? 100);
     const breakpoint = 100 * ((val - min) / (max - min));
     const colorRight = props.$colorRight ?? "hsla(0, 0%, 90%, 1)";
-
-    return {
-      style: {
-        background: `linear-gradient(to right, ${props.color} 0%, ${props.color} ${breakpoint}%, ${colorRight} ${breakpoint}%, ${colorRight} 100%)`
-      },
-      colorRight
-    };
+    const sliderColor = `linear-gradient(to right, ${props.$color} 0%, ${props.$color} ${breakpoint}%, ${colorRight} ${breakpoint}%, ${colorRight} 100%)`;
+    return { style: { background: sliderColor }, colorRight };
   }
 )`
   -webkit-appearance: none;
@@ -40,14 +35,16 @@ const SliderInput = styled.input.attrs(
   }
 `;
 
-const NumberInput = styled(Input)`
+const NumberInput = styled(Input).attrs(
+  (props: { $mobile: boolean; $format: Exclude<TFormat, "invalid" | "name"> }) => props
+)`
   && > input {
     width: 100%;
     height: 36px;
-    text-align: ${(props) => (props.format === "hex" || props.mobile === "true" ? "center" : "left")};
+    text-align: ${(props) => (props.$format === "hex" || props.$mobile ? "center" : "left")};
     padding: 6px;
-    padding-left: ${(props) => (props.format === "hex" ? "" : props.mobile === "true" ? "0.2em" : "1.5em")};
-    font-size: ${(props) => (props.mobile === "true" ? "0.925em" : "1em")};
+    padding-left: ${(props) => (props.$format === "hex" ? "" : props.$mobile ? "0.2em" : "1.5em")};
+    font-size: ${(props) => (props.$mobile ? "0.925em" : "1em")};
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
@@ -108,15 +105,15 @@ export default function RangeSlider({
   const isMobile = useIsMobile();
 
   const type = format === "hex" ? "text" : "number";
-  const CommonProps = { min, max, type, format, step, onChange };
+  const CommonProps = { type, min, max, step, $format: format, onChange };
 
   const SliderInputProps = {
     ...CommonProps,
     value: clamp(value, false),
     type: "range",
     step: format === "hex" ? "1" : "0.01",
-    color,
     draggable: false,
+    $color: color,
     $colorRight: colorRight
   };
 
@@ -138,7 +135,7 @@ export default function RangeSlider({
 
       {showNum && (
         <Grid.Column computer={colorRight ? 4 : 3} mobile={5}>
-          <NumberInput mobile={isMobile.toString()} {...NumberInputProps} />
+          <NumberInput {...NumberInputProps} $mobile={isMobile} />
         </Grid.Column>
       )}
     </Grid.Row>
