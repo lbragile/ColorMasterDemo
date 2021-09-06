@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Divider, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
+import { Checkbox, Divider, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { ContrastSample } from "../../utils/codeSamples";
 import CodeModal from "./CodeModal";
 import { useHistory } from "react-router";
+import useQuery from "../../hooks/useQuery";
 
 extendPlugins([A11yPlugin]);
 
@@ -25,11 +26,16 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
 `;
 
 export default function ContrastAnalysis(): JSX.Element {
-  const [fgColor, setFgColor] = useState(CM("hsla(60, 100%, 50%, 1)"));
-  const [bgColor, setBgColor] = useState(CM("hsla(0, 0%, 50%, 1)"));
-  const [contrast, setContrast] = useState("1:1");
+  const history = useHistory();
+  const query = useQuery();
+
+  console.log(query);
+  const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
+  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(0, 0%, 50%, 1)"));
+  const [contrast, setContrast] = useState<number | string>("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
-  const [isLarge, setIsLarge] = useState(false);
+  const [isLarge, setIsLarge] = useState(query.size === "large");
+  const [ratio, setRatio] = useState(query.ratio === "true");
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
@@ -37,26 +43,26 @@ export default function ContrastAnalysis(): JSX.Element {
   const readableOnDebounce = useDebounce(readableOn, 100);
 
   const isMobile = useIsMobile();
-  const history = useHistory();
 
   useEffect(() => {
-    setContrast(fgColor.contrast({ bgColor: bgColor, ratio: true, precision: 3 }) as string);
+    setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));
     setReadableOn([
       fgColor.readableOn({ bgColor: bgColor, ratio: "minimum", size: "body" }),
       fgColor.readableOn({ bgColor: bgColor, ratio: "enhanced", size: "body" }),
       fgColor.readableOn({ bgColor: bgColor, ratio: "minimum", size: "large" }),
       fgColor.readableOn({ bgColor: bgColor, ratio: "enhanced", size: "large" })
     ]);
-  }, [fgColor, bgColor]);
+  }, [fgColor, bgColor, ratio]);
 
   useEffect(() => {
     history.replace({
       pathname: "/contrast",
-      search: `?fgColor=${fgDebounce.stringHEX().toLowerCase()}&bgColor=${bgDebounce
+      search: `?fgColor=${fgDebounce.stringHEX().slice(1).toLowerCase()}&bgColor=${bgDebounce
         .stringHEX()
-        .toLowerCase()}&size=${isLarge}`
+        .slice(1)
+        .toLowerCase()}&ratio=${ratio}&size=${isLarge ? "large" : "body"}`
     });
-  }, [history, fgDebounce, bgDebounce, isLarge]);
+  }, [history, fgDebounce, bgDebounce, ratio, isLarge]);
 
   return (
     <Grid columns={3} verticalAlign="middle" stackable centered>
@@ -97,7 +103,18 @@ export default function ContrastAnalysis(): JSX.Element {
           <Header as="h2" textAlign="center">
             Contrast
             <Header.Subheader>
-              <b>{contrast}</b>
+              <Grid textAlign="center">
+                <Grid.Row>
+                  <Grid.Column width={1} />
+                  <Grid.Column textAlign="right">
+                    <b>{contrast}</b>
+                  </Grid.Column>
+                  <Grid.Column width={1} />
+                  <Grid.Column width={1} textAlign="left">
+                    <Checkbox label="Ratio" checked={ratio} onChange={() => setRatio(!ratio)} />
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
             </Header.Subheader>
           </Header>
 
@@ -142,7 +159,7 @@ export default function ContrastAnalysis(): JSX.Element {
 
           <Divider hidden />
 
-          <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce)} />
+          <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce, ratio)} />
         </Grid.Column>
 
         <Grid.Column width={5}>

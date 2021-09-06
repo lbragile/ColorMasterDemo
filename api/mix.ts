@@ -1,4 +1,6 @@
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import CM, { extendPlugins } from "colormaster";
+import { TFormat } from "colormaster/types";
 import MixPlugin from "colormaster/plugins/mix";
 import NamePlugin from "colormaster/plugins/name";
 
@@ -6,11 +8,11 @@ extendPlugins([MixPlugin, NamePlugin]);
 
 const validColorspace = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"];
 
-module.exports = (req, res) => {
-  const { primary, secondary, ratio: r, colorspace: c } = req.query;
+module.exports = (req: VercelRequest, res: VercelResponse) => {
+  const { primary, secondary, ratio: r, colorspace: c } = req.query as { [key: string]: string };
 
   const ratio = Number(r ?? 0.5);
-  const colorspace = c ?? "luv";
+  const colorspace = (c ?? "luv") as Exclude<TFormat, "invalid" | "name">;
 
   if (
     CM(primary).isValid() &&

@@ -12,6 +12,7 @@ import styled from "styled-components";
 import CodeModal from "./CodeModal";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import { useHistory } from "react-router";
+import useQuery from "../../hooks/useQuery";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -47,14 +48,16 @@ const SwatchCounter = styled(Label)`
 `;
 
 export default function HarmonyAnalysis(): JSX.Element {
-  const [color, setColor] = useState(CM("hsla(0, 100%, 50%, 1)"));
+  const history = useHistory();
+  const query = useQuery();
+
+  const [color, setColor] = useState(CM(query.color ?? "hsla(0, 100%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
-  const [type, setType] = useState<THarmony>("analogous");
-  const [effect, setEffect] = useState<TMonoEffect>("shades");
-  const [amount, setAmount] = useState(7);
+  const [type, setType] = useState<THarmony>((query.type as THarmony) ?? "analogous");
+  const [effect, setEffect] = useState<TMonoEffect>((query.effect as TMonoEffect) ?? "shades");
+  const [amount, setAmount] = useState(Number(query.amount ?? 7));
 
   const colorDebounce = useDebounce(color, 100);
-  const history = useHistory();
 
   useEffect(() => {
     setHarmony(
@@ -66,7 +69,7 @@ export default function HarmonyAnalysis(): JSX.Element {
   }, [colorDebounce, type, effect, amount]);
 
   useEffect(() => {
-    const baseSearch = `?color=${colorDebounce.stringHEX().toLowerCase()}&type=${type}`;
+    const baseSearch = `?color=${colorDebounce.stringHEX().slice(1).toLowerCase()}&type=${type}`;
 
     history.replace({
       pathname: "/harmony",
@@ -164,6 +167,7 @@ export default function HarmonyAnalysis(): JSX.Element {
                 position="relative"
                 background={swatch}
                 onClick={() => setColor(CM(swatch))}
+                $clickable
               >
                 {type === "monochromatic" && <SwatchCounter>{i + 1}</SwatchCounter>}
                 {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
