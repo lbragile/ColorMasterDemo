@@ -1,9 +1,10 @@
 import { ColorMaster, extendPlugins } from "colormaster";
+import { TFormat, THarmony, TMonoEffect, TNumArr } from "colormaster/types";
 import MixPlugin from "colormaster/plugins/mix";
 import HarmonyPlugin from "colormaster/plugins/harmony";
-import { TFormat, THarmony, TMonoEffect, TNumArr } from "colormaster/types";
+import NamePlugin from "colormaster/plugins/name";
 
-extendPlugins([MixPlugin, HarmonyPlugin]);
+extendPlugins([MixPlugin, HarmonyPlugin, NamePlugin]);
 
 export function ContrastSample(
   fgColor: ColorMaster,
@@ -49,23 +50,26 @@ console.log(harmonyArr); // [${color
 }
 
 export function MixSample(
-  color1: ColorMaster,
-  color2: ColorMaster,
+  primary: ColorMaster,
+  secondary: ColorMaster,
   ratio: number,
   colorspace: Exclude<TFormat, "invalid" | "name">
 ): string {
   const precision = [2, 2, 2, 2] as Required<TNumArr>;
+  const mix = primary.mix({ color: secondary, ratio, colorspace });
+  const nameOpts = { exact: false };
+
   return `import CM, { extendPlugins } from 'colormaster';
 import MixPlugin from "colormaster/plugins/mix";
 
 extendPlugins([MixPlugin]); // add ColorMaster's mix plugin
 
-const color1 = CM("${color1.stringRGB({ precision })}");
-const color2 = CM("${color2.stringRGB({ precision })}");
+const primary = CM("${primary.stringRGB({ precision })}"); // ${primary.name(nameOpts)}
+const secondary = CM("${secondary.stringRGB({ precision })}"); // ${secondary.name(nameOpts)}
 const ratio = ${ratio}; ${ratio === 0.5 ? "// default" : ""}
 const colorspace = "${colorspace}"; ${colorspace === "luv" ? "// default" : ""}
 
-const mix = color1.mix({color: color2, ratio, colorspace});
-console.log(mix.stringHSL()); // ${color1.mix({ color: color2, ratio, colorspace }).stringHSL()}
+const mix = primary.mix({color: secondary, ratio, colorspace});
+console.log(mix.stringHSL()); // ${mix.stringHSL()} → ${mix.name(nameOpts)}
 `;
 }

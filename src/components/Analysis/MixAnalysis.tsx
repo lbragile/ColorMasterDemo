@@ -12,6 +12,7 @@ import { TFormat } from "colormaster/types";
 import useCopyToClipboard from "../../hooks/useCopytoClipboard";
 import styled from "styled-components";
 import { useHistory } from "react-router";
+import useQuery from "../../hooks/useQuery";
 
 extendPlugins([MixPlugin]);
 
@@ -28,37 +29,42 @@ const StyledDropdown = styled(Dropdown)`
 `;
 
 export default function MixAnalysis(): JSX.Element {
-  const [color1, setColor1] = useState(CM("hsla(180, 100%, 50%, 1)"));
-  const [color2, setColor2] = useState(CM("hsla(0, 100%, 50%, 1)"));
-  const [ratio, setRatio] = useState(0.5);
-  const [colorspace, setColorspace] = useState<Exclude<TFormat, "invalid" | "name">>("luv");
-  const [mix, setMix] = useState(color1.mix({ color: color2, ratio, colorspace }).stringHSL());
+  const history = useHistory();
+  const query = useQuery();
 
-  const color1Debounce = useDebounce(color1, 100);
-  const color2Debounce = useDebounce(color2, 100);
+  const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
+  const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
+  const [ratio, setRatio] = useState(query.ratio ? +query.ratio : 0.5);
+  const [colorspace, setColorspace] = useState<TFormatDropdown>(
+    (colorspaceOpts.find((item) => item.value === query.colorspace)?.value as TFormatDropdown) ?? "luv"
+  );
+  const [mix, setMix] = useState(primary.mix({ color: secondary, ratio, colorspace }).stringHSL());
+
+  const primaryDebounce = useDebounce(primary, 100);
+  const secondaryDebounce = useDebounce(secondary, 100);
   const ratioDebounce = useDebounce(ratio, 100);
 
   const [copy, setCopy] = useCopyToClipboard();
-  const history = useHistory();
 
   useEffect(() => {
-    setMix(color1.mix({ color: color2, ratio, colorspace }).stringHSL());
-  }, [color1, color2, ratio, colorspace]);
+    setMix(primary.mix({ color: secondary, ratio, colorspace }).stringHSL());
+  }, [primary, secondary, ratio, colorspace]);
 
   useEffect(() => {
     history.replace({
       pathname: "/mix",
-      search: `?primary=${color1Debounce.stringHEX().toLowerCase()}&secondary=${color2Debounce
+      search: `?primary=${primaryDebounce.stringHEX().slice(1).toLowerCase()}&secondary=${secondaryDebounce
         .stringHEX()
-        .toLowerCase()}&ratio=${ratioDebounce}`
+        .slice(1)
+        .toLowerCase()}&ratio=${ratioDebounce}&colorspace=${colorspace}`
     });
-  }, [history, color1Debounce, color2Debounce, ratioDebounce]);
+  }, [history, primaryDebounce, secondaryDebounce, ratioDebounce, colorspace]);
 
   return (
     <Grid columns={3} verticalAlign="middle" stackable centered>
       <Grid.Row>
         <Grid.Column width={5}>
-          <ColorSelectorWidget color={color1} setColor={setColor1}>
+          <ColorSelectorWidget color={primary} setColor={setPrimary}>
             <Label size="big" color="black" attached="top left">
               Primary
             </Label>
@@ -74,8 +80,8 @@ export default function MixAnalysis(): JSX.Element {
 
           <Grid verticalAlign="middle" textAlign="center">
             <RangeSlider
-              color={color2.stringHSL()}
-              colorRight={color1.stringHSL()}
+              color={secondary.stringHSL()}
+              colorRight={primary.stringHSL()}
               min="0"
               max="100"
               value={ratio * 100}
@@ -146,11 +152,11 @@ export default function MixAnalysis(): JSX.Element {
 
           <Divider hidden />
 
-          <CodeModal code={MixSample(color1Debounce, color2Debounce, ratioDebounce, colorspace)} />
+          <CodeModal code={MixSample(primaryDebounce, secondaryDebounce, ratioDebounce, colorspace)} />
         </Grid.Column>
 
         <Grid.Column width={5}>
-          <ColorSelectorWidget color={color2} setColor={setColor2}>
+          <ColorSelectorWidget color={secondary} setColor={setSecondary}>
             <Label size="big" color="black" attached="top right">
               Secondary
             </Label>
