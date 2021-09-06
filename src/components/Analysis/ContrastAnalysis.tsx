@@ -4,7 +4,7 @@ import ColorSelectorWidget from "../ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../../hooks/useDebounce";
-import useIsMobile from "../../hooks/useIsMobile";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 import styled from "styled-components";
 import { ContrastSample } from "../../utils/codeSamples";
 import CodeModal from "./CodeModal";
@@ -29,20 +29,19 @@ export default function ContrastAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
 
-  console.log(query);
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
   const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(0, 0%, 50%, 1)"));
   const [contrast, setContrast] = useState<number | string>("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
-  const [isLarge, setIsLarge] = useState(query.size === "large");
-  const [ratio, setRatio] = useState(query.ratio === "true");
+  const [isLarge, setIsLarge] = useState(query.size ? query.size === "large" : true);
+  const [ratio, setRatio] = useState(query.ratio ? query.ratio === "true" : true);
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
   const contrastDebounce = useDebounce(contrast, 100);
   const readableOnDebounce = useDebounce(readableOn, 100);
 
-  const isMobile = useIsMobile();
+  const { isMobile } = useBreakpointMap();
 
   useEffect(() => {
     setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));

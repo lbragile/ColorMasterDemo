@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useState } from "react";
-import useIsMobile from "./useIsMobile";
+import useBreakpointMap from "./useBreakpointMap";
 
 type TRefCanvas = RefObject<HTMLCanvasElement>;
 
@@ -42,7 +42,7 @@ export default function useCanvasContext(
   const [main, setMain] = useState<CanvasRenderingContext2D>();
   const [picker, setPicker] = useState<CanvasRenderingContext2D>();
 
-  const isMobile = useIsMobile();
+  const { isMobile } = useBreakpointMap();
 
   useEffect(() => {
     const ctxMain = refMain.current?.getContext("2d");

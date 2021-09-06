@@ -53,8 +53,12 @@ export default function HarmonyAnalysis(): JSX.Element {
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(0, 100%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
-  const [type, setType] = useState<THarmony>((query.type as THarmony) ?? "analogous");
-  const [effect, setEffect] = useState<TMonoEffect>((query.effect as TMonoEffect) ?? "shades");
+  const [type, setType] = useState<THarmony>(
+    (typeOptions.find((item) => item.value === query.type)?.value as THarmony) ?? "analogous"
+  );
+  const [effect, setEffect] = useState<TMonoEffect>(
+    (effectOptions.find((item) => item.value === query.effect)?.value as TMonoEffect) ?? "shades"
+  );
   const [amount, setAmount] = useState(Number(query.amount ?? 7));
 
   const colorDebounce = useDebounce(color, 100);

@@ -6,7 +6,7 @@ import HSLSliderGroup from "./Sliders/HSLSliderGroup";
 import RGBSliderGroup from "./Sliders/RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
-import useIsMobile from "../hooks/useIsMobile";
+import useBreakpointMap from "../hooks/useBreakpointMap";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
 import HEXSliderGroup from "./Sliders/HEXSliderGroup";
@@ -128,7 +128,7 @@ export default function ColorSelectorWidget({
   const [colorspace, setColorspace] = useState(initColorspace);
   const [pickerType, setPickerType] = useState(initPicker);
 
-  const isMobile = useIsMobile();
+  const { isMobile } = useBreakpointMap();
   const [copy, setCopy] = useCopyToClipboard();
 
   const handleSliderChange = useCallback(

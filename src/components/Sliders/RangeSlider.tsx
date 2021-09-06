@@ -2,7 +2,7 @@ import React from "react";
 import { TFormat } from "colormaster/types";
 import { Grid, Header, Input } from "semantic-ui-react";
 import styled from "styled-components";
-import useIsMobile from "../../hooks/useIsMobile";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 
 const SliderInput = styled.input.attrs(
   (props: { value: string; min: string; max: string; $color: string; $colorRight: string }) => {
@@ -102,7 +102,7 @@ export default function RangeSlider({
     return format === "hex" && strVal.length === 1 ? "0" + strVal : strVal;
   }
 
-  const isMobile = useIsMobile();
+  const { isMobile } = useBreakpointMap();
 
   const type = format === "hex" ? "text" : "number";
   const CommonProps = { type, min, max, step, $format: format, onChange };
