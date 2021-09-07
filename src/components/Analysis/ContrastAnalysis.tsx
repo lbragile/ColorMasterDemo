@@ -46,10 +46,10 @@ export default function ContrastAnalysis(): JSX.Element {
   useEffect(() => {
     setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));
     setReadableOn([
-      fgColor.readableOn({ bgColor: bgColor, ratio: "minimum", size: "body" }),
-      fgColor.readableOn({ bgColor: bgColor, ratio: "enhanced", size: "body" }),
-      fgColor.readableOn({ bgColor: bgColor, ratio: "minimum", size: "large" }),
-      fgColor.readableOn({ bgColor: bgColor, ratio: "enhanced", size: "large" })
+      fgColor.readableOn({ bgColor: bgColor, level: "minimum", size: "body" }),
+      fgColor.readableOn({ bgColor: bgColor, level: "enhanced", size: "body" }),
+      fgColor.readableOn({ bgColor: bgColor, level: "minimum", size: "large" }),
+      fgColor.readableOn({ bgColor: bgColor, level: "enhanced", size: "large" })
     ]);
   }, [fgColor, bgColor, ratio]);
 

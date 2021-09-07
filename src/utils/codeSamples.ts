@@ -26,10 +26,10 @@ const bgColor = CM("${bgColor.stringRGB({ precision })}"); // ${bgColor.name(nam
 
 console.log(fgColor.contrast({ bgColor, ratio: ${ratio}, precision: 3 })); // ${contrast}
 
-console.log(fgColor.readableOn({ bgColor, ratio: "minimum", size: "body" })); // ${readableOn[0]}
-console.log(fgColor.readableOn({ bgColor, ratio: "enhanced", size: "body" })); // ${readableOn[1]}
-console.log(fgColor.readableOn({ bgColor, ratio: "minimum", size: "large" })); // ${readableOn[2]}
-console.log(fgColor.readableOn({ bgColor, ratio: "enhanced", size: "large" })); // ${readableOn[3]}
+console.log(fgColor.readableOn({ bgColor, level: "minimum", size: "body" })); // ${readableOn[0]}
+console.log(fgColor.readableOn({ bgColor, level: "enhanced", size: "body" })); // ${readableOn[1]}
+console.log(fgColor.readableOn({ bgColor, level: "minimum", size: "large" })); // ${readableOn[2]}
+console.log(fgColor.readableOn({ bgColor, level: "enhanced", size: "large" })); // ${readableOn[3]}
 `;
 }
 
