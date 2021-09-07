@@ -4,9 +4,9 @@ type TCanvasRef = React.RefObject<HTMLCanvasElement>;
 
 interface IPicker {
   ref: TCanvasRef;
-  onPointerDown: (e: React.MouseEvent) => void;
-  onPointerMove: (e: React.MouseEvent) => void;
-  onPointerUp: (e: React.MouseEvent) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerMove: (e: React.PointerEvent) => void;
+  onPointerUp: (e: React.PointerEvent) => void;
 }
 
 interface ICanvasGroup {
