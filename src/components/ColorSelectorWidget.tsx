@@ -6,10 +6,11 @@ import HSLSliderGroup from "./Sliders/HSLSliderGroup";
 import RGBSliderGroup from "./Sliders/RGBSliderGroup";
 import CM, { ColorMaster } from "colormaster";
 import { Ihsla, Irgba, TChannel, TChannelHSL } from "colormaster/types";
-import useIsMobile from "../hooks/useIsMobile";
+import useBreakpointMap from "../hooks/useBreakpointMap";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
 import HEXSliderGroup from "./Sliders/HEXSliderGroup";
+import useCopyToClipboard from "../hooks/useCopytoClipboard";
 
 const colorspaceOptions = [
   { key: 1, text: "RGB", value: 1 },
@@ -23,16 +24,38 @@ const pickerTypeOptions = [
   { key: 3, text: "WHEEL", value: 3 }
 ];
 
-const StyledColorDisplay = styled(Input)`
+const SWATCH_COLORS = [
+  "hsla(0, 100%, 50%, 1)",
+  "hsla(30, 100%, 50%, 1)",
+  "hsla(60, 100%, 50%, 1)",
+  "hsla(90, 100%, 50%, 1)",
+  "hsla(120, 100%, 50%, 1)",
+  "hsla(150, 100%, 50%, 1)",
+  "hsla(180, 100%, 50%, 1)",
+  "hsla(210, 100%, 50%, 1)",
+  "hsla(240, 100%, 50%, 1)",
+  "hsla(270, 100%, 50%, 1)",
+  "hsla(300, 100%, 50%, 1)",
+  "hsla(330, 100%, 50%, 1)",
+  "hsla(0, 0%, 100%, 1)",
+  "hsla(0, 0%, 75%, 1)",
+  "hsla(0, 0%,50%, 1)",
+  "hsla(0, 0%,25%, 1)",
+  "hsla(0, 0%, 0%, 1)"
+];
+
+const StyledColorDisplay = styled(Input).attrs(
+  (props: { $mobile: boolean; action: { color: string; [key: string]: unknown } }) => props
+)`
   && {
     & > input {
       text-align: center;
-      font-size: ${(props) => (props.mobile === "true" ? "0.95em" : "1em")};
+      font-size: ${(props) => (props.$mobile ? "0.95em" : "1em")};
       padding: 0;
     }
 
-    &.action button:hover,
-    &.action button:focus {
+    & .button:hover,
+    & .button:focus {
       background-color: ${(props) => (props.action.color === "teal" ? "rgba(0, 196, 196, 1)" : "rgba(0, 196, 0, 1)")};
     }
   }
@@ -89,42 +112,24 @@ interface IColorSelectorWidget {
   children?: JSX.Element;
   initColorspace?: number;
   initPicker?: number;
+  harmony?: ColorMaster[];
 }
-
-const SWATCH_COLORS = [
-  "hsla(0, 100%, 50%, 1)",
-  "hsla(30, 100%, 50%, 1)",
-  "hsla(60, 100%, 50%, 1)",
-  "hsla(90, 100%, 50%, 1)",
-  "hsla(120, 100%, 50%, 1)",
-  "hsla(150, 100%, 50%, 1)",
-  "hsla(180, 100%, 50%, 1)",
-  "hsla(210, 100%, 50%, 1)",
-  "hsla(240, 100%, 50%, 1)",
-  "hsla(270, 100%, 50%, 1)",
-  "hsla(300, 100%, 50%, 1)",
-  "hsla(330, 100%, 50%, 1)",
-  "hsla(0, 0%, 100%, 1)",
-  "hsla(0, 0%, 75%, 1)",
-  "hsla(0, 0%,50%, 1)",
-  "hsla(0, 0%,25%, 1)",
-  "hsla(0, 0%, 0%, 1)"
-];
 
 export default function ColorSelectorWidget({
   color,
   setColor,
   children,
   initColorspace = 1,
-  initPicker = 1
+  initPicker = 1,
+  harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
   const [alpha, setAlpha] = useState(true);
-  const [copied, setCopied] = useState(false);
   const [swatchIndex, setSwatchIndex] = useState(0);
   const [colorspace, setColorspace] = useState(initColorspace);
   const [pickerType, setPickerType] = useState(initPicker);
 
-  const isMobile = useIsMobile();
+  const { isMobile } = useBreakpointMap();
+  const [copy, setCopy] = useCopyToClipboard();
 
   const handleSliderChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
@@ -162,18 +167,15 @@ export default function ColorSelectorWidget({
               content="Copy to clipboard"
               position="top center"
               inverted
-              trigger={<Icon name={copied ? "check circle" : "copy"} />}
+              trigger={<Icon name={copy ? "check circle" : "copy"} />}
             />
           ),
-          color: copied ? "green" : "teal",
-          onClick: () => {
-            navigator.clipboard.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 3000);
-          }
+          color: copy ? "green" : "teal",
+          onClick: () => setCopy(text),
+          onBlur: () => setCopy("")
         };
       },
-    [copied]
+    [copy, setCopy]
   );
 
   const currentSliders = useMemo(() => {
@@ -222,6 +224,7 @@ export default function ColorSelectorWidget({
           <Swatch
             radius={50}
             background={colorspace === 1 ? color.stringRGB() : colorspace === 2 ? color.stringHEX() : color.stringHSL()}
+            title={color.stringHSL()}
           />
         </Grid.Row>
 
@@ -308,12 +311,12 @@ export default function ColorSelectorWidget({
             <StyledColorDisplay
               type="text"
               value={currentSliders.value}
-              mobile={isMobile.toString()}
               spellCheck={false}
               size="large"
               readOnly
               fluid
               action={copyAction(currentSliders.value)}
+              $mobile={isMobile}
             />
           </Grid.Column>
 
@@ -326,9 +329,9 @@ export default function ColorSelectorWidget({
       <Divider hidden />
 
       {pickerType === 2 ? (
-        <SketchPicker color={color} setColor={setColor} />
+        <SketchPicker color={color} setColor={setColor} verticalPickers={!isMobile} />
       ) : pickerType === 3 ? (
-        <WheelPicker color={color} setColor={setColor} />
+        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers={!isMobile} />
       ) : (
         currentSliders.sliders
       )}

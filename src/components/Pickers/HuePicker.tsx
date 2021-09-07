@@ -6,23 +6,24 @@ import CanvasGroup from "../CanvasGroup";
 interface IHuePicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  height?: number;
+  thickness?: number;
+  vertical?: boolean;
 }
 
-export default function HuePicker({ color, setColor, height = 25 }: IHuePicker): JSX.Element {
+export default function HuePicker({ color, setColor, thickness = 25, vertical = true }: IHuePicker): JSX.Element {
   const colorHue = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxHue, ctxPicker] = useCanvasContext(colorHue, colorPicker, height);
+  const [ctxHue, ctxPicker] = useCanvasContext(colorHue, colorPicker, thickness, vertical);
 
   useEffect(() => {
     if (ctxHue) {
-      const { width } = ctxHue.canvas;
+      const { width, height } = ctxHue.canvas;
 
       ctxHue.clearRect(0, 0, width, height);
       ctxHue.rect(0, 0, width, height);
-      const gradient = ctxHue.createLinearGradient(0, 0, width, 0);
+      const gradient = ctxHue.createLinearGradient(0, 0, vertical ? 0 : width, vertical ? height : 0);
       const a = color.alpha;
       gradient.addColorStop(0, `rgba(255, 0, 0, ${a})`);
       gradient.addColorStop(0.17, `rgba(255, 255, 0, ${a})`);
@@ -34,22 +35,25 @@ export default function HuePicker({ color, setColor, height = 25 }: IHuePicker):
       ctxHue.fillStyle = gradient;
       ctxHue.fill();
     }
-  }, [height, color, ctxHue]);
+  }, [color, vertical, ctxHue]);
 
   useEffect(() => {
     if (ctxPicker) {
-      const { width } = ctxPicker.canvas;
+      const { width, height } = ctxPicker.canvas;
 
       ctxPicker.clearRect(0, 0, width, height);
       ctxPicker.beginPath();
 
-      ctxPicker.arc((color.hue * width) / 360, height / 2, height / 2 - 1, 0, 2 * Math.PI);
+      const x = vertical ? width / 2 : (color.hue / 360) * width;
+      const y = vertical ? (color.hue / 360) * height : height / 2;
+      const r = thickness / 2 - 1;
+      ctxPicker.arc(x, y, r, 0, 2 * Math.PI);
 
       ctxPicker.lineWidth = 2;
       ctxPicker.strokeStyle = "#fff";
       ctxPicker.stroke();
     }
-  }, [height, color, ctxPicker]);
+  }, [color, vertical, thickness, ctxPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -59,15 +63,12 @@ export default function HuePicker({ color, setColor, height = 25 }: IHuePicker):
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (canDrag.current && ctxHue) {
-      const { width } = ctxHue.canvas;
-
+      const { width, height } = ctxHue.canvas;
       const { left, top } = ctxHue.canvas.getBoundingClientRect();
-      const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
-
-      const data = ctxHue.getImageData(x === width ? x - 1 : x, y === height ? y - 1 : y, 1, 1).data.slice(0, -1);
-      const newColor = CM(`rgba(${data.join(", ")}, ${color.alpha})`);
-
-      setColor(CM({ ...color.hsla(), h: newColor.hue }));
+      const x = e.clientX - Math.floor(left);
+      const y = e.clientY - Math.floor(top);
+      const newHue = vertical ? (y * 360) / height : (x * 360) / width;
+      setColor(CM({ ...color.hsla(), h: newHue }));
     }
   };
 
@@ -79,7 +80,7 @@ export default function HuePicker({ color, setColor, height = 25 }: IHuePicker):
 
   return (
     <CanvasGroup
-      height={height}
+      className="hue"
       mainRef={colorHue}
       picker={{
         ref: colorPicker,

@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import { Divider } from "semantic-ui-react";
 import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import HSVPlugin from "colormaster/plugins/hsv";
+import { CanvasContainer } from "../../styles/Canvas";
 
 extendPlugins([HSVPlugin]);
 
@@ -13,6 +13,7 @@ interface ISketchPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   pickerRadius?: number;
+  verticalPickers?: boolean;
 }
 
 /**
@@ -23,7 +24,12 @@ interface ISketchPicker {
  *
  * Thus, HSB/HSV colorspace is used to calculate the position of the cursor on the canvas
  */
-export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISketchPicker): JSX.Element {
+export default function SketchPicker({
+  color,
+  setColor,
+  pickerRadius = 5,
+  verticalPickers = true
+}: ISketchPicker): JSX.Element {
   const colorSketch = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -48,11 +54,6 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       blackGradient.addColorStop(1, "rgba(0,0,0,1)");
       ctxSketch.fillStyle = blackGradient;
       ctxSketch.fillRect(0, 0, width, width);
-
-      // draw a faint border around the sketch picker
-      ctxSketch.beginPath();
-      ctxSketch.strokeStyle = "hsla(0, 0%, 90%, 1)";
-      ctxSketch.strokeRect(0, 0, width, width);
     }
   }, [color, ctxSketch]);
 
@@ -64,7 +65,7 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
       ctxPicker.beginPath();
 
       const { s, v } = color.hsva();
-      ctxPicker.arc((s / 100) * (width - 1), (1 - v / 100) * (width - 1), pickerRadius * 2, 0, 2 * Math.PI);
+      ctxPicker.arc((s * width) / 100, ((100 - v) * width) / 100, pickerRadius * 1.5, 0, 2 * Math.PI);
       ctxPicker.lineWidth = 2;
       ctxPicker.strokeStyle = "white";
       ctxPicker.stroke();
@@ -79,10 +80,10 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (canDrag.current && ctxSketch) {
+      const { width } = ctxSketch.canvas;
       const { left, top } = ctxSketch.canvas.getBoundingClientRect();
-      const [s, v] = [e.clientX - left, e.clientY - top].map((val) => (val * 100) / ctxSketch.canvas.width);
-
-      setColor(CM(`hsva(${color.hue}, ${s}%, ${100 - v}%, 1)`));
+      const [s, v] = [e.clientX - left, e.clientY - top].map((val) => (val * 100) / width);
+      setColor(CM({ ...color.hsva(), s, v: 100 - v }));
     }
   };
 
@@ -92,9 +93,12 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
     canDrag.current = false;
   };
 
+  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
+
   return (
-    <>
+    <CanvasContainer $vertical={verticalPickers}>
       <CanvasGroup
+        className="main"
         mainRef={colorSketch}
         picker={{
           ref: colorPicker,
@@ -104,11 +108,8 @@ export default function SketchPicker({ color, setColor, pickerRadius = 5 }: ISke
         }}
       />
 
-      <Divider hidden></Divider>
-
-      <HuePicker height={15} color={color} setColor={setColor} />
-
-      <AlphaPicker height={15} color={color} setColor={setColor} />
-    </>
+      <HuePicker {...CommonProps} />
+      <AlphaPicker {...CommonProps} />
+    </CanvasContainer>
   );
 }

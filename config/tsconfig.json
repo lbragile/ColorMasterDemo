@@ -3,7 +3,7 @@
     "target": "ES6",
     "module": "ESNext",
     "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ES2017"],
+    "lib": ["DOM", "DOM.Iterable", "ES2019"],
     "moduleResolution": "node", // 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
     "noEmit": true, // Emit output files to outDir folder
     "removeComments": true, // Don't show comments in production code as they are meant for development

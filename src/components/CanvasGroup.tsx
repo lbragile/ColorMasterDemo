@@ -1,26 +1,25 @@
 import React from "react";
-import { CanvasContainer } from "../styles/Canvas";
 
 type TCanvasRef = React.RefObject<HTMLCanvasElement>;
 
 interface IPicker {
   ref: TCanvasRef;
-  onPointerDown: (e: React.MouseEvent) => void;
-  onPointerMove: (e: React.MouseEvent) => void;
-  onPointerUp: (e: React.MouseEvent) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerMove: (e: React.PointerEvent) => void;
+  onPointerUp: (e: React.PointerEvent) => void;
 }
 
 interface ICanvasGroup {
   mainRef: TCanvasRef;
   picker: IPicker;
-  height?: number;
+  className?: string;
 }
 
-export default function CanvasGroup({ mainRef, picker, height }: ICanvasGroup): JSX.Element {
+export default function CanvasGroup({ className, mainRef, picker }: ICanvasGroup): JSX.Element {
   return (
-    <CanvasContainer height={height}>
-      <canvas ref={mainRef}></canvas>
-      <canvas {...picker}></canvas>
-    </CanvasContainer>
+    <>
+      <canvas className={className} ref={mainRef}></canvas>
+      <canvas className={className} {...picker}></canvas>
+    </>
   );
 }

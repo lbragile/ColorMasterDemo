@@ -1,77 +1,81 @@
-import React, { lazy, Suspense, useMemo } from "react";
-import { Container, Divider, Icon, Tab } from "semantic-ui-react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
+import { Container, Divider, Menu } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
-import { dependencies } from "../../package.json";
 import Loading from "./Loading";
+import { Switch, Route, NavLink, useLocation, Redirect } from "react-router-dom";
+import SocialMedia from "./SocialMedia";
+import useBreakpointMap from "../hooks/useBreakpointMap";
 
-const ContrastAnalysis = lazy(() => import("./ContrastAnalysis"));
-const HarmonyAnalysis = lazy(() => import("./HarmonyAnalysis"));
-
-const LinkIcon = styled(Icon)`
-  cursor: pointer;
-`;
+const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
+const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
+const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
 
 const StyledContainer = styled(Container)`
   && {
+    position: relative;
     width: 90%;
     max-width: 95%;
+    height: 100vh;
   }
 `;
 
+const Content = styled.div.attrs((props: { $mobile: boolean }) => props)`
+  ${(props) =>
+    !props.$mobile
+      ? {
+          position: "absolute",
+          top: "50%",
+          transform: "translateY(-50%)"
+        }
+      : {}}
+`;
+
+const MENU_TABS = ["contrast", "harmony", "mix"];
+
 export default function App(): JSX.Element {
-  const panes = useMemo(
-    () =>
-      [
-        { menuItem: "Contrast", elem: <ContrastAnalysis /> },
-        { menuItem: "Harmony", elem: <HarmonyAnalysis /> }
-      ].map((item) => {
-        return {
-          menuItem: item.menuItem,
-          render: function renderElement() {
-            return (
-              <Suspense fallback={<Loading />}>
-                <Tab.Pane>{item.elem}</Tab.Pane>
-              </Suspense>
-            );
-          }
-        };
-      }),
-    []
-  );
+  const location = useLocation();
+  const [active, setActive] = useState("");
+
+  const { isMobile } = useBreakpointMap();
+
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location]);
 
   return (
     <StyledContainer>
       <GlobalStyle />
 
-      <Divider hidden />
+      <Suspense fallback={<Loading />}>
+        {isMobile && <Divider hidden />}
 
-      <h2>ColorMaster v{dependencies.colormaster.replace(/\^/g, "")}</h2>
+        <Menu pointing secondary>
+          {MENU_TABS.map((item) => {
+            const path = "/" + item;
+            return (
+              <Menu.Item as={NavLink} key={path} to={path} active={active === path} onClick={() => setActive(path)}>
+                {item[0].toUpperCase() + item.slice(1)}
+              </Menu.Item>
+            );
+          })}
 
-      <Divider hidden />
+          {!isMobile && (
+            <Menu.Item position="right">
+              <SocialMedia />
+            </Menu.Item>
+          )}
+        </Menu>
 
-      <Tab menu={{ vertical: false /*tabular: true, attached: true*/ }} panes={panes} defaultActiveIndex={1} />
-
-      <Divider hidden />
-
-      <LinkIcon
-        name="github"
-        size="big"
-        circular
-        title="https://www.github.com/lbragile/ColorMaster"
-        onClick={() => location.assign("https://www.github.com/lbragile/ColorMaster")}
-      />
-
-      <LinkIcon
-        name="npm"
-        size="big"
-        color="red"
-        circular
-        title="https://www.npmjs.com/package/colormaster"
-        onClick={() => location.assign("https://www.npmjs.com/package/colormaster")}
-      />
-
-      <Divider hidden />
+        <Content $mobile={isMobile}>
+          <Switch>
+            <Route path="/contrast" component={ContrastAnalysis} />
+            <Route path="/harmony" component={HarmonyAnalysis} />
+            <Route path="/mix" component={MixAnalysis} />
+            <Redirect from="/" to="/harmony" />
+          </Switch>
+        </Content>
+      </Suspense>
     </StyledContainer>
   );
 }

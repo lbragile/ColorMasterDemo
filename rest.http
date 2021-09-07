@@ -1,0 +1,55 @@
+# This file can be used, with VS Code's Rest Client Extension (https://marketplace.visualstudio.com/items?itemName=humao.rest-client), 
+# to quickly get responses from ColorMaster's API.
+
+@baseUrl = http://localhost:3000/api
+# http://localhost:3000/api
+# https://colormaster.vercel.app/api
+# https://colormaster-2pm8vjc79-lbragile.vercel.app/api
+
+# Mix
+@primary = 00ffffff
+@secondary = ff0000ff
+@ratio = 0.6
+@colorspace = luv
+
+# Harmony
+@color = ff0000ff
+@type = monochromatic
+@effect = shades
+@amount = 7
+
+# Contrast
+@fgColor = 000000ff
+@bgColor = 808080ff
+@showRatio = true
+@size = large
+
+###
+GET {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}}
+Content-Type: application/json
+Accept: application/json
+
+###
+GET {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}}
+Content-Type: application/json
+Accept: application/json
+
+###
+GET {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}
+Content-Type: application/json
+Accept: application/json
+
+###
+curl {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json
+
+###
+curl {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json
+
+###
+curl {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json

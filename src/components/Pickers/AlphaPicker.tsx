@@ -7,40 +7,45 @@ import CanvasGroup from "../CanvasGroup";
 interface IAlphaPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  height?: number;
+  thickness?: number;
+  vertical?: boolean;
 }
 
-export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPicker): JSX.Element {
+export default function AlphaPicker({ color, setColor, thickness = 15, vertical = true }: IAlphaPicker): JSX.Element {
   const colorAlpha = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxAlpha, ctxPicker] = useCanvasContext(colorAlpha, colorPicker, height);
+  const [ctxAlpha, ctxPicker] = useCanvasContext(colorAlpha, colorPicker, thickness, vertical);
 
   useEffect(() => {
     if (ctxAlpha) {
-      const { width } = ctxAlpha.canvas;
+      const { width, height } = ctxAlpha.canvas;
       ctxAlpha.clearRect(0, 0, width, height);
       ctxAlpha.beginPath();
-      drawCheckeredBackground(ctxAlpha);
+      drawCheckeredBackground(ctxAlpha, vertical);
 
       ctxAlpha.rect(0, 0, width, height);
-      const gradient = ctxAlpha.createLinearGradient(0, 0, width, 0);
+      const gradient = ctxAlpha.createLinearGradient(0, 0, vertical ? 0 : width, vertical ? height : 0);
       const { r, g, b } = color.rgba();
-      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 1)`);
+      gradient.addColorStop(vertical ? 1 : 0, `rgba(${r}, ${g}, ${b}, 0)`);
+      gradient.addColorStop(vertical ? 0 : 1, `rgba(${r}, ${g}, ${b}, 1)`);
       ctxAlpha.fillStyle = gradient;
       ctxAlpha.fill();
     }
-  }, [height, color, ctxAlpha]);
+  }, [color, vertical, ctxAlpha]);
 
   useEffect(() => {
     if (ctxPicker) {
-      const { width } = ctxPicker.canvas;
+      const { width, height } = ctxPicker.canvas;
 
       ctxPicker.clearRect(0, 0, width, height);
       ctxPicker.beginPath();
-      ctxPicker.arc(color.alpha * width, height / 2, height / 2 - 1, 0, 2 * Math.PI);
+
+      const x = vertical ? width / 2 : color.alpha * width;
+      const y = vertical ? (1 - color.alpha) * height : height / 2;
+      const r = thickness / 2 - 1;
+      ctxPicker.arc(x, y, r, 0, 2 * Math.PI);
 
       ctxPicker.lineWidth = 2;
       ctxPicker.fillStyle = "hsla(0, 0%, 50%, 0.6)";
@@ -48,7 +53,7 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
       ctxPicker.strokeStyle = "#fff";
       ctxPicker.stroke();
     }
-  }, [height, color, ctxPicker]);
+  }, [color, vertical, thickness, ctxPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -58,10 +63,13 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
   const handlePointerMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (canDrag.current && ctxAlpha) {
-      const { width } = ctxAlpha.canvas;
-      const { left } = ctxAlpha.canvas.getBoundingClientRect();
-      const newAlpha = (e.clientX - Math.floor(left)) / (width - 1);
-      setColor(CM(`rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha})`));
+      const { width, height } = ctxAlpha.canvas;
+      const { left, top } = ctxAlpha.canvas.getBoundingClientRect();
+      const x = e.clientX - Math.floor(left);
+      const y = e.clientY - Math.floor(top);
+      const newAlpha = vertical ? 1 - y / height : x / width;
+      const currentColor = CM(color.rgba()); // deep clone the `color` state variable
+      setColor(currentColor.alphaTo(newAlpha));
     }
   };
 
@@ -73,7 +81,7 @@ export default function AlphaPicker({ color, setColor, height = 15 }: IAlphaPick
 
   return (
     <CanvasGroup
-      height={height}
+      className="alpha"
       mainRef={colorAlpha}
       picker={{
         ref: colorPicker,

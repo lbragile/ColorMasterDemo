@@ -1,16 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import { Divider } from "semantic-ui-react";
 import CM, { ColorMaster } from "colormaster";
 import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
+import { CanvasContainer } from "../../styles/Canvas";
 
 interface IWheelPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   pickerRadius?: number;
   rotate?: number;
+  harmony?: ColorMaster[];
+  verticalPickers?: boolean;
 }
 
 /**
@@ -22,7 +24,14 @@ interface IWheelPicker {
  * @note To avoid visible gaps between the drawn segments (due to pixel resolution), interlace the segments → current segment is drawn in range [hue-1, hue+1]
  * @note `radial-gradient` is used to be independent of quadrant. Using linear-gradient will have incorrect direction in some quadrants.
  */
-export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate = 90 }: IWheelPicker): JSX.Element {
+export default function WheelPicker({
+  color,
+  setColor,
+  pickerRadius = 5,
+  rotate = 90,
+  harmony = undefined,
+  verticalPickers = true
+}: IWheelPicker): JSX.Element {
   const colorWheel = useRef<HTMLCanvasElement>(null);
   const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
@@ -50,34 +59,35 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
         ctxWheel.fillStyle = gradient;
         ctxWheel.fill();
       }
-
-      // draw a faint border around the color wheel so that it is "visible" at all times
-      ctxWheel.beginPath();
-      ctxWheel.strokeStyle = "hsla(0, 0%, 95%, 1)";
-      ctxWheel.arc(x, y, radius, 0, 2 * Math.PI);
-      ctxWheel.stroke();
     }
   }, [rotate, color, ctxWheel]);
 
   useEffect(() => {
     if (ctxPicker) {
       const radius = ctxPicker.canvas.width / 2;
+      ctxPicker.clearRect(0, 0, radius * 2 + 5, radius * 2 + 5);
 
-      const { h, s } = color.hsla();
-      ctxPicker.clearRect(0, 0, radius * 2, radius * 2);
-      ctxPicker.beginPath();
+      const colorArr = harmony ?? [color];
+      colorArr.forEach((c) => {
+        const { h, s } = c.hsla();
+        ctxPicker.beginPath();
 
-      const cos0 = Math.cos(((h - rotate) * Math.PI) / 180);
-      const hyp = (s * radius) / 100;
-      const x = radius + hyp * cos0;
-      const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
+        const cos0 = Math.cos(((h - rotate) * Math.PI) / 180);
+        const hyp = (s * radius) / 100;
+        const x = radius + hyp * cos0;
+        const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
-      ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+        ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
 
-      ctxPicker.fillStyle = "rgba(0,0,0,0.6)";
-      ctxPicker.fill();
+        const pickerColor = "rgba(0,0,0,0.6)";
+        ctxPicker.fillStyle = c.stringHSL() === color.stringHSL() ? pickerColor : "transparent";
+        ctxPicker.strokeStyle = pickerColor;
+        ctxPicker.lineWidth = 1;
+        ctxPicker.fill();
+        ctxPicker.stroke();
+      });
     }
-  }, [pickerRadius, rotate, color, ctxPicker]);
+  }, [pickerRadius, rotate, color, harmony, ctxPicker]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -88,13 +98,16 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
     e.preventDefault();
     if (canDrag.current && ctxWheel) {
       const { left, top } = ctxWheel.canvas.getBoundingClientRect();
-      const [x, y] = [e.clientX - Math.floor(left), e.clientY - Math.floor(top)];
-      const radius = ctxWheel.canvas.width / 2;
+      const [x, y] = [e.clientX - left, e.clientY - top];
+      const r = ctxWheel.canvas.width / 2;
 
       // only update the color if the click occurred within the circle
-      if (Math.pow(x - radius, 2) + Math.pow(y - radius, 2) <= Math.pow(radius, 2)) {
-        const data = ctxWheel.getImageData(x, y, 1, 1).data.slice(0, -1);
-        setColor(CM(`rgba(${data.join(", ")}, ${color.alpha})`));
+      const pos = { x: x - r, y: r - y };
+      if (Math.pow(pos.x, 2) + Math.pow(pos.y, 2) <= Math.pow(r, 2)) {
+        const hue = (Math.atan2(pos.x, pos.y) * 180) / Math.PI;
+        const sat = (Math.sqrt(Math.pow(pos.x, 2) + Math.pow(pos.y, 2)) * 100) / r;
+        const currentColor = CM(color.rgba()); // deep clone the `color` state variable
+        setColor(currentColor.hueTo(hue).saturationTo(sat));
       }
     }
   };
@@ -105,9 +118,12 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
     canDrag.current = false;
   };
 
+  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
+
   return (
-    <>
+    <CanvasContainer $vertical={verticalPickers}>
       <CanvasGroup
+        className="main wheel"
         mainRef={colorWheel}
         picker={{
           ref: colorPicker,
@@ -117,11 +133,8 @@ export default function WheelPicker({ color, setColor, pickerRadius = 5, rotate 
         }}
       />
 
-      <Divider hidden></Divider>
-
-      <HuePicker height={15} color={color} setColor={setColor} />
-
-      <AlphaPicker height={15} color={color} setColor={setColor} />
-    </>
+      <HuePicker {...CommonProps} />
+      <AlphaPicker {...CommonProps} />
+    </CanvasContainer>
   );
 }
