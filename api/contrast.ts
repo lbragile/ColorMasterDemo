@@ -15,8 +15,8 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
 
   if (CM(fgColor).isValid() && CM(bgColor).isValid()) {
     const contrast = CM(fgColor).contrast({ bgColor, ratio });
-    const readableOn = sizes.map((s) =>
-      levels.map((l) => ({ size: s, ratio: l, readable: CM(fgColor).readableOn({ bgColor, size: s, ratio: l }) }))
+    const readableOn = sizes.flatMap((s) =>
+      levels.map((l) => ({ size: s, level: l, readable: CM(fgColor).readableOn({ bgColor, size: s, level: l }) }))
     );
 
     const [fgColorName, bgColorName] = [fgColor, bgColor].map((c) => CM(c).name({ exact: false }));
