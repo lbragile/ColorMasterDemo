@@ -7,10 +7,6 @@ export const CanvasContainer = styled.div.attrs(
 )`
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-
-  touch-action: none;
-  background: transparent;
-
   grid-gap: 10px;
 
   & .main {
@@ -40,12 +36,14 @@ export const CanvasContainer = styled.div.attrs(
   }
 
   & canvas {
+    touch-action: none;
+    background: transparent;
     cursor: crosshair;
     border: 1px solid hsla(0, 0%, 90%, 1);
+    border-bottom: none;
 
     &.main.wheel {
       border: none;
-      border-radius: 50%;
     }
   }
 `;

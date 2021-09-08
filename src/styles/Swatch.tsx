@@ -20,7 +20,7 @@ export const Swatch = styled.div.attrs(
   border-radius: ${(props) => props.borderRadius ?? "50%"};
   border: ${(props) => props.borderColor ?? "hsla(0, 0%, 90%, 1)"} 1px solid;
   display: ${(props) => props.display ?? "block"};
-  margin: 0 ${(props) => (props.display ? "2px" : "auto")};
+  margin: auto ${(props) => (props.display ? "2px" : "auto")};
   position: ${(props) => props.position ?? ""};
   cursor: ${(props) => (props.$clickable ? "pointer" : "help")};
 `;

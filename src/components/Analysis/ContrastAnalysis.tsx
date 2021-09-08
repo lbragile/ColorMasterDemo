@@ -30,7 +30,7 @@ export default function ContrastAnalysis(): JSX.Element {
   const query = useQuery();
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
-  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(0, 0%, 50%, 1)"));
+  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
   const [contrast, setContrast] = useState<number | string>("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
   const [isLarge, setIsLarge] = useState(query.size ? query.size === "large" : true);
@@ -162,7 +162,7 @@ export default function ContrastAnalysis(): JSX.Element {
         </Grid.Column>
 
         <Grid.Column width={5}>
-          <ColorSelectorWidget color={bgColor} setColor={setBgColor}>
+          <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
             <Label size="big" color="black" attached="top right">
               {isMobile ? "BG" : "Background (BG)"}
             </Label>

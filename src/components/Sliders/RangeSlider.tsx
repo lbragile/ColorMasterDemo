@@ -53,6 +53,7 @@ const NumberInput = styled(Input).attrs(
       left: 0;
       top: 0;
       height: 100%;
+      transform: scaleX(1.05);
 
       &:hover {
         cursor: pointer;

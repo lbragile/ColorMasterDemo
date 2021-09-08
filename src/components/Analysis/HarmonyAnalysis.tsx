@@ -51,7 +51,7 @@ export default function HarmonyAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
 
-  const [color, setColor] = useState(CM(query.color ?? "hsla(0, 100%, 50%, 1)"));
+  const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
   const [type, setType] = useState<THarmony>(
     (typeOptions.find((item) => item.value === query.type)?.value as THarmony) ?? "analogous"
@@ -88,7 +88,8 @@ export default function HarmonyAnalysis(): JSX.Element {
           <ColorSelectorWidget
             color={color}
             setColor={setColor}
-            initPicker={3}
+            initPicker="wheel"
+            initColorspace="hsl"
             harmony={
               // only show harmonies if not shades or tints
               type !== "monochromatic" || (type === "monochromatic" && effect === "tones")

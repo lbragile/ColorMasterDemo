@@ -68,7 +68,8 @@ export function MixSample(
   primary: ColorMaster,
   secondary: ColorMaster,
   ratio: number,
-  colorspace: Exclude<TFormat, "invalid" | "name">
+  colorspace: Exclude<TFormat, "invalid" | "name">,
+  alpha: boolean
 ): string {
   const precision = [2, 2, 2, 2] as Required<TNumArr>;
   const mix = primary.mix({ color: secondary, ratio, colorspace });
@@ -84,6 +85,6 @@ const ratio = ${ratio}; ${ratio === 0.5 ? "// default" : ""}
 const colorspace = "${colorspace}"; ${colorspace === "luv" ? "// default" : ""}
 
 const mix = primary.mix({color: secondary, ratio, colorspace});
-console.log(mix.stringHSL()); // ${mix.stringHSL()} → ${mix.name(nameOpts)}
+console.log(mix.stringHSL({ alpha: ${alpha} })); // ${mix.stringHSL({ alpha })} → ${mix.name(nameOpts)}
 `;
 }
