@@ -194,7 +194,7 @@ export default function ColorSelectorWidget({
 
       <Grid verticalAlign="middle" centered stackable>
         <Grid.Row>
-          <Swatch radius={50} background={color.stringHSL()} title={color.stringHSL()} />
+          <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} />
         </Grid.Row>
 
         <Grid.Row>
@@ -220,9 +220,9 @@ export default function ColorSelectorWidget({
                 className="swatch-color"
                 key={background + "-swatch"}
                 title={background}
-                radius={15}
-                borderColor="rgba(0,0,0,0.3)"
-                borderRadius="4px"
+                $radius={15}
+                $borderColor="rgba(0,0,0,0.3)"
+                $borderRadius="4px"
                 display="inline-block"
                 background={background}
                 onClick={() => setColor(CM(background))}

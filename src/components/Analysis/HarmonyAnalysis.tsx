@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Divider, Grid, Icon, Label, Menu } from "semantic-ui-react";
+import { Container, Grid, Icon, Label, Menu } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import { Swatch } from "../../styles/Swatch";
@@ -13,6 +13,7 @@ import CodeModal from "./CodeModal";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
+import Spacers from "../Spacers";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -44,6 +45,23 @@ const SwatchCounter = styled(Label)`
     color: black;
     position: absolute;
     left: 0;
+    top: -1px;
+  }
+`;
+
+const StyledMenu = styled(Menu)`
+  && {
+    margin: 0 auto;
+    margin-bottom: 24px;
+  }
+`;
+
+const MonoEffectList = styled.li`
+  list-style: none;
+  &:before {
+    content: "•";
+    margin-right: 4px;
+    font-size: smaller;
   }
 `;
 
@@ -82,7 +100,7 @@ export default function HarmonyAnalysis(): JSX.Element {
   }, [history, colorDebounce, type, effect, amount]);
 
   return (
-    <Grid columns={3} verticalAlign="middle" stackable centered>
+    <Grid verticalAlign="middle" stackable>
       <Grid.Row>
         <Grid.Column width={5}>
           <ColorSelectorWidget
@@ -100,7 +118,7 @@ export default function HarmonyAnalysis(): JSX.Element {
         </Grid.Column>
 
         <Grid.Column width={3} textAlign="left">
-          <Menu vertical>
+          <StyledMenu vertical>
             {typeOptions.map((t) => {
               return (
                 <Menu.Item
@@ -110,7 +128,7 @@ export default function HarmonyAnalysis(): JSX.Element {
                   onClick={() => setType(t.value as THarmony)}
                 >
                   {t.text}{" "}
-                  {t.text === "monochromatic" && (
+                  {t.text === "monochromatic" && type !== t.value && (
                     <Label color="teal">
                       <Icon name="chevron circle down" />
                       {effectOptions.length}
@@ -129,12 +147,13 @@ export default function HarmonyAnalysis(): JSX.Element {
                               setType("monochromatic");
                             }}
                           >
-                            {e.text}
+                            <MonoEffectList>{e.text}</MonoEffectList>
                           </Menu.Item>
                         );
                       })}
 
-                      <Divider hidden />
+                      <Spacers height="16px" />
+
                       <Menu.Item>
                         <Label attached="top left" color="teal">
                           Amount
@@ -155,35 +174,35 @@ export default function HarmonyAnalysis(): JSX.Element {
                 </Menu.Item>
               );
             })}
-          </Menu>
+          </StyledMenu>
 
-          <Divider hidden />
+          <Container textAlign="center">
+            <CodeModal code={HarmonySample(color, type, effect, amount)} />
+          </Container>
         </Grid.Column>
 
-        <Grid.Column columns="equal" textAlign="center">
+        <Grid.Column width={type === "monochromatic" ? 6 : 7} textAlign="center">
           <Grid.Row>
-            {harmony.map((swatch, i) => (
+            {[...harmony, ...new Array(11 - harmony.length).fill("transparent")].map((swatch, i) => (
               <Swatch
-                key={swatch}
+                key={swatch + "_" + i}
                 title={swatch}
-                radius={65}
-                borderRadius="4px"
+                $radius={65}
+                $borderRadius="4px"
+                $borderColor={swatch === "transparent" ? swatch : undefined}
                 display="inline-block"
                 position="relative"
                 background={swatch}
                 onClick={() => setColor(CM(swatch))}
                 $clickable
               >
-                {type === "monochromatic" && <SwatchCounter>{i + 1}</SwatchCounter>}
+                {type === "monochromatic" && swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
                 {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
                   <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
                 )}
               </Swatch>
             ))}
           </Grid.Row>
-
-          <Divider hidden />
-          <CodeModal code={HarmonySample(color, type, effect, amount)} />
         </Grid.Column>
       </Grid.Row>
     </Grid>

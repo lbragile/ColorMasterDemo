@@ -105,8 +105,8 @@ export default function MixAnalysis(): JSX.Element {
         <Grid.Row>
           <Swatch
             title={mix}
-            radius={75}
-            borderRadius="4px"
+            $radius={75}
+            $borderRadius="4px"
             display="inline-block"
             position="relative"
             background={mix}
