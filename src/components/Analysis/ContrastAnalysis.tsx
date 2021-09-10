@@ -83,10 +83,10 @@ export default function ContrastAnalysis(): JSX.Element {
             <Header.Subheader>
               <Grid centered>
                 <Grid.Row columns={2}>
-                  <Grid.Column width={4} textAlign="center">
+                  <Grid.Column width={8} textAlign="right">
                     <Radio label="Body" name="radioGroup" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
                   </Grid.Column>
-                  <Grid.Column width={4} textAlign="center">
+                  <Grid.Column width={8} textAlign="left">
                     <Radio label="Large" name="radioGroup" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
                   </Grid.Column>
 
