@@ -8,18 +8,25 @@ import RGBSliderGroup from "../components/Sliders/RGBSliderGroup";
 type TValidFormat = Exclude<TFormat, "name" | "invalid">;
 
 interface IUseSliderChange {
+  color: ColorMaster;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  colorspace: TValidFormat;
+  alpha?: boolean;
+  min?: string;
+}
+interface IUseSliderChangeReturn {
   type: TValidFormat;
   colorStr: string;
   sliders: JSX.Element;
 }
 
-export default function useSliderChange(
-  color: ColorMaster,
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>,
-  colorspace: TValidFormat,
-  alpha: boolean,
-  min?: string
-): IUseSliderChange {
+export default function useSliderChange({
+  color,
+  setColor,
+  colorspace,
+  alpha,
+  min = "0"
+}: IUseSliderChange): IUseSliderChangeReturn {
   const handleSliderChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
       const val = Number.isNaN(e.target.valueAsNumber)
@@ -48,7 +55,7 @@ export default function useSliderChange(
   );
 
   const currentSliderChoice = useMemo(() => {
-    const possibleSliders: IUseSliderChange[] = [
+    const possibleSliders: IUseSliderChangeReturn[] = [
       {
         type: "rgb",
         colorStr: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),

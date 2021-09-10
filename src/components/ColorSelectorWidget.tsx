@@ -122,7 +122,7 @@ export default function ColorSelectorWidget({
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
   const { isMobile } = useBreakpointMap();
-  const currentSliders = useSliderChange(color, setColor, colorspace.key, alpha);
+  const currentSliders = useSliderChange({ color, setColor, colorspace: colorspace.key, alpha });
 
   const handleDropdownAdjustment = (dir: "up" | "down", type: "picker" | "colorspace") => {
     const numOptions = Object.keys(type === "colorspace" ? colorspaceOpts : pickerOpts).length;

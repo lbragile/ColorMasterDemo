@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Dropdown, Grid, Header } from "semantic-ui-react";
+import { Container, Divider, Dropdown, Grid, Header, Icon, Label, List, Message } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import { Swatch } from "../../styles/Swatch";
@@ -12,6 +12,26 @@ import { ManipulationSample } from "../../utils/codeSamples";
 import CodeModal from "./CodeModal";
 import addColor from "../../utils/addColor";
 import CM from "colormaster";
+
+const INFORMATIVE_TEXT = [
+  { header: "Color Picker", text: "Where you select color from the different pickers/sliders." },
+  {
+    header: "Adjust",
+    text: "Color picker & each of the above sliders! Combines both according to dropdown selection."
+  },
+  {
+    header: "Rotate",
+    text: "Color picker & hue slider from above sliders only! Rotation is simply moving at a fixed radius (arc) along the color wheel."
+  },
+  {
+    header: "Invert",
+    text: "Color picker only! Similar to complementary harmony. Rotates 180° and flips the lightness value. Alpha channel included based on selection."
+  },
+  {
+    header: "Grayscale",
+    text: "Color picker only! Output will vary slightly in most cases. Large variance if lightness is changed. Centered on 2D color wheel for all lightness values."
+  }
+];
 
 const ColorAdjustmentOpts = [
   {
@@ -30,31 +50,40 @@ export default function ManipulationAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
 
-  const [alpha, setAlpha] = useState(true);
+  const [alphaAdjust, setAlphaAdjust] = useState(true);
+  const [alphaRotate, setAlphaRotate] = useState(true);
+  const [alphaInvert, setAlphaInvert] = useState(true);
+  const [alphaGrayscale, setAlphaGrayscale] = useState(true);
+
   const [color, setColor] = useState(CM(query.color ?? "hsla(180, 50%, 50%, 0.5)"));
   const [incrementColor, setIncrementColor] = useState(
-    CM(`hsla(${query.hueBy ?? 0.01}, ${query.satBy ?? 0.01}%, ${query.lightBy ?? 0.01}%, ${query.alphaBy ?? 1e-4})`)
+    CM(`hsla(${query.hueBy ?? 72}, ${query.satBy ?? 15}%, ${query.lightBy ?? 10}%, ${query.alphaBy ?? 0.05})`)
   );
   const [isIncrement, setIsIncrement] = useState(true);
-  const [invert, setInvert] = useState(CM(color.hsla()).invert({ alpha }));
+  const [invert, setInvert] = useState(CM(color.hsla()).invert({ alpha: alphaInvert }));
   const [grayscale, setGrayscale] = useState(CM(color.rgba()).grayscale());
   const [rotate, setRotate] = useState(CM(color.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
 
-  const [swatchColor, setSwatchColor] = useState(addColor(color, incrementColor, isIncrement));
+  const [adjust, setAdjust] = useState(addColor(color, incrementColor, isIncrement));
 
   const colorDebounce = useDebounce(color, 100);
   const incrementColorDebounce = useDebounce(incrementColor, 100);
-  const currentSliders = useSliderChange(incrementColor, setIncrementColor, "hsl", alpha, "0.01");
+  const currentSliders = useSliderChange({
+    color: incrementColor,
+    setColor: setIncrementColor,
+    colorspace: "hsl",
+    min: "0.01"
+  });
 
   useEffect(() => {
-    setColor(colorDebounce);
-    setInvert(CM(colorDebounce.hsla()).invert({ alpha }));
-    setGrayscale(CM(colorDebounce.rgba()).grayscale());
-    setRotate(CM(colorDebounce.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
-  }, [colorDebounce, incrementColor, alpha, isIncrement]);
+    setColor(color);
+    setInvert(CM(color.hsla()).invert({ alpha: alphaInvert }));
+    setGrayscale(CM(color.rgba()).grayscale());
+    setRotate(CM(color.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
+  }, [color, incrementColor, alphaInvert, isIncrement]);
 
   useEffect(() => {
-    setSwatchColor(addColor(color, incrementColor, isIncrement));
+    setAdjust(addColor(color, incrementColor, isIncrement));
   }, [color, incrementColor, isIncrement]);
 
   useEffect(() => {
@@ -64,25 +93,34 @@ export default function ManipulationAnalysis(): JSX.Element {
       pathname: "/manipulation",
       search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${a.toFixed(
         4
-      )}`
+      )}&isIncrement=${isIncrement}&alpha=[${[alphaAdjust, alphaRotate, alphaInvert, alphaGrayscale].join(",")}]`
     });
-  }, [history, colorDebounce, incrementColorDebounce]);
+  }, [
+    history,
+    colorDebounce,
+    incrementColorDebounce,
+    isIncrement,
+    alphaAdjust,
+    alphaRotate,
+    alphaInvert,
+    alphaGrayscale
+  ]);
 
   return (
-    <Grid verticalAlign="middle" stackable>
+    <Grid verticalAlign="middle" stackable centered>
       <Grid.Column width={5}>
         <ColorSelectorWidget
           color={color}
           setColor={setColor}
           initPicker="wheel"
           initColorspace="hsl"
-          harmony={[color, swatchColor, rotate, grayscale, invert]}
+          harmony={[color, adjust, rotate, invert, grayscale]}
         />
       </Grid.Column>
 
-      <Spacers height="37px" />
+      <Spacers width="8px" />
 
-      <Grid.Column width={5}>
+      <Grid.Column width={4}>
         <Header textAlign="center">
           <Dropdown
             value={isIncrement ? "inc" : "dec"}
@@ -95,44 +133,124 @@ export default function ManipulationAnalysis(): JSX.Element {
           By
         </Header>
 
-        {currentSliders.sliders}
+        <Spacers height="12px" />
 
-        <Spacers height="32px" />
-
-        <Container textAlign="center">
-          <CodeModal code={ManipulationSample(colorDebounce, incrementColorDebounce, isIncrement, alpha)} />
-        </Container>
-      </Grid.Column>
-
-      <Grid.Column width={4}>
-        <Grid verticalAlign="middle" textAlign="center">
-          <ColorIndicator
-            color={swatchColor.stringHSL({ precision: [2, 2, 2, 2], alpha })}
-            alpha={alpha}
-            setAlpha={setAlpha}
-          />
-        </Grid>
+        <Grid.Column width={10}>{currentSliders.sliders}</Grid.Column>
 
         <Spacers height="20px" />
 
-        <Grid columns="equal" textAlign="center" stackable>
+        <Message color="blue">
+          <Message.Header>
+            <Icon name="info circle" size="large" /> Information You Might Find Useful
+          </Message.Header>
+
+          <Spacers height="20px" />
+
+          <Message.Content>
+            <List verticalAlign="middle">
+              {INFORMATIVE_TEXT.map((item, i) => (
+                <List.Item key={item.header}>
+                  <List.Header>
+                    <Label color="blue" horizontal>
+                      {i + 1}
+                    </Label>
+                    {item.header}
+                  </List.Header>
+                  <Spacers height="1px" />
+                  <List.Content>
+                    {item.text}
+                    <Spacers height="4px" />
+                  </List.Content>
+                </List.Item>
+              ))}
+            </List>
+          </Message.Content>
+        </Message>
+      </Grid.Column>
+
+      <Spacers width="8px" />
+
+      <Grid.Column width={6}>
+        <Grid columns="equal" verticalAlign="middle" textAlign="center">
           <Grid.Row>
-            <Grid.Column>
+            <Grid.Column width={8}>
               <Header>Adjust</Header>
+
+              <ColorIndicator
+                color={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
+                alpha={alphaAdjust}
+                setAlpha={setAlphaAdjust}
+              />
+
+              <Spacers height="8px" />
+
               <Swatch
-                title={swatchColor.stringHSL({ precision: [2, 2, 2, 2] })}
+                title={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
                 $radius={75}
                 $borderRadius="4px"
-                background={swatchColor.stringHSL()}
-                onClick={() => setColor(swatchColor)}
+                background={adjust.stringHSL()}
+                onClick={() => setColor(adjust)}
                 $clickable
               />
             </Grid.Column>
 
-            <Grid.Column>
-              <Header>Grayscale</Header>
+            <Grid.Column width={8}>
+              <Header>Rotate</Header>
+
+              <ColorIndicator
+                color={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
+                alpha={alphaRotate}
+                setAlpha={setAlphaRotate}
+              />
+
+              <Spacers height="8px" />
+
               <Swatch
-                title={grayscale.stringRGB({ precision: [2, 2, 2, 2] })}
+                title={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
+                $radius={75}
+                $borderRadius="4px"
+                background={rotate.stringHSL()}
+                onClick={() => setColor(rotate)}
+                $clickable
+              />
+            </Grid.Column>
+          </Grid.Row>
+          <Divider />
+          <Grid.Row>
+            <Grid.Column width={8}>
+              <Header>Invert</Header>
+
+              <ColorIndicator
+                color={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
+                alpha={alphaInvert}
+                setAlpha={setAlphaInvert}
+              />
+
+              <Spacers height="8px" />
+
+              <Swatch
+                title={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
+                $radius={75}
+                $borderRadius="4px"
+                background={invert.stringHSL()}
+                onClick={() => setColor(invert)}
+                $clickable
+              />
+            </Grid.Column>
+
+            <Grid.Column width={8}>
+              <Header>Grayscale</Header>
+
+              <ColorIndicator
+                color={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}
+                alpha={alphaGrayscale}
+                setAlpha={setAlphaGrayscale}
+              />
+
+              <Spacers height="8px" />
+
+              <Swatch
+                title={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}
                 $radius={75}
                 $borderRadius="4px"
                 background={grayscale.stringHSL()}
@@ -141,32 +259,20 @@ export default function ManipulationAnalysis(): JSX.Element {
               />
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row>
-            <Grid.Column>
-              <Header>Rotate</Header>
-              <Swatch
-                title={rotate.stringHSL({ precision: [2, 2, 2, 2] })}
-                $radius={75}
-                $borderRadius="4px"
-                background={rotate.stringHSL()}
-                onClick={() => setColor(rotate)}
-                $clickable
-              />
-            </Grid.Column>
-
-            <Grid.Column>
-              <Header>Invert</Header>
-              <Swatch
-                title={invert.stringHSL({ precision: [2, 2, 2, 2] })}
-                $radius={75}
-                $borderRadius="4px"
-                background={invert.stringHSL()}
-                onClick={() => setColor(invert)}
-                $clickable
-              />
-            </Grid.Column>
-          </Grid.Row>
         </Grid>
+
+        <Spacers height="32px" />
+
+        <Container textAlign="center">
+          <CodeModal
+            code={ManipulationSample(colorDebounce, incrementColorDebounce, isIncrement, {
+              adjust: alphaAdjust,
+              rotate: alphaRotate,
+              invert: alphaInvert,
+              grayscale: alphaGrayscale
+            })}
+          />
+        </Container>
       </Grid.Column>
     </Grid>
   );

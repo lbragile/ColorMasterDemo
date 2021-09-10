@@ -91,36 +91,62 @@ export function ManipulationSample(
   color: ColorMaster,
   incrementColor: ColorMaster,
   isIncrement: boolean,
-  alpha: boolean
+  alpha: { [K in "adjust" | "rotate" | "invert" | "grayscale"]: boolean }
 ): string {
   const precision = [2, 2, 2, 2] as Required<TNumArr>;
   const { h, s, l, a } = incrementColor.hsla();
   const sign = isIncrement ? 1 : -1;
-  const result = CM(color.stringHSL())
-    .hueBy(sign * h)
+
+  const rotate = CM(color.hsla()).hueBy(sign * h);
+
+  const adjust = CM(rotate.hsla())
     .saturateBy(sign * s)
     .lighterBy(sign * l)
     .alphaBy(sign * a);
+
+  const invert = CM(color.hsla()).invert({ alpha: alpha.invert });
+  const grayscale = CM(color.hsla()).grayscale();
 
   return `import CM from 'colormaster';
 
 const color = CM("${color.stringHSL({ precision })}"); // ${color.name(nameOpts)}
 const incrementColor = CM("${incrementColor.stringHSL({ precision })}"); // ${incrementColor.name(nameOpts)}
 
-const result = color
+// note we use \`CM(color.hsla())\` to "deep copy" \`color\` and avoid manipulating it unintentionally
+
+const adjust = CM(color.hsla())
     .hueBy(${!isIncrement ? sign + " * " : ""}incrementColor.hue)
     .${isIncrement ? "saturateBy" : "desaturateBy"}(incrementColor.saturation)
     .${isIncrement ? "lighterBy" : "darkenBy"}(incrementColor.lightness)
     .alphaBy(${!isIncrement ? sign + " * " : ""}incrementColor.alpha);
+const rotate = CM(color.hsla()).hueBy(${!isIncrement ? sign + " * " : ""}incrementColor.hue);
+const invert = CM(color.hsla()).invert({ alpha: ${alpha.invert} });
+const grayscale = CM(color.hsla()).grayscale();
 
 /**
- * const result = color.hueBy(${(sign * h).toFixed(2)}).${isIncrement ? "saturateBy" : "desaturateBy"}(${s.toFixed(
-    2
-  )}).${isIncrement ? "lighterBy" : "darkenBy"}(${l.toFixed(2)}).alphaBy(${(sign * a).toFixed(4)});
+ * Here we provide the above \`adjust\` & \`rotate\` variables with parameters that adjust dynamically:
+ * const adjust = CM(color.hsla()).hueBy(${(sign * h).toFixed(2)}).${
+    isIncrement ? "saturateBy" : "desaturateBy"
+  }(${s.toFixed(2)}).${isIncrement ? "lighterBy" : "darkenBy"}(${l.toFixed(2)}).alphaBy(${(sign * a).toFixed(4)});
+ * const rotate = CM(color.hsla()).hueBy(${(sign * h).toFixed(2)});
  */
 
-console.log(result.stringHSL({ alpha: ${alpha} }))); // ${result.stringHSL({ precision, alpha })} → ${result.name(
-    nameOpts
-  )}
+console.log(adjust.stringHSL({ alpha: ${alpha.adjust} }))); // ${adjust.stringHSL({
+    precision,
+    alpha: alpha.adjust
+  })} → ${adjust.name(nameOpts)}
+console.log(rotate.stringHSL({ alpha: ${alpha.rotate} }))); // ${rotate.stringHSL({
+    precision,
+    alpha: alpha.rotate
+  })} → ${rotate.name(nameOpts)}
+console.log(invert.stringHSL({ alpha: ${alpha.invert} }))); // ${invert.stringHSL({
+    precision,
+    alpha: alpha.invert
+  })} → ${invert.name(nameOpts)}
+console.log(grayscale.stringHSL({ alpha: ${alpha.grayscale} }))); // ${grayscale.stringHSL({
+    precision,
+    alpha: alpha.grayscale
+  })} → ${grayscale.name(nameOpts)}
+
 `;
 }

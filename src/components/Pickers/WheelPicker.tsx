@@ -68,7 +68,7 @@ export default function WheelPicker({
       ctxPicker.clearRect(0, 0, radius * 2 + 5, radius * 2 + 5);
 
       const colorArr = harmony ?? [color];
-      colorArr.forEach((c) => {
+      colorArr.forEach((c, i) => {
         const { h, s } = c.hsla();
         ctxPicker.beginPath();
 
@@ -80,11 +80,19 @@ export default function WheelPicker({
         ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
 
         const pickerColor = "rgba(0,0,0,0.6)";
-        ctxPicker.fillStyle = c.stringHSL() === color.stringHSL() ? pickerColor : "transparent";
+        ctxPicker.fillStyle = pickerColor;
         ctxPicker.strokeStyle = pickerColor;
         ctxPicker.lineWidth = 1;
         ctxPicker.fill();
         ctxPicker.stroke();
+
+        if (colorArr.length > 1) {
+          ctxPicker.fillStyle = "white";
+          ctxPicker.font = "bold 10px Arial";
+          ctxPicker.textAlign = "center";
+          ctxPicker.textBaseline = "middle";
+          ctxPicker.fillText((i + 1).toString(), x, y);
+        }
       });
     }
   }, [pickerRadius, rotate, color, harmony, ctxPicker]);

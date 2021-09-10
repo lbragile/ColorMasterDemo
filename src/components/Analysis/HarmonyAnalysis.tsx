@@ -196,7 +196,7 @@ export default function HarmonyAnalysis(): JSX.Element {
                 onClick={() => setColor(CM(swatch))}
                 $clickable
               >
-                {type === "monochromatic" && swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
+                {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
                 {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
                   <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
                 )}
