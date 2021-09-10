@@ -10,6 +10,7 @@ import useBreakpointMap from "../hooks/useBreakpointMap";
 const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
 const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
 const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
+const ManipulationAnalysis = lazy(() => import("./Analysis/ManipulationAnalysis"));
 
 const StyledContainer = styled(Container)`
   && {
@@ -31,7 +32,7 @@ const Content = styled.div.attrs((props: { $mobile: boolean }) => props)`
       : {}}
 `;
 
-const MENU_TABS = ["contrast", "harmony", "mix"];
+const MENU_TABS = ["contrast", "harmony", "mix", "manipulation"];
 
 export default function App(): JSX.Element {
   const location = useLocation();
@@ -72,6 +73,7 @@ export default function App(): JSX.Element {
             <Route path="/contrast" component={ContrastAnalysis} />
             <Route path="/harmony" component={HarmonyAnalysis} />
             <Route path="/mix" component={MixAnalysis} />
+            <Route path="/manipulation" component={ManipulationAnalysis} />
             <Redirect from="/" to="/harmony" />
           </Switch>
         </Content>

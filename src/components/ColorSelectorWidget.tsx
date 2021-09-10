@@ -1,17 +1,18 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Button, Divider, Dropdown, Grid, Header, Icon, Segment } from "semantic-ui-react";
 import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
-import HSLSliderGroup from "./Sliders/HSLSliderGroup";
-import RGBSliderGroup from "./Sliders/RGBSliderGroup";
-import CM, { ColorMaster } from "colormaster";
-import { Ihsla, Irgba, TChannel, TChannelHSL, TFormat } from "colormaster/types";
+import { TFormat } from "colormaster/types";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
-import HEXSliderGroup from "./Sliders/HEXSliderGroup";
 import ColorIndicator from "./ColorIndicator";
 import useDebounce from "../hooks/useDebounce";
+import useSliderChange from "../hooks/useSliderChange";
+import CM, { ColorMaster, extendPlugins } from "colormaster";
+import NamePlugin from "colormaster/plugins/name";
+
+extendPlugins([NamePlugin]);
 
 type TValidColorspace = Exclude<TFormat, "name" | "invalid">;
 type TValidPicker = "slider" | "sketch" | "wheel";
@@ -120,57 +121,8 @@ export default function ColorSelectorWidget({
   const [picker, setPicker] = useState(pickerOpts.find((x) => x.key === initPicker) ?? pickerOpts[0]);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-
   const { isMobile } = useBreakpointMap();
-
-  const handleSliderChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
-      const val = Number.isNaN(e.target.valueAsNumber)
-        ? e.target.value.length > 0
-          ? parseInt(e.target.value, 16)
-          : 0
-        : e.target.valueAsNumber;
-
-      const { r, g, b } = color.rgba();
-      const { h, s, l } = color.hsla();
-
-      const newColor: Irgba | Ihsla = ["red", "green", "blue"].includes(type)
-        ? { r: type === "red" ? val : r, g: type === "green" ? val : g, b: type === "blue" ? val : b, a: 1 }
-        : {
-            h: type === "hue" ? Math.max(0, Math.min(val, 359.99)) : h,
-            s: type === "saturation" ? val : s,
-            l: type === "lightness" ? val : l,
-            a: 1
-          };
-
-      newColor.a = type === "alpha" ? val / (colorspace.key === "hex" ? 255 : 100) : color.alpha;
-
-      setColor(CM(newColor));
-    },
-    [color, setColor, colorspace]
-  );
-
-  const currentSliders = useMemo(() => {
-    const possibleSliders = [
-      {
-        type: "rgb",
-        colorStr: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
-      },
-      {
-        type: "hex",
-        colorStr: color.stringHEX({ alpha }),
-        sliders: <HEXSliderGroup color={color} onChange={handleSliderChange} />
-      },
-      {
-        type: "hsl",
-        colorStr: color.stringHSL({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} />
-      }
-    ];
-
-    return possibleSliders.filter((slider) => slider.type === colorspace.key)[0];
-  }, [colorspace, color, alpha, handleSliderChange]);
+  const currentSliders = useSliderChange(color, setColor, colorspace.key, alpha);
 
   const handleDropdownAdjustment = (dir: "up" | "down", type: "picker" | "colorspace") => {
     const numOptions = Object.keys(type === "colorspace" ? colorspaceOpts : pickerOpts).length;

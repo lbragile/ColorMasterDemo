@@ -1,4 +1,4 @@
-import { ColorMaster, extendPlugins } from "colormaster";
+import CM, { ColorMaster, extendPlugins } from "colormaster";
 import { TFormat, THarmony, TMonoEffect, TNumArr } from "colormaster/types";
 import MixPlugin from "colormaster/plugins/mix";
 import HarmonyPlugin from "colormaster/plugins/harmony";
@@ -7,6 +7,7 @@ import NamePlugin from "colormaster/plugins/name";
 extendPlugins([MixPlugin, HarmonyPlugin, NamePlugin]);
 
 const nameOpts = { exact: false };
+const precision = [2, 2, 2, 2] as Required<TNumArr>;
 
 export function ContrastSample(
   fgColor: ColorMaster,
@@ -15,7 +16,6 @@ export function ContrastSample(
   readableOn: boolean[],
   ratio: boolean
 ): string {
-  const precision = [2, 2, 2, 2] as Required<TNumArr>;
   return `import CM, { extendPlugins } from 'colormaster';
 import A11yPlugin from "colormaster/plugins/accessibility";
 
@@ -34,7 +34,6 @@ console.log(fgColor.readableOn({ bgColor, level: "enhanced", size: "large" })); 
 }
 
 export function HarmonySample(color: ColorMaster, type: THarmony, effect: TMonoEffect, amount: number): string {
-  const precision = [2, 2, 2, 2] as Required<TNumArr>;
   const harmonyArr = color.harmony({ type, effect, amount });
 
   return `import CM, { extendPlugins } from 'colormaster';
@@ -71,7 +70,6 @@ export function MixSample(
   colorspace: Exclude<TFormat, "invalid" | "name">,
   alpha: boolean
 ): string {
-  const precision = [2, 2, 2, 2] as Required<TNumArr>;
   const mix = primary.mix({ color: secondary, ratio, colorspace });
 
   return `import CM, { extendPlugins } from 'colormaster';
@@ -86,5 +84,43 @@ const colorspace = "${colorspace}"; ${colorspace === "luv" ? "// default" : ""}
 
 const mix = primary.mix({color: secondary, ratio, colorspace});
 console.log(mix.stringHSL({ alpha: ${alpha} })); // ${mix.stringHSL({ alpha })} → ${mix.name(nameOpts)}
+`;
+}
+
+export function ManipulationSample(
+  color: ColorMaster,
+  incrementColor: ColorMaster,
+  isIncrement: boolean,
+  alpha: boolean
+): string {
+  const precision = [2, 2, 2, 2] as Required<TNumArr>;
+  const { h, s, l, a } = incrementColor.hsla();
+  const sign = isIncrement ? 1 : -1;
+  const result = CM(color.stringHSL())
+    .hueBy(sign * h)
+    .saturateBy(sign * s)
+    .lighterBy(sign * l)
+    .alphaBy(sign * a);
+
+  return `import CM from 'colormaster';
+
+const color = CM("${color.stringHSL({ precision })}"); // ${color.name(nameOpts)}
+const incrementColor = CM("${incrementColor.stringHSL({ precision })}"); // ${incrementColor.name(nameOpts)}
+
+const result = color
+    .hueBy(${!isIncrement ? sign + " * " : ""}incrementColor.hue)
+    .${isIncrement ? "saturateBy" : "desaturateBy"}(incrementColor.saturation)
+    .${isIncrement ? "lighterBy" : "darkenBy"}(incrementColor.lightness)
+    .alphaBy(${!isIncrement ? sign + " * " : ""}incrementColor.alpha);
+
+/**
+ * const result = color.hueBy(${(sign * h).toFixed(2)}).${isIncrement ? "saturateBy" : "desaturateBy"}(${s.toFixed(
+    2
+  )}).${isIncrement ? "lighterBy" : "darkenBy"}(${l.toFixed(2)}).alphaBy(${(sign * a).toFixed(4)});
+ */
+
+console.log(result.stringHSL({ alpha: ${alpha} }))); // ${result.stringHSL({ precision, alpha })} → ${result.name(
+    nameOpts
+  )}
 `;
 }
