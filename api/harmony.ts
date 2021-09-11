@@ -19,6 +19,94 @@ const validTypes = [
 
 const validEffects = ["tints", "shades", "tones"];
 
+/**
+ * @swagger
+ * /api/harmony:
+ *   get:
+ *     summary: Color harmonies from an input color
+ *     description: "Given a `type` with (optionally - for monochromatic types) `effect` & `amount`, returns the related color harmony group for the input color. See [color harmonies](https://www.canva.com/colors/color-wheel/) for more details"
+ *
+ *     tags:
+ *       - ColorMaster
+ *
+ *     parameters:
+ *       - in: query
+ *         name: color
+ *         required: true
+ *         description: The main color from which the harmony is determined
+ *         default: ffff00ff
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         description: "Harmony group type to find. One of: \"analogous\", \"complementary\", \"split-complementary\", \"double split-complementary\", \"triad\", \"rectangle\", \"square\", or \"monochromatic\""
+ *         default: analogous
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: effect
+ *         required: false
+ *         description: Only applies to monochromatic harmony type. Possible values are shades, tints, or tones
+ *         default: shades
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: amount
+ *         required: false
+ *         description: Only applies to monochromatic harmony type. Number of harmony colors to return - in range [2, 10]
+ *         default: 5
+ *         schema:
+ *           type: integer
+ *
+ *     responses:
+ *       200:
+ *         description: Relevant harmony information such as base color, its name, resulting harmony, and resulting harmony names
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 color:
+ *                   type: string
+ *                   example: 'ffff00ff'
+ *                 colorName:
+ *                   type: string
+ *                   example: 'yellow'
+ *                 result:
+ *                   type: array
+ *                   example: [
+ *                              "ff8000ff",
+ *                              "ffff00ff",
+ *                              "80ff00ff"
+ *                            ]
+ *                 resultName:
+ *                   type: array
+ *                   example: [
+ *                              "dark orange",
+ *                              "yellow",
+ *                              "chart reuse"
+ *                            ]
+ *                 type:
+ *                   type: string
+ *                   example: 'monochromatic'
+ *                 effect:
+ *                   type: string
+ *                   example: 'shades'
+ *                 amount:
+ *                   type: integer
+ *                   example: 5
+ *       400:
+ *         description: Bad data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Invalid data provided'
+ */
 module.exports = (req: VercelRequest, res: VercelResponse) => {
   const { color, type: t, effect: e, amount: a } = req.query as { [key: string]: string };
 

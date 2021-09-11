@@ -8,6 +8,89 @@ extendPlugins([MixPlugin, NamePlugin]);
 
 const validColorspace = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"];
 
+/**
+ * @swagger
+ * /api/mix:
+ *   get:
+ *     summary: Information from mixing two colors
+ *     description: Information from mixing two colors at a given `ratio` in `colorspace`.
+ *                  The colorspace can be any of the ones supported by ColorMaster.
+ *     tags:
+ *       - ColorMaster
+ *
+ *     parameters:
+ *       - in: query
+ *         name: primary
+ *         required: true
+ *         description: Original color that is used in the mixing process
+ *         default: ffff00ff
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: secondary
+ *         required: true
+ *         description: Another color to mix with the primary color
+ *         default: 0000ffff
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: ratio
+ *         required: false
+ *         description: The proportions to use when mixing the colors. Must be in range [0, 1]
+ *         default: 0.5
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: colorspace
+ *         required: false
+ *         description: "A colorspace supported by [ColorMaster](https://www.npmjs.com/package/colormaster#-color-space-plugins). Mixing is performed in this colorspace."
+ *         default: luv
+ *         schema:
+ *           type: string
+ *
+ *     responses:
+ *       200:
+ *         description: Foreground & Background colors, their names, contrast, and readability information.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 primary:
+ *                   type: string
+ *                   example: 'ffff00ff'
+ *                 primaryName:
+ *                   type: string
+ *                   example: 'yellow'
+ *                 secondary:
+ *                   type: string
+ *                   example: '0000ffff'
+ *                 secondaryName:
+ *                   type: string
+ *                   example: 'blue'
+ *                 result:
+ *                   type: string
+ *                   example: "9898b4ff"
+ *                 resultName:
+ *                   type: string
+ *                   example: "dark gray"
+ *                 ratio:
+ *                   type: integer
+ *                   example: 0.5
+ *                 colorspace:
+ *                   type: string
+ *                   example: luv
+ *       400:
+ *         description: Bad data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Invalid data provided'
+ */
 module.exports = (req: VercelRequest, res: VercelResponse) => {
   const { primary, secondary, ratio: r, colorspace: c } = req.query as { [key: string]: string };
 
