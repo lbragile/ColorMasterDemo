@@ -10,7 +10,7 @@ import useBreakpointMap from "../hooks/useBreakpointMap";
 const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
 const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
 const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
-const ManipulationAnalysis = lazy(() => import("./Analysis/ManipulationAnalysis"));
+const ManipulateAnalysis = lazy(() => import("./Analysis/ManipulateAnalysis"));
 const A11yStatisticsAnalysis = lazy(() => import("./Analysis/A11yStatisticsAnalysis"));
 
 const StyledContainer = styled(Container)`
@@ -33,7 +33,7 @@ const Content = styled.div.attrs((props: { $mobile: boolean }) => props)`
       : {}}
 `;
 
-const MENU_TABS = ["contrast", "statistics", "harmony", "mix", "manipulation"];
+const MENU_TABS = ["contrast", "statistics", "harmony", "mix", "manipulate"];
 
 export default function App(): JSX.Element {
   const location = useLocation();
@@ -53,7 +53,7 @@ export default function App(): JSX.Element {
         {isMobile && <Divider hidden />}
 
         <Menu pointing secondary>
-          <Dropdown item text="Accessibility">
+          <Dropdown item text={isMobile ? "A11y" : "Accessibility"}>
             <Dropdown.Menu>
               {MENU_TABS.slice(0, 2).map((item) => {
                 const path = "/accessibility/" + item;
@@ -94,7 +94,7 @@ export default function App(): JSX.Element {
             <Route path="/accessibility/statistics" component={A11yStatisticsAnalysis} />
             <Route path="/harmony" component={HarmonyAnalysis} />
             <Route path="/mix" component={MixAnalysis} />
-            <Route path="/manipulation" component={ManipulationAnalysis} />
+            <Route path="/manipulate" component={ManipulateAnalysis} />
             <Redirect from="/" to="/harmony" />
           </Switch>
         </Content>

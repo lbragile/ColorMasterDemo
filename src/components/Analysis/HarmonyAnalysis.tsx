@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Grid, Icon, Label, Menu } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
-import { Swatch } from "../../styles/Swatch";
+import { CurrentColorIcon, Swatch, SwatchCounter } from "../../styles/Swatch";
 import RangeSlider from "../Sliders/RangeSlider";
 import { HarmonySample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
@@ -29,25 +29,6 @@ const typeOptions = [
 ].map((value) => ({ key: value, text: value.includes("double") ? "double split-complementary" : value, value }));
 
 const effectOptions = ["shades", "tints", "tones"].map((value) => ({ key: value, text: value, value }));
-
-const CurrentColorIcon = styled(Icon)`
-  && {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-`;
-
-const SwatchCounter = styled(Label)`
-  && {
-    border-radius: 2px 0;
-    color: black;
-    position: absolute;
-    left: 0;
-    top: -1px;
-  }
-`;
 
 const StyledMenu = styled(Menu)`
   && {

@@ -6,7 +6,7 @@ extendPlugins([NamePlugin]);
 
 /**
  * @swagger
- * /api/manipulation:
+ * /api/manipulate:
  *   get:
  *     summary: Various manipulations of an input color
  *     description: "Given an \"increment color\" (via `hueBy`, `satBy`, `lightBy`, and `alphaBy`), returns 4 new colors:

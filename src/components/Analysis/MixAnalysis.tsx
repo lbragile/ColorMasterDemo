@@ -92,7 +92,7 @@ export default function MixAnalysis(): JSX.Element {
           </Header>
         </Divider>
 
-        <Spacers height="20px" />
+        <Spacers height="16px" />
 
         <Grid verticalAlign="middle" textAlign="center">
           <Grid.Column computer={8} mobile={14}>
@@ -100,7 +100,7 @@ export default function MixAnalysis(): JSX.Element {
           </Grid.Column>
         </Grid>
 
-        <Divider hidden />
+        <Spacers height="8px" />
 
         <Grid.Row>
           <Swatch
@@ -115,17 +115,7 @@ export default function MixAnalysis(): JSX.Element {
           />
         </Grid.Row>
 
-        <Divider hidden />
-
-        <Grid.Row textAlign="left">
-          <Header>
-            <Label color="teal" size="big">
-              Color Space
-            </Label>
-          </Header>
-        </Grid.Row>
-
-        <Spacers height="10px" />
+        <Spacers height="4px" />
 
         <Grid.Row>
           <Dropdown

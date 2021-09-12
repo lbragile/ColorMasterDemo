@@ -228,7 +228,7 @@ export default function ColorSelectorWidget({
           </Grid.Column>
         </Grid.Row>
 
-        <ColorIndicator color={currentSliders.colorStr} alpha={alpha} setAlpha={setAlpha} />
+        <ColorIndicator color={currentSliders.colorStr} showName={false} alpha={alpha} setAlpha={setAlpha} />
       </Grid>
 
       <Divider hidden />

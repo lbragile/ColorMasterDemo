@@ -31,6 +31,7 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
 export default function ContrastAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isMobile } = useBreakpointMap();
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
   const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
@@ -43,8 +44,6 @@ export default function ContrastAnalysis(): JSX.Element {
   const bgDebounce = useDebounce(bgColor, 100);
   const contrastDebounce = useDebounce(contrast, 100);
   const readableOnDebounce = useDebounce(readableOn, 100);
-
-  const { isMobile } = useBreakpointMap();
 
   useEffect(() => {
     setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));
@@ -68,9 +67,11 @@ export default function ContrastAnalysis(): JSX.Element {
 
   return (
     <>
+      {isMobile && <Spacers height="24px" />}
+
       <BreadcrumbPath path="Contrast" />
 
-      <Spacers height="20px" />
+      <Spacers height={isMobile ? "40px" : "20px"} />
 
       <Grid columns={3} verticalAlign="middle" stackable centered>
         <Grid.Row>

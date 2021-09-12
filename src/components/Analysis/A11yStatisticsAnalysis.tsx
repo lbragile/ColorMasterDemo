@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Header, Icon } from "semantic-ui-react";
+import { Container, Divider, Grid, Header, Icon } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
-import CM, { ColorMaster, extendPlugins } from "colormaster";
-import A11yPlugin from "colormaster/plugins/accessibility";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
 import Spacers from "../Spacers";
 import BreadcrumbPath from "../BreadcrumbPath";
-import { Swatch } from "../../styles/Swatch";
+import { CurrentColorIcon, Swatch, SwatchCounter } from "../../styles/Swatch";
 import ColorIndicator from "../ColorIndicator";
+import { A11yStatisticsSample } from "../../utils/codeSamples";
+import CodeModal from "./CodeModal";
+import CM, { ColorMaster, extendPlugins } from "colormaster";
+import A11yPlugin from "colormaster/plugins/accessibility";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 
 extendPlugins([A11yPlugin]);
 
@@ -18,11 +21,12 @@ interface IPureHue {
   reason: string;
 }
 
-export default function HarmonyAnalysis(): JSX.Element {
+export default function A11yStatisticsAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isMobile } = useBreakpointMap();
 
-  const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
+  const [color, setColor] = useState(CM(query.color ?? "hsla(45, 75%, 50%, 1)"));
   const [pureHue, setPureHue] = useState<IPureHue>(color.isPureHue() as IPureHue);
   const [closest, setClosest] = useState<{ [K in "warm" | "cool" | "pure" | "web"]: ColorMaster }>({
     warm: CM(color.hsla()).closestWarm(),
@@ -31,10 +35,10 @@ export default function HarmonyAnalysis(): JSX.Element {
     web: CM(color.hsla()).closestWebSafe()
   });
 
-  const [alphaWarm, setAlphaWarm] = useState(true);
-  const [alphaCool, setAlphaCool] = useState(true);
-  const [alphaPure, setAlphaPure] = useState(true);
-  const [alphaWeb, setAlphaWeb] = useState(true);
+  const [alphaWarm, setAlphaWarm] = useState(query.alpha ? JSON.parse(query.alpha)[0] : true);
+  const [alphaCool, setAlphaCool] = useState(query.alpha ? JSON.parse(query.alpha)[1] : true);
+  const [alphaPure, setAlphaPure] = useState(query.alpha ? JSON.parse(query.alpha)[2] : true);
+  const [alphaWeb, setAlphaWeb] = useState(query.alpha ? JSON.parse(query.alpha)[3] : true);
 
   const colorDebounce = useDebounce(color, 100);
 
@@ -51,12 +55,17 @@ export default function HarmonyAnalysis(): JSX.Element {
   useEffect(() => {
     history.replace({
       pathname: "/accessibility/statistics",
-      search: `?color=${colorDebounce.stringHEX().slice(1).toLowerCase()}`
+      search: `?color=${colorDebounce
+        .stringHEX()
+        .slice(1)
+        .toLowerCase()}&alpha=[${alphaWarm},${alphaCool},${alphaPure},${alphaWeb}]`
     });
-  }, [history, colorDebounce]);
+  }, [history, colorDebounce, alphaWarm, alphaCool, alphaPure, alphaWeb]);
 
   return (
     <>
+      {isMobile && <Spacers height="24px" />}
+
       <BreadcrumbPath path="Statistics" />
 
       <Spacers height="40px" />
@@ -129,7 +138,7 @@ export default function HarmonyAnalysis(): JSX.Element {
             <Grid columns="equal" verticalAlign="middle" textAlign="center">
               <Grid.Row>
                 <Grid.Column width={8}>
-                  <Header>Closest Warm</Header>
+                  <Header as="h2">Closest Warm</Header>
 
                   <ColorIndicator
                     color={closest.warm.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaWarm })}
@@ -141,16 +150,23 @@ export default function HarmonyAnalysis(): JSX.Element {
 
                   <Swatch
                     title={closest.warm.stringHSL({ precision: [2, 2, 2, 2] })}
-                    $radius={75}
-                    $borderRadius="4px"
+                    position="relative"
                     background={closest.warm.stringHSL()}
                     onClick={() => setColor(closest.warm)}
+                    $radius={75}
+                    $borderRadius="4px"
                     $cursor="pointer"
-                  />
+                  >
+                    <SwatchCounter>1</SwatchCounter>
+                    {closest.warm.stringHSL({ precision: [2, 2, 2, 2] }) ===
+                      colorDebounce.stringHSL({ precision: [2, 2, 2, 2] }) && (
+                      <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
+                    )}
+                  </Swatch>
                 </Grid.Column>
 
                 <Grid.Column width={8}>
-                  <Header>Closest Cool</Header>
+                  <Header as="h2">Closest Cool</Header>
 
                   <ColorIndicator
                     color={closest.cool.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaCool })}
@@ -162,18 +178,27 @@ export default function HarmonyAnalysis(): JSX.Element {
 
                   <Swatch
                     title={closest.cool.stringHSL({ precision: [2, 2, 2, 2] })}
-                    $radius={75}
-                    $borderRadius="4px"
+                    position="relative"
                     background={closest.cool.stringHSL()}
                     onClick={() => setColor(closest.cool)}
+                    $radius={75}
+                    $borderRadius="4px"
                     $cursor="pointer"
-                  />
+                  >
+                    <SwatchCounter>2</SwatchCounter>
+                    {closest.cool.stringHSL({ precision: [2, 2, 2, 2] }) ===
+                      colorDebounce.stringHSL({ precision: [2, 2, 2, 2] }) && (
+                      <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
+                    )}
+                  </Swatch>
                 </Grid.Column>
               </Grid.Row>
 
+              <Divider />
+
               <Grid.Row>
                 <Grid.Column width={8}>
-                  <Header>Closest Pure Hue</Header>
+                  <Header as="h2">Closest Pure Hue</Header>
 
                   <ColorIndicator
                     color={closest.pure.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaPure })}
@@ -185,16 +210,19 @@ export default function HarmonyAnalysis(): JSX.Element {
 
                   <Swatch
                     title={closest.pure.stringHSL({ precision: [2, 2, 2, 2] })}
-                    $radius={75}
-                    $borderRadius="4px"
+                    position="relative"
                     background={closest.pure.stringHSL()}
                     onClick={() => setColor(closest.pure)}
+                    $radius={75}
+                    $borderRadius="4px"
                     $cursor="pointer"
-                  />
+                  >
+                    <SwatchCounter>3</SwatchCounter>
+                  </Swatch>
                 </Grid.Column>
 
                 <Grid.Column width={8}>
-                  <Header>Closest Web Safe</Header>
+                  <Header as="h2">Closest Web Safe</Header>
 
                   <ColorIndicator
                     color={closest.web.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaWeb })}
@@ -207,16 +235,30 @@ export default function HarmonyAnalysis(): JSX.Element {
                   <Swatch
                     title={closest.web.stringHSL({ precision: [2, 2, 2, 2] })}
                     $radius={75}
+                    position="relative"
                     $borderRadius="4px"
                     background={closest.web.stringHSL()}
                     onClick={() => setColor(closest.web)}
                     $cursor="pointer"
-                  />
+                  >
+                    <SwatchCounter>4</SwatchCounter>
+                  </Swatch>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
 
             <Spacers height="32px" />
+
+            <Container textAlign="center">
+              <CodeModal
+                code={A11yStatisticsSample(colorDebounce, {
+                  warm: alphaWarm,
+                  cool: alphaCool,
+                  pure: alphaPure,
+                  web: alphaWeb
+                })}
+              />
+            </Container>
           </Grid.Column>
         </Grid.Row>
       </Grid>

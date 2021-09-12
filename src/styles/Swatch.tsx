@@ -1,3 +1,4 @@
+import { Icon, Label } from "semantic-ui-react";
 import styled from "styled-components";
 
 export const Swatch = styled.div.attrs(
@@ -23,4 +24,23 @@ export const Swatch = styled.div.attrs(
   margin: auto ${(props) => (props.display ? "2px" : "auto")};
   position: ${(props) => props.position ?? ""};
   cursor: ${(props) => props.$cursor};
+`;
+
+export const CurrentColorIcon = styled(Icon)`
+  && {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
+
+export const SwatchCounter = styled(Label)`
+  && {
+    border-radius: 2px 0;
+    color: black;
+    position: absolute;
+    left: 0;
+    top: -1px;
+  }
 `;

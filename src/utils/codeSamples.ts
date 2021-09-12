@@ -93,7 +93,6 @@ export function ManipulationSample(
   isIncrement: boolean,
   alpha: { [K in "adjust" | "rotate" | "invert" | "grayscale"]: boolean }
 ): string {
-  const precision = [2, 2, 2, 2] as Required<TNumArr>;
   const { h, s, l, a } = incrementColor.hsla();
   const sign = isIncrement ? 1 : -1;
 
@@ -147,6 +146,47 @@ console.log(grayscale.stringHSL({ alpha: ${alpha.grayscale} }))); // ${grayscale
     precision,
     alpha: alpha.grayscale
   })} → ${grayscale.name(nameOpts)}
+`;
+}
 
+export function A11yStatisticsSample(
+  color: ColorMaster,
+  alpha: { [K in "warm" | "cool" | "pure" | "web"]: boolean }
+): string {
+  const warm = CM(color.hsla()).closestWarm();
+  const cool = CM(color.hsla()).closestCool();
+  const pure = CM(color.hsla()).closestPureHue();
+  const web = CM(color.hsla()).closestWebSafe();
+
+  return `import CM, { extendPlugins } from 'colormaster';
+import A11yPlugin from "colormaster/plugins/accessibility";
+
+extendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin
+
+const color = CM("${color.stringHSL({ precision })}"); // ${color.name(nameOpts)}
+
+// note we use \`CM(color.hsla())\` to "deep copy" \`color\` and avoid manipulating it unintentionally
+
+const warm = CM(color.hsla()).closestWarm()
+const cool = CM(color.hsla()).closestCool()
+const pure = CM(color.hsla()).closestPureHue()
+const web = CM(color.hsla()).closestWebSafe()
+
+console.log(warm.stringHSL({ alpha: ${alpha.warm} }))); // ${warm.stringHSL({
+    precision,
+    alpha: alpha.warm
+  })} → ${warm.name(nameOpts)}
+console.log(cool.stringHSL({ alpha: ${alpha.cool} }))); // ${cool.stringHSL({
+    precision,
+    alpha: alpha.cool
+  })} → ${cool.name(nameOpts)}
+console.log(pure.stringHSL({ alpha: ${alpha.pure} }))); // ${pure.stringHSL({
+    precision,
+    alpha: alpha.pure
+  })} → ${pure.name(nameOpts)}
+console.log(web.stringHSL({ alpha: ${alpha.web} }))); // ${web.stringHSL({
+    precision,
+    alpha: alpha.web
+  })} → ${web.name(nameOpts)}
 `;
 }

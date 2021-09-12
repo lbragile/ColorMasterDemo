@@ -1,9 +1,13 @@
 import React, { useMemo } from "react";
-import { Popup, Icon, Grid, Checkbox, Input } from "semantic-ui-react";
+import { Popup, Icon, Grid, Checkbox, Input, Header } from "semantic-ui-react";
 import styled from "styled-components";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import useCopyToClipboard from "../hooks/useCopytoClipboard";
 import Spacers from "./Spacers";
+import CM, { extendPlugins } from "colormaster";
+import NamePlugin from "colormaster/plugins/name";
+
+extendPlugins([NamePlugin]);
 
 const StyledColorDisplay = styled(Input).attrs(
   (props: { $mobile: boolean; action: { color: string; [key: string]: unknown } }) => props
@@ -25,11 +29,13 @@ const StyledColorDisplay = styled(Input).attrs(
 export default function ColorIndicator({
   color,
   alpha,
-  setAlpha
+  setAlpha,
+  showName = true
 }: {
   color: string;
   alpha: boolean;
   setAlpha: React.Dispatch<React.SetStateAction<boolean>>;
+  showName?: boolean;
 }): JSX.Element {
   const [copy, setCopy] = useCopyToClipboard();
   const { isMobile } = useBreakpointMap();
@@ -55,25 +61,39 @@ export default function ColorIndicator({
   );
 
   return (
-    <Grid.Row columns={2}>
-      <Grid.Column computer={12}>
-        <StyledColorDisplay
-          type="text"
-          value={color}
-          spellCheck={false}
-          size="large"
-          readOnly
-          fluid
-          action={copyAction(color)}
-          $mobile={isMobile}
-        />
-      </Grid.Column>
+    <>
+      {showName && (
+        <>
+          <Grid.Row>
+            <Header as="h3" color="grey">
+              {CM(color).name({ exact: false })}
+            </Header>
+          </Grid.Row>
 
-      <Spacers height="12px" />
+          <Spacers height="6px" />
+        </>
+      )}
 
-      <Grid.Column computer={2}>
-        <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
-      </Grid.Column>
-    </Grid.Row>
+      <Grid.Row columns={2}>
+        <Grid.Column computer={12}>
+          <StyledColorDisplay
+            type="text"
+            value={color}
+            spellCheck={false}
+            size="large"
+            readOnly
+            fluid
+            action={copyAction(color)}
+            $mobile={isMobile}
+          />
+        </Grid.Column>
+
+        <Spacers height="12px" />
+
+        <Grid.Column computer={2}>
+          <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
+        </Grid.Column>
+      </Grid.Row>
+    </>
   );
 }

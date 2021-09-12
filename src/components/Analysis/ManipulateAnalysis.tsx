@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Container, Divider, Dropdown, Grid, Header, Icon, Label, List, Popup } from "semantic-ui-react";
+import { Container, Divider, Dropdown, Grid, Header, Icon, List, Popup } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
-import { Swatch } from "../../styles/Swatch";
+import { Swatch, SwatchCounter } from "../../styles/Swatch";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
 import useSliderChange from "../../hooks/useSliderChange";
@@ -36,33 +36,28 @@ const ColorAdjustmentOpts = [
   }
 ];
 
-const Information = ({ index, text }: { index: number; text: string }) => {
+const Information = ({ text }: { text: string }) => {
   return (
     <Popup
       trigger={<Icon name="info circle" color="blue" />}
       position="top center"
       content={
         <List.Item>
-          <List.Content>
-            <Label color="blue" horizontal>
-              {index}
-            </Label>{" "}
-            {text}
-          </List.Content>
+          <List.Content>{text}</List.Content>
         </List.Item>
       }
     />
   );
 };
 
-export default function ManipulationAnalysis(): JSX.Element {
+export default function ManipulateAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
 
-  const [alphaAdjust, setAlphaAdjust] = useState(true);
-  const [alphaRotate, setAlphaRotate] = useState(true);
-  const [alphaInvert, setAlphaInvert] = useState(true);
-  const [alphaGrayscale, setAlphaGrayscale] = useState(true);
+  const [alphaAdjust, setAlphaAdjust] = useState(query.alpha ? JSON.parse(query.alpha)[0] : true);
+  const [alphaRotate, setAlphaRotate] = useState(query.alpha ? JSON.parse(query.alpha)[1] : true);
+  const [alphaInvert, setAlphaInvert] = useState(query.alpha ? JSON.parse(query.alpha)[2] : true);
+  const [alphaGrayscale, setAlphaGrayscale] = useState(query.alpha ? JSON.parse(query.alpha)[3] : true);
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(180, 50%, 50%, 0.5)"));
   const [incrementColor, setIncrementColor] = useState(
@@ -99,7 +94,7 @@ export default function ManipulationAnalysis(): JSX.Element {
     const { h, s, l, a } = incrementColorDebounce.hsla();
     const color = colorDebounce.stringHEX().slice(1).toLowerCase();
     history.replace({
-      pathname: "/manipulation",
+      pathname: "/manipulate",
       search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${(
         a * 100
       ).toFixed(2)}&isIncrement=${isIncrement}&alpha=[${[alphaAdjust, alphaRotate, alphaInvert, alphaGrayscale].join(
@@ -157,9 +152,9 @@ export default function ManipulationAnalysis(): JSX.Element {
             <Grid.Column width={8}>
               <Grid textAlign="center">
                 <Grid.Row>
-                  <Header>Adjust</Header>
+                  <Header as="h2">Adjust</Header>
                   <Spacers width="4px" />
-                  <Information index={2} text={INFORMATIVE_TEXT.adjust} />
+                  <Information text={INFORMATIVE_TEXT.adjust} />
                 </Grid.Row>
               </Grid>
 
@@ -173,20 +168,23 @@ export default function ManipulationAnalysis(): JSX.Element {
 
               <Swatch
                 title={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
-                $radius={75}
-                $borderRadius="4px"
+                position="relative"
                 background={adjust.stringHSL()}
                 onClick={() => setColor(adjust)}
+                $radius={75}
+                $borderRadius="4px"
                 $cursor="pointer"
-              />
+              >
+                <SwatchCounter>2</SwatchCounter>
+              </Swatch>
             </Grid.Column>
 
             <Grid.Column width={8}>
               <Grid textAlign="center">
                 <Grid.Row>
-                  <Header>Rotate</Header>
+                  <Header as="h2">Rotate</Header>
                   <Spacers width="4px" />
-                  <Information index={3} text={INFORMATIVE_TEXT.rotate} />
+                  <Information text={INFORMATIVE_TEXT.rotate} />
                 </Grid.Row>
               </Grid>
 
@@ -200,12 +198,15 @@ export default function ManipulationAnalysis(): JSX.Element {
 
               <Swatch
                 title={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
-                $radius={75}
-                $borderRadius="4px"
+                position="relative"
                 background={rotate.stringHSL()}
                 onClick={() => setColor(rotate)}
+                $radius={75}
+                $borderRadius="4px"
                 $cursor="pointer"
-              />
+              >
+                <SwatchCounter>3</SwatchCounter>
+              </Swatch>
             </Grid.Column>
           </Grid.Row>
           <Divider />
@@ -213,9 +214,9 @@ export default function ManipulationAnalysis(): JSX.Element {
             <Grid.Column width={8}>
               <Grid textAlign="center">
                 <Grid.Row>
-                  <Header>Invert</Header>
+                  <Header as="h2">Invert</Header>
                   <Spacers width="4px" />
-                  <Information index={4} text={INFORMATIVE_TEXT.invert} />
+                  <Information text={INFORMATIVE_TEXT.invert} />
                 </Grid.Row>
               </Grid>
 
@@ -229,20 +230,23 @@ export default function ManipulationAnalysis(): JSX.Element {
 
               <Swatch
                 title={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
-                $radius={75}
-                $borderRadius="4px"
+                position="relative"
                 background={invert.stringHSL()}
                 onClick={() => setColor(invert)}
+                $radius={75}
+                $borderRadius="4px"
                 $cursor="pointer"
-              />
+              >
+                <SwatchCounter>4</SwatchCounter>
+              </Swatch>
             </Grid.Column>
 
             <Grid.Column width={8}>
               <Grid textAlign="center">
                 <Grid.Row>
-                  <Header>Grayscale</Header>
+                  <Header as="h2">Grayscale</Header>
                   <Spacers width="4px" />
-                  <Information index={5} text={INFORMATIVE_TEXT.grayscale} />
+                  <Information text={INFORMATIVE_TEXT.grayscale} />
                 </Grid.Row>
               </Grid>
 
@@ -256,12 +260,15 @@ export default function ManipulationAnalysis(): JSX.Element {
 
               <Swatch
                 title={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}
-                $radius={75}
-                $borderRadius="4px"
+                position="relative"
                 background={grayscale.stringHSL()}
                 onClick={() => setColor(grayscale)}
+                $radius={75}
+                $borderRadius="4px"
                 $cursor="pointer"
-              />
+              >
+                <SwatchCounter>5</SwatchCounter>
+              </Swatch>
             </Grid.Column>
           </Grid.Row>
         </Grid>
