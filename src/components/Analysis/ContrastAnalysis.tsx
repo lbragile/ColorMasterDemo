@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox, Divider, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
+import { Checkbox, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
@@ -10,6 +10,8 @@ import { ContrastSample } from "../../utils/codeSamples";
 import CodeModal from "./CodeModal";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
+import Spacers from "../Spacers";
+import BreadcrumbPath from "../BreadcrumbPath";
 
 extendPlugins([A11yPlugin]);
 
@@ -23,14 +25,16 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
   border: 1px solid hsla(0, 0%, 90%, 1);
   text-align: left;
   line-height: 2rem;
+  margin-top: 12px;
 `;
 
 export default function ContrastAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isMobile } = useBreakpointMap();
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
-  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(0, 0%, 50%, 1)"));
+  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
   const [contrast, setContrast] = useState<number | string>("1:1");
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
   const [isLarge, setIsLarge] = useState(query.size ? query.size === "large" : true);
@@ -40,8 +44,6 @@ export default function ContrastAnalysis(): JSX.Element {
   const bgDebounce = useDebounce(bgColor, 100);
   const contrastDebounce = useDebounce(contrast, 100);
   const readableOnDebounce = useDebounce(readableOn, 100);
-
-  const { isMobile } = useBreakpointMap();
 
   useEffect(() => {
     setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));
@@ -55,7 +57,7 @@ export default function ContrastAnalysis(): JSX.Element {
 
   useEffect(() => {
     history.replace({
-      pathname: "/contrast",
+      pathname: "/accessibility/contrast",
       search: `?fgColor=${fgDebounce.stringHEX().slice(1).toLowerCase()}&bgColor=${bgDebounce
         .stringHEX()
         .slice(1)
@@ -64,111 +66,126 @@ export default function ContrastAnalysis(): JSX.Element {
   }, [history, fgDebounce, bgDebounce, ratio, isLarge]);
 
   return (
-    <Grid columns={3} verticalAlign="middle" stackable centered>
-      <Grid.Row>
-        <Grid.Column width={5}>
-          <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
-            <Label size="big" color="black" attached="top left">
-              {isMobile ? "FG" : "Foreground (FG)"}
-            </Label>
-          </ColorSelectorWidget>
-        </Grid.Column>
+    <>
+      {isMobile && <Spacers height="24px" />}
 
-        <Grid.Column width={6} textAlign="center">
-          <Header as="h2">Sample Output</Header>
-          <Grid centered>
-            <Grid.Row columns={2}>
-              <Grid.Column width={4} textAlign="center">
-                <Radio label="Body" name="radioGroup" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
-              </Grid.Column>
-              <Grid.Column width={4} textAlign="center">
-                <Radio label="Large" name="radioGroup" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
-              </Grid.Column>
-            </Grid.Row>
+      <BreadcrumbPath path="Contrast" />
 
-            <Grid.Row>
-              <SampleOutput
-                background={bgDebounce.stringRGB()}
-                color={fgDebounce.stringRGB()}
-                size={isLarge ? "large" : "body"}
-              >
-                The quick brown fox jumps over the lazy dog.
-              </SampleOutput>
-            </Grid.Row>
-          </Grid>
+      <Spacers height={isMobile ? "40px" : "20px"} />
 
-          <Divider hidden />
+      <Grid columns={3} verticalAlign="middle" stackable centered>
+        <Grid.Row>
+          <Grid.Column width={5}>
+            <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
+              <Label size="big" color="black" attached="top left">
+                {isMobile ? "FG" : "Foreground"}
+              </Label>
+            </ColorSelectorWidget>
+          </Grid.Column>
 
-          <Header as="h2" textAlign="center">
-            Contrast
-            <Header.Subheader>
-              <Grid textAlign="center">
-                <Grid.Row>
-                  <Grid.Column width={1} />
-                  <Grid.Column textAlign="right">
-                    <b>{contrast}</b>
-                  </Grid.Column>
-                  <Grid.Column width={1} />
-                  <Grid.Column width={1} textAlign="left">
-                    <Checkbox label="Ratio" checked={ratio} onChange={() => setRatio(!ratio)} />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Header.Subheader>
-          </Header>
+          <Grid.Column width={6} textAlign="center">
+            <Header as="h2">
+              Sample Output
+              <Spacers height="16px" />
+              <Header.Subheader>
+                <Grid centered>
+                  <Grid.Row columns={2}>
+                    <Grid.Column width={8} textAlign="right">
+                      <Radio label="Body" name="radioGroup" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
+                    </Grid.Column>
+                    <Grid.Column width={8} textAlign="left">
+                      <Radio label="Large" name="radioGroup" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
+                    </Grid.Column>
 
-          <Divider hidden />
+                    <SampleOutput
+                      background={bgDebounce.stringRGB()}
+                      color={fgDebounce.stringRGB()}
+                      size={isLarge ? "large" : "body"}
+                    >
+                      The quick brown fox jumps over the lazy dog.
+                    </SampleOutput>
+                  </Grid.Row>
+                </Grid>
+              </Header.Subheader>
+            </Header>
 
-          <Header as="h2" textAlign="center">
-            ReadableOn
-          </Header>
-          <Table definition celled textAlign="center">
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell></Table.HeaderCell>
-                <Table.HeaderCell>Minimum (AA)</Table.HeaderCell>
-                <Table.HeaderCell>Enhanced (AAA)</Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
+            <Spacers height="8px" />
 
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell>Body</Table.Cell>
-                <Table.Cell positive={readableOn[0]} negative={!readableOn[0]}>
-                  <Icon name={readableOn[0] ? "checkmark" : "x"} /> 4.5:1
-                </Table.Cell>
-                <Table.Cell positive={readableOn[1]} negative={!readableOn[1]}>
-                  <Icon name={readableOn[1] ? "checkmark" : "x"} />
-                  7.0:1
-                </Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Large</Table.Cell>
-                <Table.Cell positive={readableOn[2]} negative={!readableOn[2]}>
-                  <Icon name={readableOn[2] ? "checkmark" : "x"} />
-                  3.0:1
-                </Table.Cell>
+            <Header as="h2" textAlign="center">
+              Contrast
+              <Spacers height="8px" />
+              <Header.Subheader>
+                <Grid textAlign="center">
+                  <Grid.Row>
+                    <Grid.Column width={1} />
+                    <Grid.Column textAlign="right">
+                      <b>{contrast}</b>
+                    </Grid.Column>
+                    <Grid.Column width={1} />
+                    <Grid.Column width={1} textAlign="left">
+                      <Checkbox label="Ratio" checked={ratio} onChange={() => setRatio(!ratio)} />
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </Header.Subheader>
+            </Header>
 
-                <Table.Cell positive={readableOn[3]} negative={!readableOn[3]}>
-                  <Icon name={readableOn[3] ? "checkmark" : "x"} /> 4.5:1
-                </Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table>
+            <Spacers height="8px" />
 
-          <Divider hidden />
+            <Header as="h2" textAlign="center">
+              ReadableOn
+              <Spacers height="8px" />
+              <Header.Subheader>
+                <Table definition celled textAlign="center">
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.HeaderCell></Table.HeaderCell>
+                      <Table.HeaderCell>Minimum (AA)</Table.HeaderCell>
+                      <Table.HeaderCell>Enhanced (AAA)</Table.HeaderCell>
+                    </Table.Row>
+                  </Table.Header>
 
-          <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce, ratio)} />
-        </Grid.Column>
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.Cell>Body</Table.Cell>
+                      <Table.Cell positive={readableOn[0]} negative={!readableOn[0]}>
+                        <Icon name={readableOn[0] ? "checkmark" : "x"} /> 4.5:1
+                      </Table.Cell>
+                      <Table.Cell positive={readableOn[1]} negative={!readableOn[1]}>
+                        <Icon name={readableOn[1] ? "checkmark" : "x"} />
+                        7.0:1
+                      </Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>Large</Table.Cell>
+                      <Table.Cell positive={readableOn[2]} negative={!readableOn[2]}>
+                        <Icon name={readableOn[2] ? "checkmark" : "x"} />
+                        3.0:1
+                      </Table.Cell>
 
-        <Grid.Column width={5}>
-          <ColorSelectorWidget color={bgColor} setColor={setBgColor}>
-            <Label size="big" color="black" attached="top right">
-              {isMobile ? "BG" : "Background (BG)"}
-            </Label>
-          </ColorSelectorWidget>
-        </Grid.Column>
-      </Grid.Row>
-    </Grid>
+                      <Table.Cell positive={readableOn[3]} negative={!readableOn[3]}>
+                        <Icon name={readableOn[3] ? "checkmark" : "x"} /> 4.5:1
+                      </Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table>
+              </Header.Subheader>
+            </Header>
+
+            <Spacers height="12px" />
+
+            <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce, ratio)} />
+          </Grid.Column>
+
+          <Grid.Column width={5}>
+            <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
+              <Label size="big" color="black" attached="top right">
+                {isMobile ? "BG" : "Background"}
+              </Label>
+            </ColorSelectorWidget>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </>
   );
 }

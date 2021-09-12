@@ -1,16 +1,19 @@
 # This file can be used, with VS Code's Rest Client Extension (https://marketplace.visualstudio.com/items?itemName=humao.rest-client), 
 # to quickly get responses from ColorMaster's API.
 
-@baseUrl = http://localhost:3000/api
 # http://localhost:3000/api
 # https://colormaster.vercel.app/api
-# https://colormaster-2pm8vjc79-lbragile.vercel.app/api
+@baseUrl = http://localhost:3000/api
 
-# Mix
-@primary = 00ffffff
-@secondary = ff0000ff
-@ratio = 0.6
-@colorspace = luv
+# Accessiblity/Contrast
+@fgColor = 000000ff
+@bgColor = 808080ff
+@showRatio = true
+@size = large
+
+# Accessiblity/Statistics
+@statsColor = dfaf20ff
+@statsAlpha = [true,true,true,true]
 
 # Harmony
 @color = ff0000ff
@@ -18,38 +21,79 @@
 @effect = shades
 @amount = 7
 
-# Contrast
-@fgColor = 000000ff
-@bgColor = 808080ff
-@showRatio = true
-@size = large
+# Mix
+@primary = 00ffffff
+@secondary = ff0000ff
+@ratio = 0.6
+@colorspace = luv
+
+# Manipulate
+@manipColor = ffff0080
+@hueBy = 72
+@satBy = 15
+@lightBy = 10
+@alphaBy = 0.05
+@isIncrement = true
+@alpha = [true,true,true,true]
+
+### REST ###
 
 ###
-GET {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}}
+GET {{baseUrl}}/accessibility/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
 ###
-GET {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}}
+GET {{baseUrl}}/accessibility/statistics?color={{statsColor}}&alpha={{statsAlpha}} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
 ###
-GET {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}
+GET {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+
+###
+GET {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
 ###
-curl {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}}\
+GET {{baseUrl}}/manipulate?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+
+
+### CURL ###
+
+###
+curl -X 'GET'\
+ {{baseUrl}}/accessibility/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}\
  -H Content-Type: application/json\
  -H Accept: application/json
 
 ###
-curl {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}}\
+curl -X 'GET'\
+ {{baseUrl}}/accessibility/statistics?color={{statsColor}}&alpha={{statsAlpha}}\
  -H Content-Type: application/json\
  -H Accept: application/json
 
 ###
-curl {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}\
+curl -X 'GET'\
+ {{baseUrl}}/harmony?color={{color}}&type={{type}}&effect={{effect}}&amount={{amount}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json
+
+###
+curl -X 'GET'\
+ {{baseUrl}}/mix?primary={{primary}}&secondary={{secondary}}&ratio={{ratio}}&colorspace={{colorspace}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json
+
+###
+curl -X 'GET'\
+ {{baseUrl}}/manipulate?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}}\
  -H Content-Type: application/json\
  -H Accept: application/json
