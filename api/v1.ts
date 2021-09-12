@@ -28,7 +28,13 @@ const swaggerSpec = swaggerJSDoc({
     },
     tags: [{ name: "ColorMaster", description: "Routes for main functionality" }]
   },
-  apis: ["api/*"]
+  apis: [
+    "api/accessibility/contrast.ts",
+    "api/accessibility/statistics.ts",
+    "api/harmony.ts",
+    "api/manipulate.ts",
+    "api/mix.ts"
+  ]
 });
 
 const cssOpts = {

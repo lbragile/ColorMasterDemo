@@ -10,7 +10,7 @@ const levels = ["minimum", "enhanced"] as ("minimum" | "enhanced")[];
 
 /**
  * @swagger
- * /api/contrast:
+ * /api/accessibility/contrast:
  *   get:
  *     summary: Contrast & Readability information from two colors
  *     description: Obtain `contrast` and `readability` related information from `foreground` and `background` colors.

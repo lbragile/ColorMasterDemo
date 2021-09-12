@@ -5,11 +5,15 @@
 # https://colormaster.vercel.app/api
 @baseUrl = http://localhost:3000/api
 
-# Contrast
+# Accessiblity/Contrast
 @fgColor = 000000ff
 @bgColor = 808080ff
 @showRatio = true
 @size = large
+
+# Accessiblity/Statistics
+@statsColor = dfaf20ff
+@statsAlpha = [true,true,true,true]
 
 # Harmony
 @color = ff0000ff
@@ -35,7 +39,12 @@
 ### REST ###
 
 ###
-GET {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}} HTTP/1.1
+GET {{baseUrl}}/accessibility/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+###
+GET {{baseUrl}}/accessibility/statistics?color={{statsColor}}&alpha={{statsAlpha}} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
@@ -51,15 +60,23 @@ Content-Type: application/json
 Accept: application/json
 
 ###
-GET {{baseUrl}}/manipulation?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}} HTTP/1.1
+GET {{baseUrl}}/manipulate?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
+
+
 
 ### CURL ###
 
 ###
 curl -X 'GET'\
- {{baseUrl}}/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}\
+ {{baseUrl}}/accessibility/contrast?fgColor={{fgColor}}&bgColor={{bgColor}}&ratio={{showRatio}}&size={{size}}\
+ -H Content-Type: application/json\
+ -H Accept: application/json
+
+###
+curl -X 'GET'\
+ {{baseUrl}}/accessibility/statistics?color={{statsColor}}&alpha={{statsAlpha}}\
  -H Content-Type: application/json\
  -H Accept: application/json
 
@@ -77,6 +94,6 @@ curl -X 'GET'\
 
 ###
 curl -X 'GET'\
- {{baseUrl}}/manipulation?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}}\
+ {{baseUrl}}/manipulate?color={{manipColor}}&isIncrement={{isIncrement}}&hueBy={{hueBy}}&satBy={{satBy}}&lightBy={{lightBy}}&alphaBy={{alphaBy}}&alpha={{alpha}}\
  -H Content-Type: application/json\
  -H Accept: application/json

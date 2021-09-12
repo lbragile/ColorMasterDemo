@@ -50,7 +50,7 @@ const validColorspace = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv",
  *
  *     responses:
  *       200:
- *         description: Foreground & Background colors, their names, contrast, and readability information.
+ *         description: Results from the mixture obtained by mixing `primary` with `secondary` with proportions given by `ratio` in `colorspace`
  *         content:
  *           application/json:
  *             schema:

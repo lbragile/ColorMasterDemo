@@ -87,7 +87,7 @@ extendPlugins([NamePlugin]);
  *
  *     responses:
  *       200:
- *         description: Relevant harmony information such as base color, its name, resulting harmony, and resulting harmony names
+ *         description: Information regarding the manipulation of the input `color` based on the relevant increment/decrement parameters
  *         content:
  *           application/json:
  *             schema:
@@ -101,19 +101,19 @@ extendPlugins([NamePlugin]);
  *                   example: 'yellow (with opacity)'
  *                 adjust:
  *                   type: string
- *                   example: '33FF5C8D'
+ *                   example: '33ff5C8D'
  *                 adjustName:
  *                   type: string
  *                   example: 'spring green (with opacity)'
  *                 rotate:
  *                   type: string
- *                   example: '00FF3380'
+ *                   example: '00ff3380'
  *                 rotateName:
  *                   type: string
  *                   example: 'lime (with opacity)'
  *                 invert:
  *                   type: string
- *                   example: '0000FF7F'
+ *                   example: '0000ff7f'
  *                 invertName:
  *                   type: string
  *                   example: 'blue (with opacity)'
@@ -163,15 +163,17 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
     const rotate = CM(color)
       .rotate(sign * hueBy)
       .stringHEX({ alpha: alpha[1] })
-      .slice(1);
+      .slice(1)
+      .toLowerCase();
     const adjust = CM(rotate)
       .alphaBy(sign * alphaBy)
       .saturateBy(sign * satBy)
       .lighterBy(sign * lightBy)
       .stringHEX({ alpha: alpha[0] })
-      .slice(1);
-    const invert = CM(color).invert({ alpha: alpha[2] }).stringHEX({ alpha: alpha[2] }).slice(1);
-    const grayscale = CM(color).grayscale().stringHEX({ alpha: alpha[3] }).slice(1);
+      .slice(1)
+      .toLowerCase();
+    const invert = CM(color).invert({ alpha: alpha[2] }).stringHEX({ alpha: alpha[2] }).slice(1).toLowerCase();
+    const grayscale = CM(color).grayscale().stringHEX({ alpha: alpha[3] }).slice(1).toLowerCase();
 
     const [colorName, adjustName, rotateName, invertName, grayscaleName] = [
       color,
