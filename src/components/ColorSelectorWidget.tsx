@@ -146,7 +146,7 @@ export default function ColorSelectorWidget({
 
       <Grid verticalAlign="middle" centered stackable>
         <Grid.Row>
-          <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} />
+          <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />
         </Grid.Row>
 
         <Grid.Row>

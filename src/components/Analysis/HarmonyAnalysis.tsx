@@ -194,7 +194,7 @@ export default function HarmonyAnalysis(): JSX.Element {
                 position="relative"
                 background={swatch}
                 onClick={() => swatch !== "transparent" && setColor(CM(swatch))}
-                $clickable={swatch !== "transparent"}
+                $cursor={swatch !== "transparent" ? "pointer" : ""}
               >
                 {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
                 {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (

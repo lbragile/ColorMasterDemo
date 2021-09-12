@@ -177,7 +177,7 @@ export default function ManipulationAnalysis(): JSX.Element {
                 $borderRadius="4px"
                 background={adjust.stringHSL()}
                 onClick={() => setColor(adjust)}
-                $clickable
+                $cursor="pointer"
               />
             </Grid.Column>
 
@@ -204,7 +204,7 @@ export default function ManipulationAnalysis(): JSX.Element {
                 $borderRadius="4px"
                 background={rotate.stringHSL()}
                 onClick={() => setColor(rotate)}
-                $clickable
+                $cursor="pointer"
               />
             </Grid.Column>
           </Grid.Row>
@@ -233,7 +233,7 @@ export default function ManipulationAnalysis(): JSX.Element {
                 $borderRadius="4px"
                 background={invert.stringHSL()}
                 onClick={() => setColor(invert)}
-                $clickable
+                $cursor="pointer"
               />
             </Grid.Column>
 
@@ -260,7 +260,7 @@ export default function ManipulationAnalysis(): JSX.Element {
                 $borderRadius="4px"
                 background={grayscale.stringHSL()}
                 onClick={() => setColor(grayscale)}
-                $clickable
+                $cursor="pointer"
               />
             </Grid.Column>
           </Grid.Row>

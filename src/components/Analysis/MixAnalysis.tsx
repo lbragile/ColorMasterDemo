@@ -111,6 +111,7 @@ export default function MixAnalysis(): JSX.Element {
             position="relative"
             background={mix}
             tabIndex={0}
+            $cursor="help"
           />
         </Grid.Row>
 
