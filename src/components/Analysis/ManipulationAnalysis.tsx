@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Divider, Dropdown, Grid, Header, Icon, Label, List, Message } from "semantic-ui-react";
+import { Container, Divider, Dropdown, Grid, Header, Icon, Label, List, Popup } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import { Swatch } from "../../styles/Swatch";
@@ -13,25 +13,15 @@ import CodeModal from "./CodeModal";
 import addColor from "../../utils/addColor";
 import CM from "colormaster";
 
-const INFORMATIVE_TEXT = [
-  { header: "Color Picker", text: "Where you select color from the different pickers/sliders." },
-  {
-    header: "Adjust",
-    text: "Color picker & each of the above sliders! Combines both according to dropdown selection."
-  },
-  {
-    header: "Rotate",
-    text: "Color picker & hue slider from above sliders only! Rotation is simply moving at a fixed radius (arc) along the color wheel."
-  },
-  {
-    header: "Invert",
-    text: "Color picker only! Similar to complementary harmony. Rotates 180° and flips the lightness value. Alpha channel included based on selection."
-  },
-  {
-    header: "Grayscale",
-    text: "Color picker only! Output will vary slightly in most cases. Large variance if lightness is changed. Centered on 2D color wheel for all lightness values."
-  }
-];
+const INFORMATIVE_TEXT = {
+  adjust: "Color picker & each of the above sliders! Combines both according to dropdown selection.",
+  rotate:
+    "Color picker & hue slider from above sliders only! Rotation is simply moving at a fixed radius (arc) along the color wheel.",
+  invert:
+    "Color picker only! Similar to complementary harmony. Rotates 180° and flips the lightness value. Alpha channel included based on selection.",
+  grayscale:
+    "Color picker only! Output will vary slightly in most cases. Large variance if lightness is changed. Centered on 2D color wheel for all lightness values."
+};
 
 const ColorAdjustmentOpts = [
   {
@@ -46,6 +36,25 @@ const ColorAdjustmentOpts = [
   }
 ];
 
+const Information = ({ index, text }: { index: number; text: string }) => {
+  return (
+    <Popup
+      trigger={<Icon name="info circle" color="blue" />}
+      position="top center"
+      content={
+        <List.Item>
+          <List.Content>
+            <Label color="blue" horizontal>
+              {index}
+            </Label>{" "}
+            {text}
+          </List.Content>
+        </List.Item>
+      }
+    />
+  );
+};
+
 export default function ManipulationAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
@@ -57,7 +66,11 @@ export default function ManipulationAnalysis(): JSX.Element {
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(180, 50%, 50%, 0.5)"));
   const [incrementColor, setIncrementColor] = useState(
-    CM(`hsla(${query.hueBy ?? 72}, ${query.satBy ?? 15}%, ${query.lightBy ?? 10}%, ${query.alphaBy ?? 0.05})`)
+    CM(
+      `hsla(${query.hueBy ?? 72}, ${query.satBy ?? 15}%, ${query.lightBy ?? 10}%, ${
+        query.alphaBy ? +query.alphaBy / 100 : 0.05
+      })`
+    )
   );
   const [isIncrement, setIsIncrement] = useState(true);
   const [invert, setInvert] = useState(CM(color.hsla()).invert({ alpha: alphaInvert }));
@@ -76,24 +89,22 @@ export default function ManipulationAnalysis(): JSX.Element {
   });
 
   useEffect(() => {
-    setColor(color);
     setInvert(CM(color.hsla()).invert({ alpha: alphaInvert }));
     setGrayscale(CM(color.rgba()).grayscale());
     setRotate(CM(color.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
-  }, [color, incrementColor, alphaInvert, isIncrement]);
-
-  useEffect(() => {
     setAdjust(addColor(color, incrementColor, isIncrement));
-  }, [color, incrementColor, isIncrement]);
+  }, [color, incrementColor, alphaInvert, isIncrement]);
 
   useEffect(() => {
     const { h, s, l, a } = incrementColorDebounce.hsla();
     const color = colorDebounce.stringHEX().slice(1).toLowerCase();
     history.replace({
       pathname: "/manipulation",
-      search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${a.toFixed(
-        4
-      )}&isIncrement=${isIncrement}&alpha=[${[alphaAdjust, alphaRotate, alphaInvert, alphaGrayscale].join(",")}]`
+      search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${(
+        a * 100
+      ).toFixed(2)}&isIncrement=${isIncrement}&alpha=[${[alphaAdjust, alphaRotate, alphaInvert, alphaGrayscale].join(
+        ","
+      )}]`
     });
   }, [
     history,
@@ -136,36 +147,6 @@ export default function ManipulationAnalysis(): JSX.Element {
         <Spacers height="12px" />
 
         <Grid.Column width={10}>{currentSliders.sliders}</Grid.Column>
-
-        <Spacers height="20px" />
-
-        <Message color="blue">
-          <Message.Header>
-            <Icon name="info circle" size="large" /> Information You Might Find Useful
-          </Message.Header>
-
-          <Spacers height="20px" />
-
-          <Message.Content>
-            <List verticalAlign="middle">
-              {INFORMATIVE_TEXT.map((item, i) => (
-                <List.Item key={item.header}>
-                  <List.Header>
-                    <Label color="blue" horizontal>
-                      {i + 1}
-                    </Label>
-                    {item.header}
-                  </List.Header>
-                  <Spacers height="1px" />
-                  <List.Content>
-                    {item.text}
-                    <Spacers height="4px" />
-                  </List.Content>
-                </List.Item>
-              ))}
-            </List>
-          </Message.Content>
-        </Message>
       </Grid.Column>
 
       <Spacers width="8px" />
@@ -174,7 +155,13 @@ export default function ManipulationAnalysis(): JSX.Element {
         <Grid columns="equal" verticalAlign="middle" textAlign="center">
           <Grid.Row>
             <Grid.Column width={8}>
-              <Header>Adjust</Header>
+              <Grid textAlign="center">
+                <Grid.Row>
+                  <Header>Adjust</Header>
+                  <Spacers width="4px" />
+                  <Information index={2} text={INFORMATIVE_TEXT.adjust} />
+                </Grid.Row>
+              </Grid>
 
               <ColorIndicator
                 color={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
@@ -195,7 +182,13 @@ export default function ManipulationAnalysis(): JSX.Element {
             </Grid.Column>
 
             <Grid.Column width={8}>
-              <Header>Rotate</Header>
+              <Grid textAlign="center">
+                <Grid.Row>
+                  <Header>Rotate</Header>
+                  <Spacers width="4px" />
+                  <Information index={3} text={INFORMATIVE_TEXT.rotate} />
+                </Grid.Row>
+              </Grid>
 
               <ColorIndicator
                 color={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
@@ -218,7 +211,13 @@ export default function ManipulationAnalysis(): JSX.Element {
           <Divider />
           <Grid.Row>
             <Grid.Column width={8}>
-              <Header>Invert</Header>
+              <Grid textAlign="center">
+                <Grid.Row>
+                  <Header>Invert</Header>
+                  <Spacers width="4px" />
+                  <Information index={4} text={INFORMATIVE_TEXT.invert} />
+                </Grid.Row>
+              </Grid>
 
               <ColorIndicator
                 color={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
@@ -239,7 +238,13 @@ export default function ManipulationAnalysis(): JSX.Element {
             </Grid.Column>
 
             <Grid.Column width={8}>
-              <Header>Grayscale</Header>
+              <Grid textAlign="center">
+                <Grid.Row>
+                  <Header>Grayscale</Header>
+                  <Spacers width="4px" />
+                  <Information index={5} text={INFORMATIVE_TEXT.grayscale} />
+                </Grid.Row>
+              </Grid>
 
               <ColorIndicator
                 color={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}

@@ -1,12 +1,10 @@
 import express = require("express");
 import swaggerJSDoc = require("swagger-jsdoc");
 import swaggerUi = require("swagger-ui-express");
-import packageJSON = require("../package.json");
-import path = require("path");
+import { version } from "../package.json";
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, "../", "public")));
 
 const swaggerSpec = swaggerJSDoc({
   swaggerDefinition: {
@@ -15,7 +13,7 @@ const swaggerSpec = swaggerJSDoc({
       title: "ColorMaster's API",
       description:
         "This API highlights the main functionality of ColorMaster. You can find out more information at [NPM - ColorMaster](https://www.npmjs.com/package/colormaster)",
-      version: packageJSON.version,
+      version,
       license: {
         name: "MIT License",
         url: "https://github.com/lbragile/ColorMaster/blob/master/LICENSE.md"

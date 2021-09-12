@@ -22,28 +22,28 @@ const levels = ["minimum", "enhanced"] as ("minimum" | "enhanced")[];
  *       - in: query
  *         name: fgColor
  *         required: true
- *         description: The foreground color (text on top of background)
+ *         description: The **foreground color** (text on top of background)
  *         default: ffff00ff
  *         schema:
  *           type: string
  *       - in: query
  *         name: bgColor
  *         required: true
- *         description: The background color (behind the text)
+ *         description: The **background color** (behind the text)
  *         default: 0000ffff
  *         schema:
  *           type: string
  *       - in: query
  *         name: ratio
  *         required: false
- *         description: Whether or not to add ":1" to the contrast
+ *         description: Whether or not to add **:1** to the contrast
  *         default: true
  *         schema:
  *           type: boolean
  *       - in: query
  *         name: size
  *         required: false
- *         description: body or large - indicating the text size
+ *         description: "`body` or `large` indicating the text size"
  *         default: large
  *         schema:
  *           type: string

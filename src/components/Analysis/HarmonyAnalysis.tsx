@@ -186,15 +186,15 @@ export default function HarmonyAnalysis(): JSX.Element {
             {[...harmony, ...new Array(11 - harmony.length).fill("transparent")].map((swatch, i) => (
               <Swatch
                 key={swatch + "_" + i}
-                title={swatch}
+                title={swatch === "transparent" ? undefined : swatch}
                 $radius={65}
                 $borderRadius="4px"
                 $borderColor={swatch === "transparent" ? swatch : undefined}
                 display="inline-block"
                 position="relative"
                 background={swatch}
-                onClick={() => setColor(CM(swatch))}
-                $clickable
+                onClick={() => swatch !== "transparent" && setColor(CM(swatch))}
+                $clickable={swatch !== "transparent"}
               >
                 {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
                 {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (

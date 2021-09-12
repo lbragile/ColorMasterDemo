@@ -39,7 +39,7 @@ const validColorspace = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv",
  *         description: The proportions to use when mixing the colors. Must be in range [0, 1]
  *         default: 0.5
  *         schema:
- *           type: number
+ *           type: float
  *       - in: query
  *         name: colorspace
  *         required: false

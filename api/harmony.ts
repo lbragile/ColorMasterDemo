@@ -40,21 +40,21 @@ const validEffects = ["tints", "shades", "tones"];
  *       - in: query
  *         name: type
  *         required: true
- *         description: "Harmony group type to find. One of: \"analogous\", \"complementary\", \"split-complementary\", \"double split-complementary\", \"triad\", \"rectangle\", \"square\", or \"monochromatic\""
+ *         description: "Harmony group type to find. One of: `analogous`, `complementary`, `split-complementary`, `double split-complementary`, `triad`, `rectangle`, `square`, or `monochromatic`"
  *         default: analogous
  *         schema:
  *           type: string
  *       - in: query
  *         name: effect
  *         required: false
- *         description: Only applies to monochromatic harmony type. Possible values are shades, tints, or tones
+ *         description: Only applies to **monochromatic** harmony type. Possible values are `shades`, `tints`, or `tones`
  *         default: shades
  *         schema:
  *           type: string
  *       - in: query
  *         name: amount
  *         required: false
- *         description: Only applies to monochromatic harmony type. Number of harmony colors to return - in range [2, 10]
+ *         description: Only applies to **monochromatic** harmony type. Number of harmony colors to return - in range [2, 10]
  *         default: 5
  *         schema:
  *           type: integer
