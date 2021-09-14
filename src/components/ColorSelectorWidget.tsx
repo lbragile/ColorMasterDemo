@@ -121,7 +121,7 @@ export default function ColorSelectorWidget({
   const [picker, setPicker] = useState(pickerOpts.find((x) => x.key === initPicker) ?? pickerOpts[0]);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-  const { isMobile } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
   const currentSliders = useSliderChange({ color, setColor, colorspace: colorspace.key, alpha });
 
   const handleDropdownAdjustment = (dir: "up" | "down", type: "picker" | "colorspace") => {
@@ -167,7 +167,10 @@ export default function ColorSelectorWidget({
               onClick={() => setSwatchIndex(swatchIndex - 1)}
             />
 
-            {SWATCH_COLORS.slice(swatchIndex, swatchIndex + (isMobile ? 7 : 12)).map((background) => (
+            {SWATCH_COLORS.slice(
+              swatchIndex,
+              swatchIndex + (isMobile || isTablet ? 7 : isLaptop ? 8 : isComputer ? 9 : 10)
+            ).map((background) => (
               <Swatch
                 className="swatch-color"
                 key={background + "-swatch"}
@@ -185,7 +188,9 @@ export default function ColorSelectorWidget({
               className="right-swatch-arrow"
               size="large"
               name="angle right"
-              disabled={swatchIndex === SWATCH_COLORS.length - (isMobile ? 7 : 12)}
+              disabled={
+                swatchIndex === SWATCH_COLORS.length - (isMobile || isTablet ? 7 : isLaptop ? 8 : isComputer ? 9 : 10)
+              }
               onClick={() => setSwatchIndex(swatchIndex + 1)}
             />
           </SwatchSegment>
@@ -201,7 +206,7 @@ export default function ColorSelectorWidget({
 
           {[{ key: "colorspace" }, { key: "picker" }].map((elem, i) => {
             return (
-              <Grid.Column key={elem.key + "-column"} computer={6}>
+              <Grid.Column key={elem.key + "-column"} tablet={8} computer={6}>
                 <StyledDropdown
                   icon={<Icon name={i === 0 ? "paint brush" : "crosshairs"} color="grey" />}
                   value={(i === 0 ? colorspace : picker).value}
@@ -234,9 +239,9 @@ export default function ColorSelectorWidget({
       <Divider hidden />
 
       {picker.key === "sketch" ? (
-        <SketchPicker color={color} setColor={setColor} verticalPickers={!isMobile} />
+        <SketchPicker color={color} setColor={setColor} verticalPickers={isComputer || isWideScreen} />
       ) : picker.key === "wheel" ? (
-        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers={!isMobile} />
+        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers={isComputer || isWideScreen} />
       ) : (
         currentSliders.sliders
       )}

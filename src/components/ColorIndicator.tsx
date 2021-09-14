@@ -75,7 +75,7 @@ export default function ColorIndicator({
       )}
 
       <Grid.Row columns={2}>
-        <Grid.Column computer={12}>
+        <Grid.Column tablet={16} computer={11} largeScreen={12}>
           <StyledColorDisplay
             type="text"
             value={color}
@@ -90,7 +90,7 @@ export default function ColorIndicator({
 
         <Spacers height="12px" />
 
-        <Grid.Column computer={2}>
+        <Grid.Column tablet={16} computer={2}>
           <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
         </Grid.Column>
       </Grid.Row>

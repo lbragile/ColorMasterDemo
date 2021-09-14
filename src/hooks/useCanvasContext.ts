@@ -5,19 +5,25 @@ type TRefCanvas = RefObject<HTMLCanvasElement>;
 
 function fitCanvasContainer(
   ctx: CanvasRenderingContext2D,
+  breakpoints: {
+    isMobile: boolean;
+    isTablet: boolean;
+    isLaptop: boolean;
+    isComputer: boolean;
+    isWideScreen: boolean;
+  },
   thickness?: number,
-  vertical?: boolean,
-  isMobile?: boolean
+  vertical?: boolean
 ): CanvasRenderingContext2D {
   // vertical hue & alpha pickers
   if (thickness && vertical) {
-    ctx.canvas.style.height = ctx.canvas.offsetWidth + "px";
+    ctx.canvas.style.height = (!breakpoints.isWideScreen ? 0.75 : 1) * ctx.canvas.offsetWidth + "px";
     ctx.canvas.style.width = thickness + "px";
     ctx.canvas.width = thickness;
     ctx.canvas.height = ctx.canvas.offsetHeight;
   } else {
     // non-vertical pickers (hue, alpha, sketch, wheel)
-    ctx.canvas.style.width = isMobile ? "75%" : "";
+    ctx.canvas.style.width = !breakpoints.isWideScreen ? "75%" : "";
     ctx.canvas.width = ctx.canvas.offsetWidth;
     ctx.canvas.height = thickness ?? ctx.canvas.offsetWidth;
   }
@@ -42,16 +48,16 @@ export default function useCanvasContext(
   const [main, setMain] = useState<CanvasRenderingContext2D>();
   const [picker, setPicker] = useState<CanvasRenderingContext2D>();
 
-  const { isMobile } = useBreakpointMap();
+  const breakpoints = useBreakpointMap();
 
   useEffect(() => {
     const ctxMain = refMain.current?.getContext("2d");
     const ctxPicker = refPicker.current?.getContext("2d");
     if (ctxMain && ctxPicker) {
-      setMain(fitCanvasContainer(ctxMain, thickness, vertical, isMobile));
-      setPicker(fitCanvasContainer(ctxPicker, thickness, vertical, isMobile));
+      setMain(fitCanvasContainer(ctxMain, breakpoints, thickness, vertical));
+      setPicker(fitCanvasContainer(ctxPicker, breakpoints, thickness, vertical));
     }
-  }, [refMain, refPicker, thickness, vertical, isMobile]);
+  }, [refMain, refPicker, thickness, vertical, breakpoints]);
 
   return [main, picker];
 }

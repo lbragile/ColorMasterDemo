@@ -14,6 +14,7 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
 import Spacers from "../Spacers";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -49,6 +50,7 @@ const MonoEffectList = styled.li`
 export default function HarmonyAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isComputer, isWideScreen } = useBreakpointMap();
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
@@ -161,6 +163,8 @@ export default function HarmonyAnalysis(): JSX.Element {
             <CodeModal code={HarmonySample(color, type, effect, amount)} />
           </Container>
         </Grid.Column>
+
+        {!isComputer && !isWideScreen && <Spacers width="20px" />}
 
         <Grid.Column width={type === "monochromatic" ? 6 : 7} textAlign="center">
           <Grid.Row>

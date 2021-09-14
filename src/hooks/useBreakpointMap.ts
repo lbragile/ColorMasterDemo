@@ -1,11 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-interface IBreakpointMap {
-  isMobile: boolean;
-  isTablet: boolean;
-  isLaptop: boolean;
-  isComputer: boolean;
-}
+type IBreakpointMap = {
+  [K in "isMobile" | "isTablet" | "isLaptop" | "isComputer" | "isWideScreen"]: boolean;
+};
 
 /**
  * Hook to pin point the user's device based on the window size
@@ -26,10 +23,16 @@ export default function useBreakpointMap(): IBreakpointMap {
     };
   }, []);
 
-  return {
-    isMobile: width <= 576,
-    isTablet: 576 < width && width <= 992,
-    isLaptop: 992 < width && width <= 1200,
-    isComputer: 1200 < width
-  };
+  const breakpoints = useMemo(
+    () => ({
+      isMobile: width <= 576,
+      isTablet: 576 < width && width <= 992,
+      isLaptop: 992 < width && width <= 1200,
+      isComputer: 1200 < width && width <= 1500,
+      isWideScreen: 1500 < width
+    }),
+    [width]
+  );
+
+  return breakpoints;
 }

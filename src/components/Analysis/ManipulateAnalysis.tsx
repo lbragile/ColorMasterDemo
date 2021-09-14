@@ -12,6 +12,7 @@ import { ManipulationSample } from "../../utils/codeSamples";
 import CodeModal from "./CodeModal";
 import addColor from "../../utils/addColor";
 import CM from "colormaster";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 
 const INFORMATIVE_TEXT = {
   adjust: "Color picker & each of the above sliders! Combines both according to dropdown selection.",
@@ -53,6 +54,7 @@ const Information = ({ text }: { text: string }) => {
 export default function ManipulateAnalysis(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isWideScreen } = useBreakpointMap();
 
   const [alphaAdjust, setAlphaAdjust] = useState(query.alpha ? JSON.parse(query.alpha)[0] : true);
   const [alphaRotate, setAlphaRotate] = useState(query.alpha ? JSON.parse(query.alpha)[1] : true);
@@ -146,7 +148,7 @@ export default function ManipulateAnalysis(): JSX.Element {
 
       <Spacers width="8px" />
 
-      <Grid.Column width={6}>
+      <Grid.Column width={!isWideScreen ? 5 : 6}>
         <Grid columns="equal" verticalAlign="middle" textAlign="center">
           <Grid.Row>
             <Grid.Column width={8}>

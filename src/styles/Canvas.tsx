@@ -33,6 +33,7 @@ export const CanvasContainer = styled.div.attrs(
     border: none;
     border-radius: 4px;
     padding-right: 2px;
+    align-self: center;
   }
 
   & canvas {
