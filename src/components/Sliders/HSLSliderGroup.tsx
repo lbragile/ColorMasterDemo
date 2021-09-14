@@ -1,7 +1,7 @@
 import { Ihsla, TChannelHSL } from "colormaster/types";
 import React from "react";
-import { Grid } from "semantic-ui-react";
-import RangeSlider from "./RangeSlider";
+import FullSlider from "./FullSlider";
+import { FlexColumn } from "./RGBSliderGroup";
 
 interface IHSLSliderGroup {
   hsl: Ihsla;
@@ -13,8 +13,8 @@ export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderG
   const { h, s, l, a } = hsl;
 
   return (
-    <Grid verticalAlign="middle" centered>
-      <RangeSlider
+    <FlexColumn>
+      <FullSlider
         value={h}
         color={`hsla(${h}, 100%, 50%, 1)`}
         title="H"
@@ -24,7 +24,7 @@ export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderG
         onChange={(e) => onChange(e, "hue")}
       />
 
-      <RangeSlider
+      <FullSlider
         value={s}
         color={`hsla(${h}, ${s}%, 50%, 1)`}
         title="S"
@@ -34,7 +34,7 @@ export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderG
         onChange={(e) => onChange(e, "saturation")}
       />
 
-      <RangeSlider
+      <FullSlider
         value={l}
         color={`hsla(0, 0%, ${l - 5}%, 1)`}
         title="L"
@@ -44,7 +44,7 @@ export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderG
         onChange={(e) => onChange(e, "lightness")}
       />
 
-      <RangeSlider
+      <FullSlider
         value={a * 100}
         color="rgba(0,0,0,0.5)"
         title="A"
@@ -53,6 +53,6 @@ export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderG
         postfix={"%"}
         onChange={(e) => onChange(e, "alpha")}
       />
-    </Grid>
+    </FlexColumn>
   );
 }

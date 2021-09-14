@@ -4,7 +4,7 @@ import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import CodeModal from "./CodeModal";
 import { Swatch } from "../../styles/Swatch";
-import RangeSlider from "../Sliders/RangeSlider";
+import FullSlider from "../Sliders/FullSlider";
 import { MixSample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
@@ -73,7 +73,7 @@ export default function MixAnalysis(): JSX.Element {
         <Spacers height="12px" />
 
         <Grid verticalAlign="middle">
-          <RangeSlider
+          <FullSlider
             color={secondary.stringHSL()}
             colorRight={primary.stringHSL()}
             min="0"

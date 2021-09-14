@@ -3,7 +3,7 @@ import { Container, Grid, Icon, Label, Menu } from "semantic-ui-react";
 import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import { CurrentColorIcon, Swatch, SwatchCounter } from "../../styles/Swatch";
-import RangeSlider from "../Sliders/RangeSlider";
+import FullSlider from "../Sliders/FullSlider";
 import { HarmonySample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
 import HarmonyPlugin from "colormaster/plugins/harmony";
@@ -142,12 +142,11 @@ export default function HarmonyAnalysis(): JSX.Element {
                           Amount
                         </Label>
 
-                        <RangeSlider
+                        <FullSlider
                           color="hsl(180,100%,35%)"
                           min="2"
                           max="10"
                           format="hex"
-                          showNum={false}
                           value={amount}
                           onChange={(e) => setAmount(e.target.valueAsNumber)}
                         />
