@@ -3,22 +3,23 @@ import { Irgba, TChannel } from "colormaster/types";
 import styled from "styled-components";
 import FullSlider from "./FullSlider";
 
-export const FlexColumn = styled.div`
+export const FlexColumn = styled.div.attrs((props: { $gap: string }) => props)`
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: ${(props) => props.$gap ?? ""}; ;
 `;
 
 interface IRGBSliderGroup {
   rgb: Irgba;
   onChange: (e: React.ChangeEvent<HTMLInputElement>, type: TChannel) => void;
   format?: "hex" | "rgb";
+  gap?: string;
 }
 
-export default function RGBSliderGroup({ rgb, onChange, format = "rgb" }: IRGBSliderGroup): JSX.Element {
+export default function RGBSliderGroup({ rgb, onChange, format = "rgb", gap = "" }: IRGBSliderGroup): JSX.Element {
   const { r, g, b, a } = rgb;
   return (
-    <FlexColumn>
+    <FlexColumn $gap={gap}>
       <FullSlider
         value={r}
         color="rgba(255, 0, 0, 1)"

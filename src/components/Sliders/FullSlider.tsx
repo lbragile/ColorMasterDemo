@@ -1,9 +1,10 @@
 import React from "react";
-import RangeInput, { IRangeInput } from "./RangeInput";
-import NumberInput, { INumberInput } from "./NumberInput";
+import RangeInput from "./RangeInput";
+import NumberInput from "./NumberInput";
 import styled from "styled-components";
+import { IFullSlider } from "../../types/Sliders";
 
-const SliderRow = styled.div`
+export const FlexRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -14,10 +15,6 @@ const Title = styled.span`
   font-weight: bold;
   font-size: 1.2rem;
 `;
-
-interface IFullSlider extends INumberInput, IRangeInput {
-  title?: string;
-}
 
 export default function FullSlider({
   color,
@@ -33,10 +30,10 @@ export default function FullSlider({
   const CommonProps = { value, min, max, format, onChange };
 
   return (
-    <SliderRow>
+    <FlexRow>
       <Title>{title?.[0].toUpperCase()}</Title>
       <RangeInput {...CommonProps} color={color} colorRight={colorRight} />
       <NumberInput {...CommonProps} postfix={postfix} />
-    </SliderRow>
+    </FlexRow>
   );
 }

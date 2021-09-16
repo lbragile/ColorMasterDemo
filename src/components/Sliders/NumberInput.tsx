@@ -1,6 +1,7 @@
 import React from "react";
 import { TFormat } from "colormaster/types";
 import styled from "styled-components";
+import { INumberInput } from "../../types/Sliders";
 
 const NumberInputContainer = styled.div`
   display: flex;
@@ -51,15 +52,6 @@ const StyledLabel = styled.div`
   place-items: center;
   font-weight: bolder;
 `;
-
-export interface INumberInput {
-  value: number | string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  format?: Exclude<TFormat, "name" | "invalid">;
-  min?: string;
-  max?: string;
-  postfix?: string;
-}
 
 export default function NumberInput({
   value,

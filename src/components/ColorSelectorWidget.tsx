@@ -1,35 +1,32 @@
-import React, { useState } from "react";
-import { Button, Divider, Dropdown, Grid, Header, Icon, Segment } from "semantic-ui-react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
-import { TFormat } from "colormaster/types";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
-import ColorIndicator from "./ColorIndicator";
+import ColorIndicator, { Heading } from "./ColorIndicator";
 import useDebounce from "../hooks/useDebounce";
 import useSliderChange from "../hooks/useSliderChange";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
+import { FlexColumn } from "./Sliders/RGBSliderGroup";
+import { FlexRow } from "./Sliders/FullSlider";
+import Spacers from "./Spacers";
+import Dropdown from "./Dropdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAngleDown,
+  faAngleLeft,
+  faAngleRight,
+  faAngleUp,
+  faCrosshairs,
+  faPalette
+} from "@fortawesome/free-solid-svg-icons";
 
 extendPlugins([NamePlugin]);
 
-type TValidColorspace = Exclude<TFormat, "name" | "invalid">;
-type TValidPicker = "slider" | "sketch" | "wheel";
-type TColorspaceOpts = { key: TValidColorspace; text: `${Uppercase<TValidColorspace>}`; value: number }[];
-type TPickerOpts = { key: TValidPicker; text: `${Uppercase<TValidPicker>}`; value: number }[];
-
-const colorspaceOpts: TColorspaceOpts = [
-  { key: "rgb", text: "RGB", value: 1 },
-  { key: "hex", text: "HEX", value: 2 },
-  { key: "hsl", text: "HSL", value: 3 }
-];
-
-const pickerOpts: TPickerOpts = [
-  { key: "slider", text: "SLIDER", value: 1 },
-  { key: "sketch", text: "SKETCH", value: 2 },
-  { key: "wheel", text: "WHEEL", value: 3 }
-];
+const colorspaceOpts = ["rgb", "hex", "hsl"];
+const pickerOpts = ["slider", "sketch", "wheel"];
 
 const SWATCH_COLORS = [
   "hsla(0, 100%, 50%, 1)",
@@ -51,57 +48,30 @@ const SWATCH_COLORS = [
   "hsla(0, 0%, 0%, 1)"
 ];
 
-const StyledDropdown = styled(Dropdown)`
-  &.ui.selection.dropdown {
-    &,
-    & .menu > .item {
-      text-align: center;
-    }
+const BorderedSegment = styled.div`
+  border: 1px solid hsla(0, 0%, 75%, 1);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 5px 5px 10px 1px rgba(102, 102, 102, 0.5);
+`;
 
-    & .icon {
-      position: absolute;
-      right: 4px;
+const StyledAngleIcon = styled(FontAwesomeIcon).attrs((props: { $disabled: boolean }) => props)`
+  cursor: ${(props) => (props.$disabled ? "not-allowed" : "pointer")};
+
+  & path {
+    opacity: ${(props) => (props.$disabled ? 0.5 : 1)};
+
+    &:hover {
+      fill: ${(props) => (props.$disabled ? "grey" : "black")};
     }
   }
 `;
-
-const StyledButton = styled(Button.Group)`
-  & .ui.basic.button {
-    padding: 0;
-  }
-`;
-
-const SwatchSegment = styled(Segment)`
-  && {
-    margin: auto;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-
-    .left-swatch-arrow,
-    .right-swatch-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-60%);
-    }
-
-    .left-swatch-arrow {
-      transform: translate(-100%, -60%);
-    }
-
-    .swatch-color:hover,
-    i:hover {
-      cursor: pointer;
-    }
-  }
-`;
-
 interface IColorSelectorWidget {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   children?: JSX.Element;
-  initColorspace?: TValidColorspace;
-  initPicker?: TValidPicker;
+  initColorspace?: string;
+  initPicker?: string;
   harmony?: ColorMaster[];
 }
 
@@ -109,142 +79,138 @@ export default function ColorSelectorWidget({
   color,
   setColor,
   children,
-  initColorspace = colorspaceOpts[0].key,
-  initPicker = pickerOpts[0].key,
+  initColorspace = colorspaceOpts[0],
+  initPicker = pickerOpts[0],
   harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
+  const numVisibleSwatches = useRef(9);
+
   const [alpha, setAlpha] = useState(true);
   const [swatchIndex, setSwatchIndex] = useState(0);
-  const [colorspace, setColorspace] = useState(
-    colorspaceOpts.find((x) => x.key === initColorspace) ?? colorspaceOpts[0]
-  );
-  const [picker, setPicker] = useState(pickerOpts.find((x) => x.key === initPicker) ?? pickerOpts[0]);
+  const [colorspace, setColorspace] = useState(colorspaceOpts.find((x) => x === initColorspace) ?? colorspaceOpts[0]);
+  const [picker, setPicker] = useState(pickerOpts.find((x) => x === initPicker) ?? pickerOpts[0]);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
-  const currentSliders = useSliderChange({ color, setColor, colorspace: colorspace.key, alpha });
+  const { isComputer, isWideScreen } = useBreakpointMap();
+  const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });
 
-  const handleDropdownAdjustment = (dir: "up" | "down", type: "picker" | "colorspace") => {
-    const numOptions = Object.keys(type === "colorspace" ? colorspaceOpts : pickerOpts).length;
-    const value = (type === "colorspace" ? colorspace : picker).value;
-    let newValue = 0;
+  const adjustSelection = (dir: "up" | "down", type: "picker" | "colorspace") => {
+    const opts = type === "colorspace" ? colorspaceOpts : pickerOpts;
+    const value = type === "colorspace" ? colorspace : picker;
+    let newValue = "";
+    const currentIndex = opts.indexOf(value);
     if (dir === "down") {
-      newValue = value === 1 ? numOptions : value - 1;
+      newValue = currentIndex === 0 ? opts[opts.length - 1] : opts[currentIndex - 1];
     } else {
-      newValue = value === numOptions ? 1 : value + 1;
+      newValue = currentIndex === opts.length - 1 ? opts[0] : opts[currentIndex + 1];
     }
 
-    if (type === "colorspace") setColorspace(colorspaceOpts[newValue - 1]);
-    else setPicker(pickerOpts[newValue - 1]);
+    if (type === "colorspace") setColorspace(newValue);
+    else setPicker(newValue);
   };
 
   return (
-    <Segment>
+    <BorderedSegment>
       {children}
 
-      {isMobile && <Divider hidden />}
+      <FlexColumn>
+        <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />
 
-      <Grid verticalAlign="middle" centered stackable>
-        <Grid.Row>
-          <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />
-        </Grid.Row>
+        <Heading color="grey">{colorNameDebounce}</Heading>
 
-        <Grid.Row>
-          <Grid.Column width={16} textAlign="center">
-            <Header as="h3" color="grey">
-              {colorNameDebounce}
-            </Header>
-          </Grid.Column>
-        </Grid.Row>
+        <FlexRow>
+          <StyledAngleIcon
+            icon={faAngleLeft}
+            color="gray"
+            $disabled={swatchIndex === 0}
+            onClick={() => swatchIndex > 0 && setSwatchIndex(swatchIndex - 1)}
+          />
 
-        <Grid.Row>
-          <SwatchSegment>
-            <Icon
-              className="left-swatch-arrow"
-              size="large"
-              name="angle left"
-              disabled={swatchIndex === 0}
-              onClick={() => setSwatchIndex(swatchIndex - 1)}
+          <Spacers width="4px" />
+
+          {SWATCH_COLORS.slice(swatchIndex, swatchIndex + numVisibleSwatches.current).map((background) => (
+            <Swatch
+              className="swatch-color"
+              key={background + "-swatch"}
+              title={background}
+              $radius={15}
+              $borderColor="rgba(0,0,0,0.3)"
+              $borderRadius="4px"
+              display="inline-block"
+              background={background}
+              onClick={() => setColor(CM(background))}
             />
+          ))}
 
-            {SWATCH_COLORS.slice(
-              swatchIndex,
-              swatchIndex + (isMobile || isTablet ? 7 : isLaptop ? 8 : isComputer ? 9 : 10)
-            ).map((background) => (
-              <Swatch
-                className="swatch-color"
-                key={background + "-swatch"}
-                title={background}
-                $radius={15}
-                $borderColor="rgba(0,0,0,0.3)"
-                $borderRadius="4px"
-                display="inline-block"
-                background={background}
-                onClick={() => setColor(CM(background))}
-              />
-            ))}
+          <Spacers width="4px" />
 
-            <Icon
-              className="right-swatch-arrow"
-              size="large"
-              name="angle right"
-              disabled={
-                swatchIndex === SWATCH_COLORS.length - (isMobile || isTablet ? 7 : isLaptop ? 8 : isComputer ? 9 : 10)
-              }
-              onClick={() => setSwatchIndex(swatchIndex + 1)}
-            />
-          </SwatchSegment>
-        </Grid.Row>
+          <StyledAngleIcon
+            icon={faAngleRight}
+            color="gray"
+            $disabled={swatchIndex === SWATCH_COLORS.length - numVisibleSwatches.current}
+            onClick={() =>
+              swatchIndex < SWATCH_COLORS.length - numVisibleSwatches.current && setSwatchIndex(swatchIndex + 1)
+            }
+          />
+        </FlexRow>
 
-        <Grid.Row>
-          <Grid.Column computer={1} only="computer">
-            <StyledButton vertical>
-              <Button icon="angle up" basic onClick={() => handleDropdownAdjustment("up", "colorspace")} />
-              <Button icon="angle down" basic onClick={() => handleDropdownAdjustment("down", "colorspace")} />
-            </StyledButton>
-          </Grid.Column>
+        <Spacers height="30px" />
 
-          {[{ key: "colorspace" }, { key: "picker" }].map((elem, i) => {
-            return (
-              <Grid.Column key={elem.key + "-column"} tablet={8} computer={6}>
-                <StyledDropdown
-                  icon={<Icon name={i === 0 ? "paint brush" : "crosshairs"} color="grey" />}
-                  value={(i === 0 ? colorspace : picker).value}
-                  options={i === 0 ? colorspaceOpts : pickerOpts}
-                  labeled
-                  selection
-                  scrolling
-                  fluid
-                  onChange={(e: React.ChangeEvent, { value }: { value: number }) =>
-                    i === 0
-                      ? setColorspace({ ...colorspaceOpts[value - 1], value })
-                      : setPicker({ ...pickerOpts[value - 1], value })
-                  }
-                />
-              </Grid.Column>
-            );
-          })}
+        <FlexRow>
+          <FlexColumn>
+            <StyledAngleIcon icon={faAngleUp} color="gray" onClick={() => adjustSelection("up", "colorspace")} />
+            <StyledAngleIcon icon={faAngleDown} color="gray" onClick={() => adjustSelection("down", "colorspace")} />
+          </FlexColumn>
 
-          <Grid.Column computer={1} only="computer">
-            <StyledButton vertical>
-              <Button icon="angle up" basic onClick={() => handleDropdownAdjustment("up", "picker")} />
-              <Button icon="angle down" basic onClick={() => handleDropdownAdjustment("down", "picker")} />
-            </StyledButton>
-          </Grid.Column>
-        </Grid.Row>
+          <Spacers width="5px" />
+
+          <Dropdown
+            opts={colorspaceOpts}
+            value={colorspace}
+            setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
+            icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
+            iconPos="left"
+            cols={8}
+          />
+
+          <Spacers width="10px" />
+
+          <Dropdown
+            opts={pickerOpts}
+            value={picker}
+            setValue={setPicker as React.Dispatch<React.SetStateAction<string>>}
+            icon={<FontAwesomeIcon icon={faCrosshairs} color="dimgray" />}
+            iconPos="right"
+            cols={8}
+          />
+
+          <Spacers width="5px" />
+
+          <FlexColumn>
+            <StyledAngleIcon icon={faAngleUp} color="gray" onClick={() => adjustSelection("up", "picker")} />
+            <StyledAngleIcon icon={faAngleDown} color="gray" onClick={() => adjustSelection("down", "picker")} />
+          </FlexColumn>
+        </FlexRow>
+
+        <Spacers height="30px" />
 
         <ColorIndicator color={currentSliders.colorStr} showName={false} alpha={alpha} setAlpha={setAlpha} />
-      </Grid>
 
-      <Divider hidden />
+        <Spacers height="30px" />
 
-      {picker.key === "sketch" ? (
-        <SketchPicker color={color} setColor={setColor} verticalPickers={isComputer || isWideScreen} />
-      ) : picker.key === "wheel" ? (
-        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers={isComputer || isWideScreen} />
-      ) : (
-        currentSliders.sliders
-      )}
-    </Segment>
+        {picker === "sketch" ? (
+          <SketchPicker color={color} setColor={setColor} verticalPickers={isComputer || isWideScreen} />
+        ) : picker === "wheel" ? (
+          <WheelPicker
+            color={color}
+            setColor={setColor}
+            harmony={harmony}
+            verticalPickers={isComputer || isWideScreen}
+          />
+        ) : (
+          currentSliders.sliders
+        )}
+      </FlexColumn>
+    </BorderedSegment>
   );
 }

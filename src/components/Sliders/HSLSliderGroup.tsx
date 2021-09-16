@@ -7,13 +7,14 @@ interface IHSLSliderGroup {
   hsl: Ihsla;
   onChange: (e: React.ChangeEvent<HTMLInputElement>, type: TChannelHSL) => void;
   min?: string;
+  gap?: string;
 }
 
-export default function HSLSliderGroup({ hsl, onChange, min = "0" }: IHSLSliderGroup): JSX.Element {
+export default function HSLSliderGroup({ hsl, onChange, min = "0", gap = "" }: IHSLSliderGroup): JSX.Element {
   const { h, s, l, a } = hsl;
 
   return (
-    <FlexColumn>
+    <FlexColumn $gap={gap}>
       <FullSlider
         value={h}
         color={`hsla(${h}, 100%, 50%, 1)`}

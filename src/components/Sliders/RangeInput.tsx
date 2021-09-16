@@ -1,6 +1,6 @@
 import React from "react";
-import { TFormat } from "colormaster/types";
 import styled from "styled-components";
+import { IRangeInput } from "../../types/Sliders";
 
 const SliderInput = styled.input.attrs(
   (props: { value: string; min: string; max: string; $color: string; $colorRight: string }) => {
@@ -33,17 +33,6 @@ const SliderInput = styled.input.attrs(
     cursor: ew-resize;
   }
 `;
-
-export interface IRangeInput {
-  color: string;
-  colorRight?: string;
-  value: number | string;
-  min?: string;
-  max?: string;
-  step?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  format?: Exclude<TFormat, "name" | "invalid">;
-}
 
 export default function RangeInput({
   color,

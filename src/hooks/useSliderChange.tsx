@@ -1,21 +1,19 @@
 import React, { useCallback, useMemo } from "react";
-import { TChannel, TChannelHSL, Irgba, Ihsla, TFormat } from "colormaster/types";
+import { TChannel, TChannelHSL, Irgba, Ihsla } from "colormaster/types";
 import CM, { ColorMaster } from "colormaster";
 import HEXSliderGroup from "../components/Sliders/HEXSliderGroup";
 import HSLSliderGroup from "../components/Sliders/HSLSliderGroup";
 import RGBSliderGroup from "../components/Sliders/RGBSliderGroup";
 
-type TValidFormat = Exclude<TFormat, "name" | "invalid">;
-
 interface IUseSliderChange {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  colorspace: TValidFormat;
+  colorspace: string;
   alpha?: boolean;
   min?: string;
 }
 interface IUseSliderChangeReturn {
-  type: TValidFormat;
+  type: string;
   colorStr: string;
   sliders: JSX.Element;
 }
@@ -59,17 +57,17 @@ export default function useSliderChange({
       {
         type: "rgb",
         colorStr: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} />
+        sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} gap="28px" />
       },
       {
         type: "hex",
         colorStr: color.stringHEX({ alpha }),
-        sliders: <HEXSliderGroup color={color} onChange={handleSliderChange} />
+        sliders: <HEXSliderGroup color={color} onChange={handleSliderChange} gap="28px" />
       },
       {
         type: "hsl",
         colorStr: color.stringHSL({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} min={min} />
+        sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} min={min} gap="28px" />
       }
     ];
 
