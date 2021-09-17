@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import { FlexColumn } from "../styles/Flex";
+import { StyledAngleIcon } from "./ColorSelectorWidget";
+import Spacers from "./Spacers";
 
 const Container = styled.div.attrs((props: { $cols: number }) => props)`
   position: relative;
@@ -53,40 +57,88 @@ interface IDropdown {
   setValue: React.Dispatch<React.SetStateAction<string>>;
   icon: JSX.Element;
   iconPos: "left" | "right";
+  /** The up/down angle brackets that let the user adjust dropdown values without opening it */
+  switcherPos: "left" | "right";
   cols?: number;
 }
 
-export default function Dropdown({ opts, value, setValue, icon, iconPos, cols = 4 }: IDropdown): JSX.Element {
+const Switcher = ({ adjustSelection }: { adjustSelection: (dir: "up" | "down") => void }): JSX.Element => {
+  return (
+    <FlexColumn>
+      <StyledAngleIcon icon={faAngleUp} color="gray" onClick={() => adjustSelection("up")} />
+      <StyledAngleIcon icon={faAngleDown} color="gray" onClick={() => adjustSelection("down")} />
+    </FlexColumn>
+  );
+};
+
+export default function Dropdown({
+  opts,
+  value,
+  setValue,
+  icon,
+  iconPos,
+  switcherPos,
+  cols = 4
+}: IDropdown): JSX.Element {
   const [show, setShow] = useState(false);
   const [activeItem, setActiveItem] = useState("");
 
+  const adjustSelection = useCallback(
+    (dir: "up" | "down") => {
+      let newValue = "";
+      const currentIndex = opts.indexOf(value);
+      if (dir === "down") {
+        newValue = currentIndex === 0 ? opts[opts.length - 1] : opts[currentIndex - 1];
+      } else {
+        newValue = currentIndex === opts.length - 1 ? opts[0] : opts[currentIndex + 1];
+      }
+
+      setValue(newValue);
+    },
+    [opts, value, setValue]
+  );
+
   return (
-    <Container $cols={cols}>
-      <Button onClick={() => setShow(!show)}>
-        <StyledIcon $iconPos={iconPos}>{iconPos === "left" && icon}</StyledIcon>
-        {value.toUpperCase()}
-        <StyledIcon $iconPos={iconPos}>{iconPos === "right" && icon}</StyledIcon>
-      </Button>
-      <ItemsWrapper onPointerLeave={() => setShow(false)}>
-        {show &&
-          opts.map((item, i) => {
-            return (
-              <Item
-                key={item}
-                $active={item === activeItem}
-                $selected={item === value}
-                $last={i === opts.length - 1}
-                onClick={() => {
-                  setValue(item);
-                  setShow(false);
-                }}
-                onPointerOver={() => setActiveItem(item)}
-              >
-                {item.toUpperCase()}
-              </Item>
-            );
-          })}
-      </ItemsWrapper>
-    </Container>
+    <>
+      {switcherPos === "left" && (
+        <>
+          <Switcher adjustSelection={adjustSelection} />
+          <Spacers width="5px" />
+        </>
+      )}
+      <Container $cols={cols}>
+        <Button onClick={() => setShow(!show)}>
+          <StyledIcon $iconPos={iconPos}>{iconPos === "left" && icon}</StyledIcon>
+          {value.toUpperCase()}
+          <StyledIcon $iconPos={iconPos}>{iconPos === "right" && icon}</StyledIcon>
+        </Button>
+        <ItemsWrapper onPointerLeave={() => setShow(false)}>
+          {show &&
+            opts.map((item, i) => {
+              return (
+                <Item
+                  key={item}
+                  $active={item === activeItem}
+                  $selected={item === value}
+                  $last={i === opts.length - 1}
+                  onClick={() => {
+                    setValue(item);
+                    setShow(false);
+                  }}
+                  onPointerOver={() => setActiveItem(item)}
+                >
+                  {item.toUpperCase()}
+                </Item>
+              );
+            })}
+        </ItemsWrapper>
+      </Container>
+      {switcherPos === "right" && (
+        <>
+          <Spacers width="5px" />
+          <Switcher adjustSelection={adjustSelection} />
+        </>
+      )}
+    </>
   );
 }

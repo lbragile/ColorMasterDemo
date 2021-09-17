@@ -1,13 +1,7 @@
 import React from "react";
 import { Irgba, TChannel } from "colormaster/types";
-import styled from "styled-components";
 import FullSlider from "./FullSlider";
-
-export const FlexColumn = styled.div.attrs((props: { $gap: string }) => props)`
-  display: flex;
-  flex-direction: column;
-  gap: ${(props) => props.$gap ?? ""}; ;
-`;
+import { FlexColumn } from "../../styles/Flex";
 
 interface IRGBSliderGroup {
   rgb: Irgba;

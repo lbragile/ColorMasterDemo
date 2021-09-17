@@ -3,13 +3,7 @@ import RangeInput from "./RangeInput";
 import NumberInput from "./NumberInput";
 import styled from "styled-components";
 import { IFullSlider } from "../../types/Sliders";
-
-export const FlexRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
+import { FlexRow } from "../../styles/Flex";
 
 const Title = styled.span`
   font-weight: bold;

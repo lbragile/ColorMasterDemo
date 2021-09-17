@@ -5,7 +5,8 @@ import useBreakpointMap from "../hooks/useBreakpointMap";
 import Spacers from "./Spacers";
 import CM, { extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
-import { FlexRow } from "./Sliders/FullSlider";
+import { FlexRow } from "../styles/Flex";
+import Checkbox from "./Checkbox";
 
 extendPlugins([NamePlugin]);
 
@@ -14,13 +15,12 @@ const StyledColorDisplay = styled.input.attrs(
 )`
   padding: 10px;
   border-radius: 4px;
-  width: min-content;
-  margin: 0 8px;
 `;
 
 export const Heading = styled.h3.attrs((props: { $color?: string }) => props)`
   color: ${(props) => props.color ?? "black"};
   text-align: center;
+  margin: 0;
 `;
 
 interface IColorIndicator {
@@ -59,20 +59,11 @@ export default function ColorIndicator({ color, alpha, setAlpha, showName = true
       {showName && <Heading $color="grey">{CM(color).name({ exact: false })}</Heading>}
 
       <FlexRow>
-        <StyledColorDisplay
-          type="text"
-          value={color}
-          spellCheck={false}
-          // size="large"
-          readOnly
-          // fluid
-          // action={copyAction(color)}
-          $mobile={isMobile}
-        />
+        <StyledColorDisplay type="text" value={color} spellCheck={false} readOnly $mobile={isMobile} />
 
-        <input type="checkbox" id="alpha_name" name="alpha_name" checked={alpha} onChange={() => setAlpha(!alpha)} />
-        <Spacers width="2px" />
-        <label htmlFor="alpha_name">Alpha</label>
+        <Spacers width="4px" />
+
+        <Checkbox value={alpha} setValue={setAlpha} label="Alpha" />
       </FlexRow>
     </>
   );

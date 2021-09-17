@@ -1,7 +1,7 @@
 import { Ihsla, TChannelHSL } from "colormaster/types";
 import React from "react";
+import { FlexColumn } from "../../styles/Flex";
 import FullSlider from "./FullSlider";
-import { FlexColumn } from "./RGBSliderGroup";
 
 interface IHSLSliderGroup {
   hsl: Ihsla;
