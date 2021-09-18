@@ -1,9 +1,7 @@
-import React, { useCallback, useMemo } from "react";
-import { TChannel, TChannelHSL, Irgba, Ihsla } from "colormaster/types";
-import CM, { ColorMaster } from "colormaster";
-import HEXSliderGroup from "../components/Sliders/HEXSliderGroup";
-import HSLSliderGroup from "../components/Sliders/HSLSliderGroup";
-import RGBSliderGroup from "../components/Sliders/RGBSliderGroup";
+import React, { useMemo } from "react";
+import { ColorMaster } from "colormaster";
+import SliderGroup from "../components/Sliders/SliderGroup";
+import { TFormat } from "colormaster/types";
 
 interface IUseSliderChange {
   color: ColorMaster;
@@ -13,7 +11,7 @@ interface IUseSliderChange {
   min?: string;
 }
 interface IUseSliderChangeReturn {
-  type: string;
+  type: Exclude<TFormat, "name" | "invalid">;
   colorStr: string;
   sliders: JSX.Element;
 }
@@ -22,57 +20,35 @@ export default function useSliderChange({
   color,
   setColor,
   colorspace,
-  alpha,
-  min = "0"
+  alpha
 }: IUseSliderChange): IUseSliderChangeReturn {
-  const handleSliderChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>, type: TChannel | TChannelHSL) => {
-      const val = Number.isNaN(e.target.valueAsNumber)
-        ? e.target.value.length > 0
-          ? parseInt(e.target.value, 16)
-          : 0
-        : e.target.valueAsNumber;
-
-      const { r, g, b } = color.rgba();
-      const { h, s, l } = color.hsla();
-
-      const newColor: Irgba | Ihsla = ["red", "green", "blue"].includes(type)
-        ? { r: type === "red" ? val : r, g: type === "green" ? val : g, b: type === "blue" ? val : b, a: 1 }
-        : {
-            h: type === "hue" ? Math.max(0, Math.min(val, 359.99)) : h,
-            s: type === "saturation" ? val : s,
-            l: type === "lightness" ? val : l,
-            a: 1
-          };
-
-      newColor.a = type === "alpha" ? val / (colorspace === "hex" ? 255 : 100) : color.alpha;
-
-      setColor(CM(newColor));
-    },
-    [color, setColor, colorspace]
-  );
-
   const currentSliderChoice = useMemo(() => {
     const possibleSliders: IUseSliderChangeReturn[] = [
       {
         type: "rgb",
         colorStr: color.stringRGB({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <RGBSliderGroup rgb={color.rgba()} onChange={handleSliderChange} gap="28px" />
+        sliders: (
+          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="rgb" gap="28px" />
+        )
       },
       {
         type: "hex",
         colorStr: color.stringHEX({ alpha }),
-        sliders: <HEXSliderGroup color={color} onChange={handleSliderChange} gap="28px" />
+        sliders: (
+          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="hex" gap="28px" />
+        )
       },
       {
         type: "hsl",
         colorStr: color.stringHSL({ alpha, precision: [2, 2, 2, 2] }),
-        sliders: <HSLSliderGroup hsl={color.hsla()} onChange={handleSliderChange} min={min} gap="28px" />
+        sliders: (
+          <SliderGroup colorArr={Object.values(color.hsla()) as number[]} setColor={setColor} format="hsl" gap="28px" />
+        )
       }
     ];
 
-    return possibleSliders.filter((slider) => slider.type === colorspace)[0];
-  }, [colorspace, color, alpha, handleSliderChange, min]);
+    return possibleSliders.find((slider) => slider.type === colorspace) ?? possibleSliders[0];
+  }, [colorspace, color, setColor, alpha]);
 
   return currentSliderChoice;
 }

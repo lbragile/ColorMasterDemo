@@ -1,4 +1,5 @@
 import { TFormat } from "colormaster/types";
+import React from "react";
 
 interface ICommon {
   value: number | string;
