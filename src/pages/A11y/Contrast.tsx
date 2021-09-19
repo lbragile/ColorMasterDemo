@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
-import ColorSelectorWidget from "../ColorSelectorWidget";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../../hooks/useDebounce";
 import useBreakpointMap from "../../hooks/useBreakpointMap";
 import styled from "styled-components";
 import { ContrastSample } from "../../utils/codeSamples";
-import CodeModal from "./CodeModal";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
-import Spacers from "../Spacers";
-import BreadcrumbPath from "../BreadcrumbPath";
+import BreadcrumbPath from "../../components/BreadcrumbPath";
+import CodeModal from "../../components/CodeModal";
+import ColorSelectorWidget from "../../components/ColorSelectorWidget";
+import Spacers from "../../components/Spacers";
 
 extendPlugins([A11yPlugin]);
 
@@ -28,7 +28,7 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
   margin-top: 12px;
 `;
 
-export default function ContrastAnalysis(): JSX.Element {
+export default function Contrast(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
   const { isMobile } = useBreakpointMap();

@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Container, Grid, Icon, Label, Menu } from "semantic-ui-react";
-import ColorSelectorWidget from "../ColorSelectorWidget";
-import useDebounce from "../../hooks/useDebounce";
-import { CurrentColorIcon, Swatch, SwatchCounter } from "../../styles/Swatch";
-import FullSlider from "../Sliders/FullSlider";
-import { HarmonySample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
+import A11yPlugin from "colormaster/plugins/accessibility";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 import { THarmony, TMonoEffect } from "colormaster/types";
+import { useHistory } from "react-router-dom";
+import { Menu, Grid, Label, Icon, Container } from "semantic-ui-react";
 import styled from "styled-components";
-import CodeModal from "./CodeModal";
-import A11yPlugin from "colormaster/plugins/accessibility";
-import { useHistory } from "react-router";
-import useQuery from "../../hooks/useQuery";
-import Spacers from "../Spacers";
-import useBreakpointMap from "../../hooks/useBreakpointMap";
+import CodeModal from "../components/CodeModal";
+import ColorSelectorWidget from "../components/ColorSelectorWidget";
+import FullSlider from "../components/Sliders/FullSlider";
+import Spacers from "../components/Spacers";
+import useBreakpointMap from "../hooks/useBreakpointMap";
+import useDebounce from "../hooks/useDebounce";
+import useQuery from "../hooks/useQuery";
+import { Swatch, SwatchCounter, CurrentColorIcon } from "../styles/Swatch";
+import { HarmonySample } from "../utils/codeSamples";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -47,7 +47,7 @@ const MonoEffectList = styled.li`
   }
 `;
 
-export default function HarmonyAnalysis(): JSX.Element {
+export default function Harmony(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
   const { isComputer, isWideScreen } = useBreakpointMap();

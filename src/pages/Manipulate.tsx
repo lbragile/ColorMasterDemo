@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Container, Divider, Dropdown, Grid, Header, Icon, List, Popup } from "semantic-ui-react";
-import ColorSelectorWidget from "../ColorSelectorWidget";
-import useDebounce from "../../hooks/useDebounce";
-import { Swatch, SwatchCounter } from "../../styles/Swatch";
 import { useHistory } from "react-router";
-import useQuery from "../../hooks/useQuery";
-import useSliderChange from "../../hooks/useSliderChange";
-import ColorIndicator from "../ColorIndicator";
-import Spacers from "../Spacers";
-import { ManipulationSample } from "../../utils/codeSamples";
-import CodeModal from "./CodeModal";
-import addColor from "../../utils/addColor";
 import CM from "colormaster";
-import useBreakpointMap from "../../hooks/useBreakpointMap";
+import CodeModal from "../components/CodeModal";
+import ColorIndicator from "../components/ColorIndicator";
+import ColorSelectorWidget from "../components/ColorSelectorWidget";
+import Spacers from "../components/Spacers";
+import useBreakpointMap from "../hooks/useBreakpointMap";
+import useDebounce from "../hooks/useDebounce";
+import useQuery from "../hooks/useQuery";
+import useSliderChange from "../hooks/useSliderChange";
+import { Swatch, SwatchCounter } from "../styles/Swatch";
+import addColor from "../utils/addColor";
+import { ManipulationSample } from "../utils/codeSamples";
 
 const INFORMATIVE_TEXT = {
   adjust: "Color picker & each of the above sliders! Combines both according to dropdown selection.",
@@ -51,7 +51,7 @@ const Information = ({ text }: { text: string }) => {
   );
 };
 
-export default function ManipulateAnalysis(): JSX.Element {
+export default function Manipulate(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
   const { isWideScreen } = useBreakpointMap();

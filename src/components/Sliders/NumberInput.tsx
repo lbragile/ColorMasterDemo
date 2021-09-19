@@ -22,9 +22,9 @@ const StyledNumberInput = styled.input`
   border-radius: 4px;
   padding: 6px;
   text-align: center;
+  outline: none;
 
   &:focus {
-    outline: none;
     border: 1px solid hsla(210, 100%, 75%, 1);
   }
 `;
@@ -44,10 +44,10 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   border: none;
   border-bottom: ${(props) => (props.$dir === "up" ? "1px solid hsla(0, 0%, 75%, 1)" : "")};
   outline: none;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   &:hover {
     background-color: hsla(0, 0%, 80%, 1);
-    cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   }
 
   & path {
@@ -82,7 +82,7 @@ export default function NumberInput({
 
   useEffect(() => {
     const preventZoom = (e: WheelEvent) => {
-      if (e.ctrlKey) {
+      if (e.ctrlKey || e.altKey) {
         e.preventDefault();
       }
     };

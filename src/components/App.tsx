@@ -7,11 +7,11 @@ import { Switch, Route, NavLink, useLocation, Redirect } from "react-router-dom"
 import SocialMedia from "./SocialMedia";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 
-const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
-const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
-const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
-const ManipulateAnalysis = lazy(() => import("./Analysis/ManipulateAnalysis"));
-const A11yStatisticsAnalysis = lazy(() => import("./Analysis/A11yStatisticsAnalysis"));
+const Contrast = lazy(() => import("../pages/A11y/Contrast"));
+const Statistics = lazy(() => import("../pages/A11y/Statistics"));
+const Harmony = lazy(() => import("../pages/Harmony"));
+const Mix = lazy(() => import("../pages/Mix"));
+const Manipulate = lazy(() => import("../pages/Manipulate"));
 
 const StyledContainer = styled(Container)`
   && {
@@ -90,11 +90,11 @@ export default function App(): JSX.Element {
 
         <Content $mobile={isMobile}>
           <Switch>
-            <Route path="/accessibility/contrast" component={ContrastAnalysis} />
-            <Route path="/accessibility/statistics" component={A11yStatisticsAnalysis} />
-            <Route path="/harmony" component={HarmonyAnalysis} />
-            <Route path="/mix" component={MixAnalysis} />
-            <Route path="/manipulate" component={ManipulateAnalysis} />
+            <Route path="/accessibility/contrast" component={Contrast} />
+            <Route path="/accessibility/statistics" component={Statistics} />
+            <Route path="/harmony" component={Harmony} />
+            <Route path="/mix" component={Mix} />
+            <Route path="/manipulate" component={Manipulate} />
             <Redirect from="/" to="/harmony" />
           </Switch>
         </Content>

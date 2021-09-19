@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Divider, Dropdown, Grid, Header, Icon, Label, Popup } from "semantic-ui-react";
-import ColorSelectorWidget from "../ColorSelectorWidget";
-import useDebounce from "../../hooks/useDebounce";
-import CodeModal from "./CodeModal";
-import { Swatch } from "../../styles/Swatch";
-import FullSlider from "../Sliders/FullSlider";
-import { MixSample } from "../../utils/codeSamples";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 import { TFormat } from "colormaster/types";
 import { useHistory } from "react-router";
-import useQuery from "../../hooks/useQuery";
-import ColorIndicator from "../ColorIndicator";
-import Spacers from "../Spacers";
+import CodeModal from "../components/CodeModal";
+import ColorIndicator from "../components/ColorIndicator";
+import ColorSelectorWidget from "../components/ColorSelectorWidget";
+import FullSlider from "../components/Sliders/FullSlider";
+import Spacers from "../components/Spacers";
+import useDebounce from "../hooks/useDebounce";
+import useQuery from "../hooks/useQuery";
+import { Swatch } from "../styles/Swatch";
+import { MixSample } from "../utils/codeSamples";
 
 extendPlugins([MixPlugin]);
 
@@ -22,7 +22,7 @@ const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", 
   (value, i) => ({ key: i, text: value.toUpperCase(), value })
 );
 
-export default function MixAnalysis(): JSX.Element {
+export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
 

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Container, Divider, Grid, Header, Icon } from "semantic-ui-react";
-import ColorSelectorWidget from "../ColorSelectorWidget";
 import useDebounce from "../../hooks/useDebounce";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
-import Spacers from "../Spacers";
-import BreadcrumbPath from "../BreadcrumbPath";
 import { CurrentColorIcon, Swatch, SwatchCounter } from "../../styles/Swatch";
-import ColorIndicator from "../ColorIndicator";
 import { A11yStatisticsSample } from "../../utils/codeSamples";
-import CodeModal from "./CodeModal";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useBreakpointMap from "../../hooks/useBreakpointMap";
+import BreadcrumbPath from "../../components/BreadcrumbPath";
+import CodeModal from "../../components/CodeModal";
+import ColorIndicator from "../../components/ColorIndicator";
+import ColorSelectorWidget from "../../components/ColorSelectorWidget";
+import Spacers from "../../components/Spacers";
 
 extendPlugins([A11yPlugin]);
 
@@ -21,7 +21,7 @@ interface IPureHue {
   reason: string;
 }
 
-export default function A11yStatisticsAnalysis(): JSX.Element {
+export default function Statistics(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
   const { isMobile } = useBreakpointMap();

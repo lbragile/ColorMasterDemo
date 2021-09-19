@@ -16,14 +16,8 @@ const Button = styled.button`
   border: 1px solid hsla(0, 0%, 75%, 1);
   border-radius: 4px;
   width: 100%;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
+  cursor: pointer;
+  outline: none;
 `;
 
 const ItemsWrapper = styled.div`
@@ -31,7 +25,7 @@ const ItemsWrapper = styled.div`
   position: absolute;
   width: calc(100% - 2px);
   left: 1px;
-  z-index: 10;
+  z-index: 1;
 `;
 
 const Item = styled.div.attrs((props: { $active: boolean; $selected: boolean; $last: boolean }) => props)`
