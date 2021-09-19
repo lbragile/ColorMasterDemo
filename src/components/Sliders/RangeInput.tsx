@@ -3,14 +3,14 @@ import styled from "styled-components";
 import { IRangeInput } from "../../types/Sliders";
 
 const SliderInput = styled.input.attrs(
-  (props: { value: string; min: string; max: string; $color: string; $colorRight: string }) => {
+  (props: { value: string | number; min: string; max: string; $color: string; $colorRight?: string }) => {
     const val = Number(props.value ?? 0);
     const min = Number(props.min ?? 0);
     const max = Number(props.max ?? 100);
     const breakpoint = 100 * ((val - min) / (max - min));
     const colorRight = props.$colorRight ?? "hsla(0, 0%, 90%, 1)";
     const sliderColor = `linear-gradient(to right, ${props.$color} 0%, ${props.$color} ${breakpoint}%, ${colorRight} ${breakpoint}%, ${colorRight} 100%)`;
-    return { style: { background: sliderColor }, colorRight };
+    return { ...props, style: { background: sliderColor }, $colorRight: colorRight };
   }
 )`
   -webkit-appearance: none;
@@ -18,7 +18,7 @@ const SliderInput = styled.input.attrs(
   height: 8px;
   margin: 0 16px;
   border-radius: 12px;
-  border: ${(props) => (props.colorRight ? "1px solid hsla(0, 0%, 80%, 1)" : "")};
+  border: ${(props) => (props.$colorRight ? "1px solid hsla(0, 0%, 80%, 1)" : "")};
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -40,20 +40,22 @@ export default function RangeInput({
   value,
   min = "0",
   max = "100",
-  onChange,
-  format = undefined
+  format = undefined,
+  onChange
 }: IRangeInput): JSX.Element {
-  const SliderInputProps = {
-    min,
-    max,
-    onChange,
-    value,
-    type: "range",
-    step: format === "hex" ? "1" : "0.01",
-    draggable: false,
-    $color: color,
-    $colorRight: colorRight
-  };
-
-  return <SliderInput {...SliderInputProps} />;
+  return (
+    <SliderInput
+      type="range"
+      min={min}
+      max={max}
+      value={value}
+      draggable={false}
+      $color={color}
+      $colorRight={colorRight}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        // * sliders are always numeric (base 10), so need to convert to hex (base 16) if format matches
+        onChange({ ...e, target: { ...e.target, value: Number(e.target.value).toString(format === "hex" ? 16 : 10) } });
+      }}
+    />
+  );
 }

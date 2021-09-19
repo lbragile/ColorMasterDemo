@@ -25,7 +25,7 @@ export default function FullSlider({
 
   return (
     <FlexRow>
-      <Title>{title?.[0].toUpperCase()}</Title>
+      <Title>{title}</Title>
       <RangeInput {...CommonProps} color={color} colorRight={colorRight} />
       <NumberInput {...CommonProps} postfix={postfix} />
     </FlexRow>

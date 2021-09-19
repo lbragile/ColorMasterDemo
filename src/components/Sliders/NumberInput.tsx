@@ -1,17 +1,22 @@
-import React, { useRef } from "react";
-import { TFormat } from "colormaster/types";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { INumberInput } from "../../types/Sliders";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FlexColumn, FlexRow } from "../../styles/Flex";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
+interface IPressedKey {
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  altKey: boolean;
+}
+
 const InputContainer = styled(FlexRow)`
   position: relative;
 `;
 
-const StyledNumberInput = styled.input.attrs((props: { $format: Exclude<TFormat, "invalid" | "name"> }) => props)`
-  width: 110px;
+const StyledNumberInput = styled.input`
+  width: 90px;
   height: 36px;
   border: 1px solid hsla(0, 0%, 90%, 1);
   border-radius: 4px;
@@ -75,29 +80,62 @@ export default function NumberInput({
   const timeoutId = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handlePointerDown(btn: "top" | "bottom", step: number) {
-    const sign = btn === "top" ? 1 : -1;
-
-    timeoutId.current = setInterval(() => {
-      if (inputRef.current) {
-        const value =
-          format === "hex" ? parseInt(inputRef.current.value, 16) + sign : Number(inputRef.current.value) + sign * step;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        onChange({ target: { value } });
+  useEffect(() => {
+    const preventZoom = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
       }
-    }, 75) as unknown as number;
+    };
+
+    document.addEventListener("wheel", preventZoom, { passive: false });
+    return () => document.removeEventListener("wheel", preventZoom);
+  }, []);
+
+  function getStepSize({ shiftKey, ctrlKey, altKey }: IPressedKey): number {
+    let step = 0;
+    if (ctrlKey) step += 25;
+    if (shiftKey) step += 10;
+    if (altKey) step += 5;
+
+    if (step === 0) step = 1;
+
+    return step;
   }
 
-  const NumberInputProps = {
-    type: "text",
-    min,
-    max,
-    step: 0.1,
-    value:
-      format === "hex" ? ("0" + Math.round(+value).toString(16)).slice(-2).toUpperCase() : Number(value).toFixed(2),
-    onChange,
-    $format: format
+  function manualChangeEvent(e: React.ChangeEvent<HTMLInputElement>, sign: number, step: number): void {
+    if (inputRef.current) {
+      const delta = sign * step;
+      const numValue =
+        format === "hex"
+          ? Math.max(0, Math.min(parseInt(inputRef.current.value, 16) + delta, 255))
+          : Number(inputRef.current.value) + delta;
+
+      onChange({ ...e, target: { ...e.target, value: numValue.toString(format === "hex" ? 16 : 10) } });
+    }
+  }
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>, btn: "top" | "bottom") => {
+    const { shiftKey, ctrlKey, altKey } = e;
+    const step = getStepSize({ shiftKey, ctrlKey, altKey });
+    timeoutId.current = setInterval(
+      () => manualChangeEvent(e as unknown as React.ChangeEvent<HTMLInputElement>, btn === "top" ? 1 : -1, step),
+      75
+    ) as unknown as number;
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    const { shiftKey, ctrlKey, altKey, deltaY } = e;
+    const step = getStepSize({ shiftKey, ctrlKey, altKey });
+
+    // only fire if the previous interval was cleared
+    if (timeoutId.current === 0) {
+      manualChangeEvent(e as unknown as React.ChangeEvent<HTMLInputElement>, deltaY < 0 ? 1 : -1, step);
+    }
+  };
+
+  const clearHold = () => {
+    clearInterval(timeoutId.current);
+    timeoutId.current = 0;
   };
 
   return (
@@ -106,21 +144,34 @@ export default function NumberInput({
         <ArrowButton
           $dir="up"
           disabled={Number(value) === Number(max)}
-          onPointerDown={() => handlePointerDown("top", NumberInputProps.step)}
-          onPointerUp={() => clearInterval(timeoutId.current)}
+          onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "top")}
+          onPointerUp={clearHold}
         >
           <FontAwesomeIcon icon={faCaretUp} color="hsla(0, 0%, 25%, 1)" />
         </ArrowButton>
+
         <ArrowButton
           $dir="down"
           disabled={Number(value) === Number(min)}
-          onPointerDown={() => handlePointerDown("bottom", NumberInputProps.step)}
-          onPointerUp={() => clearInterval(timeoutId.current)}
+          onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "bottom")}
+          onPointerUp={clearHold}
         >
           <FontAwesomeIcon icon={faCaretDown} color="hsla(0, 0%, 25%, 1)" />
         </ArrowButton>
       </FlexColumn>
-      <StyledNumberInput ref={inputRef} {...NumberInputProps} />
+
+      <StyledNumberInput
+        ref={inputRef}
+        type="text"
+        min={min}
+        max={max}
+        value={
+          format === "hex" ? ("0" + Math.round(+value).toString(16)).slice(-2).toUpperCase() : Number(value).toFixed(0)
+        }
+        onChange={onChange}
+        onWheel={handleWheel}
+      />
+
       {postfix && <StyledLabel>{postfix}</StyledLabel>}
     </InputContainer>
   );

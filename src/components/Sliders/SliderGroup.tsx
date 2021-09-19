@@ -15,15 +15,15 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "" }: IS
   const generateCMStr = useCallback(
     (arr: number[]): ColorMaster => {
       switch (format) {
-        case "hsl":
-          return CM({ h: arr[0], s: arr[1], l: arr[2], a: arr[3] });
-
         case "hex": {
           const formattedArr = arr.map(
             (val, i) => ("0" + Math.round(i === arr.length - 1 ? val * 255 : val).toString(16)).slice(-2) as THexStr
           );
           return CM({ r: formattedArr[0], g: formattedArr[1], b: formattedArr[2], a: formattedArr[3] });
         }
+
+        case "hsl":
+          return CM({ h: arr[0], s: arr[1], l: arr[2], a: arr[3] });
 
         default:
           return CM({ r: arr[0], g: arr[1], b: arr[2], a: arr[3] });
@@ -70,28 +70,11 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "" }: IS
   }, [format, colorArr]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, channel: number) => {
-    const val = +e.target.value;
+    const val = parseInt(e.target.value, format === "hex" ? 16 : 10);
 
     if (!Number.isNaN(val)) {
-      switch (channel) {
-        case 0:
-          setColor(generateCMStr([val, ...colorArr.slice(1)]));
-          break;
-
-        case 1:
-          setColor(generateCMStr([colorArr[0], +e.target.value, ...colorArr.slice(2)]));
-          break;
-
-        case 2:
-          setColor(generateCMStr([...colorArr.slice(0, 2), +e.target.value, colorArr[3]]));
-          break;
-
-        case 3:
-          setColor(generateCMStr([...colorArr.slice(0, 3), +e.target.value / (format === "hex" ? 255 : 100)]));
-          break;
-
-        // no default
-      }
+      colorArr.splice(channel, 1, channel === colorArr.length - 1 ? val / (format === "hex" ? 255 : 100) : val);
+      setColor(generateCMStr(colorArr));
     }
   };
 
@@ -99,16 +82,17 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "" }: IS
     <FlexColumn $gap={gap}>
       {colorArr.map((val, i) => {
         const isAlpha = i === colorArr.length - 1;
+        const { color, title, min, max, postfix } = formattedProps;
 
         return (
           <FullSlider
             key={"slider-" + i}
             value={isAlpha ? val * (format === "hex" ? 255 : 100) : val}
-            color={formattedProps.color[i]}
-            title={isAlpha ? "A" : formattedProps.title[i]}
-            min={formattedProps.min[i]}
-            max={formattedProps.max[i]}
-            postfix={formattedProps.postfix[i]}
+            color={color[i]}
+            title={isAlpha ? "A" : title[i]}
+            min={min[i]}
+            max={max[i]}
+            postfix={postfix[i]}
             format={format}
             onChange={(e) => handleChange(e, i)}
           />
