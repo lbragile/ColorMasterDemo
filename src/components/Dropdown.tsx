@@ -58,7 +58,7 @@ interface IDropdown {
 
 const Switcher = ({ adjustSelection }: { adjustSelection: (dir: "up" | "down") => void }): JSX.Element => {
   return (
-    <FlexColumn>
+    <FlexColumn $cols={1}>
       <StyledAngleIcon icon={faAngleUp} color="gray" onClick={() => adjustSelection("up")} />
       <StyledAngleIcon icon={faAngleDown} color="gray" onClick={() => adjustSelection("down")} />
     </FlexColumn>

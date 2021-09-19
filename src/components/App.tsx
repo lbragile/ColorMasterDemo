@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
-import { Container, Divider, Dropdown, Menu } from "semantic-ui-react";
+import { Dropdown, Menu } from "semantic-ui-react";
 import styled from "styled-components";
 import { GlobalStyle } from "../styles/Global";
 import Loading from "./Loading";
@@ -13,13 +13,12 @@ const Harmony = lazy(() => import("../pages/Harmony"));
 const Mix = lazy(() => import("../pages/Mix"));
 const Manipulate = lazy(() => import("../pages/Manipulate"));
 
-const StyledContainer = styled(Container)`
-  && {
-    position: relative;
-    width: 90%;
-    max-width: 95%;
-    height: 100vh;
-  }
+const Grid = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 90%;
+  height: 100vh;
 `;
 
 const Content = styled.div.attrs((props: { $mobile: boolean }) => props)`
@@ -46,13 +45,11 @@ export default function App(): JSX.Element {
   }, [location]);
 
   return (
-    <StyledContainer>
+    <Grid>
       <GlobalStyle />
 
       <Suspense fallback={<Loading />}>
-        {isMobile && <Divider hidden />}
-
-        <Menu pointing secondary>
+        {/* <Menu pointing secondary>
           <Dropdown item text={isMobile ? "A11y" : "Accessibility"}>
             <Dropdown.Menu>
               {MENU_TABS.slice(0, 2).map((item) => {
@@ -86,19 +83,19 @@ export default function App(): JSX.Element {
               <SocialMedia />
             </Menu.Item>
           )}
-        </Menu>
+        </Menu> */}
 
-        <Content $mobile={isMobile}>
-          <Switch>
-            <Route path="/accessibility/contrast" component={Contrast} />
-            <Route path="/accessibility/statistics" component={Statistics} />
-            <Route path="/harmony" component={Harmony} />
-            <Route path="/mix" component={Mix} />
-            <Route path="/manipulate" component={Manipulate} />
-            <Redirect from="/" to="/harmony" />
-          </Switch>
-        </Content>
+        {/* <Content $mobile={isMobile}> */}
+        <Switch>
+          <Route path="/accessibility/contrast" component={Contrast} />
+          <Route path="/accessibility/statistics" component={Statistics} />
+          <Route path="/harmony" component={Harmony} />
+          <Route path="/mix" component={Mix} />
+          <Route path="/manipulate" component={Manipulate} />
+          <Redirect from="/" to="/harmony" />
+        </Switch>
+        {/* </Content> */}
       </Suspense>
-    </StyledContainer>
+    </Grid>
   );
 }

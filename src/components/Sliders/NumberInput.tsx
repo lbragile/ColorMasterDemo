@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { INumberInput } from "../../types/Sliders";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FlexColumn, FlexRow } from "../../styles/Flex";
+import { FlexColumn } from "../../styles/Flex";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 interface IPressedKey {
@@ -11,7 +11,7 @@ interface IPressedKey {
   altKey: boolean;
 }
 
-const InputContainer = styled(FlexRow)`
+const InputContainer = styled.div`
   position: relative;
 `;
 
@@ -140,7 +140,7 @@ export default function NumberInput({
 
   return (
     <InputContainer>
-      <FlexColumn>
+      <FlexColumn $cols={1}>
         <ArrowButton
           $dir="up"
           disabled={Number(value) === Number(max)}

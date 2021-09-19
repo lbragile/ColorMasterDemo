@@ -5,6 +5,7 @@ import Spacers from "./Spacers";
 import { StyledAngleIcon } from "./ColorSelectorWidget";
 import CM from "colormaster";
 import { FlexRow } from "../styles/Flex";
+import useBreakpointMap from "../hooks/useBreakpointMap";
 
 const SWATCH_COLORS = [
   "hsla(0, 100%, 50%, 1)",
@@ -32,7 +33,8 @@ interface ISwatchCarousel {
 }
 
 export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): JSX.Element {
-  const numVisibleSwatches = useRef(num);
+  const { isMobile, isTablet } = useBreakpointMap();
+  const numVisibleSwatches = useRef(isMobile || isTablet ? 7 : num);
   const [swatchIndex, setSwatchIndex] = useState(0);
 
   return (

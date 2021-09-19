@@ -4,7 +4,6 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 import { THarmony, TMonoEffect } from "colormaster/types";
 import { useHistory } from "react-router-dom";
-import { Menu, Grid, Label, Icon, Container } from "semantic-ui-react";
 import styled from "styled-components";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
@@ -15,6 +14,9 @@ import useDebounce from "../hooks/useDebounce";
 import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter, CurrentColorIcon } from "../styles/Swatch";
 import { HarmonySample } from "../utils/codeSamples";
+import { FlexColumn, FlexRow } from "../styles/Flex";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle, faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -31,11 +33,10 @@ const typeOptions = [
 
 const effectOptions = ["shades", "tints", "tones"].map((value) => ({ key: value, text: value, value }));
 
-const StyledMenu = styled(Menu)`
-  && {
-    margin: 0 auto;
-    margin-bottom: 24px;
-  }
+const VerticalMenu = styled.div``;
+
+const SwatchContainer = styled.div`
+  position: relative;
 `;
 
 const MonoEffectList = styled.li`
@@ -83,112 +84,103 @@ export default function Harmony(): JSX.Element {
   }, [history, colorDebounce, type, effect, amount]);
 
   return (
-    <Grid verticalAlign="middle" stackable>
-      <Grid.Row>
-        <Grid.Column width={5}>
-          <ColorSelectorWidget
-            color={color}
-            setColor={setColor}
-            initPicker="wheel"
-            initColorspace="hsl"
-            harmony={
-              // only show harmonies if not shades or tints
-              type !== "monochromatic" || (type === "monochromatic" && effect === "tones")
-                ? color.harmony({ type, effect, amount })
-                : undefined
-            }
-          />
-        </Grid.Column>
+    <FlexRow>
+      <FlexColumn $cols={10}>
+        <ColorSelectorWidget
+          color={color}
+          setColor={setColor}
+          initPicker="wheel"
+          initColorspace="hsl"
+          harmony={
+            // only show harmonies if not shades or tints
+            type !== "monochromatic" || (type === "monochromatic" && effect === "tones")
+              ? color.harmony({ type, effect, amount })
+              : undefined
+          }
+        />
+      </FlexColumn>
 
-        <Grid.Column width={3} textAlign="left">
-          <StyledMenu vertical>
-            {typeOptions.map((t) => {
-              return (
-                <Menu.Item
-                  key={t.text + "-menu-item"}
-                  link
-                  active={type === t.value}
-                  onClick={() => setType(t.value as THarmony)}
-                >
-                  {t.text}{" "}
-                  {t.text === "monochromatic" && type !== t.value && (
-                    <Label color="teal">
-                      <Icon name="chevron circle down" />
-                      {effectOptions.length}
-                    </Label>
-                  )}
-                  {type === "monochromatic" && t.text === "monochromatic" && (
-                    <Menu.Menu>
-                      {effectOptions.map((e) => {
-                        return (
-                          <Menu.Item
-                            as="span"
-                            key={e.text + "-monochromatic-effect"}
-                            active={e.text === effect}
-                            onClick={() => {
-                              setEffect(e.text as TMonoEffect);
-                              setType("monochromatic");
-                            }}
-                          >
-                            <MonoEffectList>{e.text}</MonoEffectList>
-                          </Menu.Item>
-                        );
-                      })}
+      <FlexColumn $cols={3}>
+        <VerticalMenu>
+          {typeOptions.map((t) => {
+            return (
+              <div
+                key={t.text + "-menu-item"}
+                // active={type === t.value}
+                onClick={() => setType(t.value as THarmony)}
+              >
+                {t.text}{" "}
+                {t.text === "monochromatic" && type !== t.value && (
+                  <div>
+                    <FontAwesomeIcon icon={faChevronCircleDown} />
+                    {effectOptions.length}
+                  </div>
+                )}
+                {type === "monochromatic" && t.text === "monochromatic" && (
+                  <VerticalMenu>
+                    {effectOptions.map((e) => {
+                      return (
+                        <div
+                          key={e.text + "-monochromatic-effect"}
+                          // active={e.text === effect}
+                          onClick={() => {
+                            setEffect(e.text as TMonoEffect);
+                            setType("monochromatic");
+                          }}
+                        >
+                          <MonoEffectList>{e.text}</MonoEffectList>
+                        </div>
+                      );
+                    })}
 
-                      <Spacers height="16px" />
+                    <Spacers height="16px" />
 
-                      <Menu.Item>
-                        <Label attached="top left" color="teal">
-                          Amount
-                        </Label>
+                    <div>
+                      <div>Amount</div>
 
-                        <FullSlider
-                          color="hsl(180,100%,35%)"
-                          min="2"
-                          max="10"
-                          format="hex"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.valueAsNumber)}
-                        />
-                      </Menu.Item>
-                    </Menu.Menu>
-                  )}
-                </Menu.Item>
-              );
-            })}
-          </StyledMenu>
+                      {/* <FullSlider
+                        color="hsl(180,100%,35%)"
+                        min="2"
+                        max="10"
+                        format="rgb"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.valueAsNumber)}
+                      /> */}
+                    </div>
+                  </VerticalMenu>
+                )}
+              </div>
+            );
+          })}
+        </VerticalMenu>
 
-          <Container textAlign="center">
-            <CodeModal code={HarmonySample(color, type, effect, amount)} />
-          </Container>
-        </Grid.Column>
+        {/*<Container textAlign="center">
+          <CodeModal code={HarmonySample(color, type, effect, amount)} />
+        </Container> */}
+      </FlexColumn>
 
-        {!isComputer && !isWideScreen && <Spacers width="20px" />}
+      {!isComputer && !isWideScreen && <Spacers width="20px" />}
 
-        <Grid.Column width={type === "monochromatic" ? 6 : 7} textAlign="center">
-          <Grid.Row>
-            {[...harmony, ...new Array(11 - harmony.length).fill("transparent")].map((swatch, i) => (
+      <FlexColumn $cols={8}>
+        <FlexRow $gap="8px" $wrap="wrap">
+          {harmony.map((swatch, i) => (
+            <SwatchContainer key={swatch + "_" + i}>
               <Swatch
-                key={swatch + "_" + i}
-                title={swatch === "transparent" ? undefined : swatch}
+                title={swatch}
                 $radius={65}
                 $borderRadius="4px"
-                $borderColor={swatch === "transparent" ? swatch : undefined}
-                display="inline-block"
-                position="relative"
                 background={swatch}
-                onClick={() => swatch !== "transparent" && setColor(CM(swatch))}
-                $cursor={swatch !== "transparent" ? "pointer" : ""}
-              >
-                {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
-                {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
-                  <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
-                )}
-              </Swatch>
-            ))}
-          </Grid.Row>
-        </Grid.Column>
-      </Grid.Row>
-    </Grid>
+                onClick={() => setColor(CM(swatch))}
+                $cursor="pointer"
+              />
+              {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
+              {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
+                <CurrentColorIcon icon={faCheckCircle} color={color.isDark() ? "white" : "black"} size="2x" />
+              )}
+            </SwatchContainer>
+          ))}
+        </FlexRow>
+      </FlexColumn>
+    </FlexRow>
   );
 }

@@ -13,6 +13,7 @@ import CodeModal from "../../components/CodeModal";
 import ColorIndicator from "../../components/ColorIndicator";
 import ColorSelectorWidget from "../../components/ColorSelectorWidget";
 import Spacers from "../../components/Spacers";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 extendPlugins([A11yPlugin]);
 
@@ -160,7 +161,7 @@ export default function Statistics(): JSX.Element {
                     <SwatchCounter>1</SwatchCounter>
                     {closest.warm.stringHSL({ precision: [2, 2, 2, 2] }) ===
                       colorDebounce.stringHSL({ precision: [2, 2, 2, 2] }) && (
-                      <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
+                      <CurrentColorIcon icon={faCheckCircle} color={color.isDark() ? "white" : "black"} size="2x" />
                     )}
                   </Swatch>
                 </Grid.Column>
@@ -188,7 +189,7 @@ export default function Statistics(): JSX.Element {
                     <SwatchCounter>2</SwatchCounter>
                     {closest.cool.stringHSL({ precision: [2, 2, 2, 2] }) ===
                       colorDebounce.stringHSL({ precision: [2, 2, 2, 2] }) && (
-                      <CurrentColorIcon name="check circle" inverted={color.isDark()} size="large" />
+                      <CurrentColorIcon icon={faCheckCircle} color={color.isDark() ? "white" : "black"} size="2x" />
                     )}
                   </Swatch>
                 </Grid.Column>

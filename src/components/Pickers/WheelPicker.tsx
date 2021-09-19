@@ -4,7 +4,7 @@ import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
 import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
-import { CanvasContainer } from "../../styles/Canvas";
+import { FlexRow } from "../../styles/Flex";
 
 interface IWheelPicker {
   color: ColorMaster;
@@ -129,9 +129,8 @@ export default function WheelPicker({
   const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
 
   return (
-    <CanvasContainer $vertical={verticalPickers}>
+    <FlexRow $gap="4px">
       <CanvasGroup
-        className="main wheel"
         mainRef={colorWheel}
         picker={{
           ref: colorPicker,
@@ -143,6 +142,6 @@ export default function WheelPicker({
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </CanvasContainer>
+    </FlexRow>
   );
 }

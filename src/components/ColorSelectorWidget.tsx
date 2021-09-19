@@ -26,6 +26,7 @@ const BorderedSegment = styled.div`
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 5px 5px 10px 1px rgba(102, 102, 102, 0.5);
+  width: fit-content;
 `;
 
 export const StyledAngleIcon = styled(FontAwesomeIcon).attrs((props: { $disabled: boolean }) => props)`
@@ -68,11 +69,8 @@ export default function ColorSelectorWidget({
   return (
     <BorderedSegment>
       {children}
-
       <FlexColumn>
-        <FlexRow>
-          <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />
-        </FlexRow>
+        <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />
 
         <Spacers height="15px" />
 
@@ -108,11 +106,11 @@ export default function ColorSelectorWidget({
           />
         </FlexRow>
 
-        <Spacers height="20px" />
+        <Spacers height="30px" />
 
         <ColorIndicator color={currentSliders.colorStr} showName={false} alpha={alpha} setAlpha={setAlpha} />
 
-        <Spacers height="20px" />
+        <Spacers height="30px" />
 
         {picker === "sketch" ? (
           <SketchPicker color={color} setColor={setColor} verticalPickers={isComputer || isWideScreen} />

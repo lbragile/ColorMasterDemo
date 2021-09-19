@@ -1,4 +1,4 @@
-import { Icon, Label } from "semantic-ui-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 
 export const Swatch = styled.div.attrs(
@@ -23,21 +23,26 @@ export const Swatch = styled.div.attrs(
   cursor: ${(props) => props.$cursor};
 `;
 
-export const CurrentColorIcon = styled(Icon)`
-  && {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+export const CurrentColorIcon = styled(FontAwesomeIcon)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
-export const SwatchCounter = styled(Label)`
+export const SwatchCounter = styled.div`
   && {
     border-radius: 2px 0;
     color: black;
     position: absolute;
-    left: 0;
-    top: -1px;
+    top: 1px;
+    left: 1px;
+    padding: 4px 8px;
+    background-color: hsla(0, 0%, 90%);
+    color: black;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;

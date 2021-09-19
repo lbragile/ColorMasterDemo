@@ -5,7 +5,7 @@ import useCanvasContext from "../../hooks/useCanvasContext";
 import CanvasGroup from "../CanvasGroup";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import HSVPlugin from "colormaster/plugins/hsv";
-import { CanvasContainer } from "../../styles/Canvas";
+import { FlexRow } from "../../styles/Flex";
 
 extendPlugins([HSVPlugin]);
 
@@ -96,9 +96,8 @@ export default function SketchPicker({
   const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
 
   return (
-    <CanvasContainer $vertical={verticalPickers}>
+    <FlexRow $gap="4px">
       <CanvasGroup
-        className="main"
         mainRef={colorSketch}
         picker={{
           ref: colorPicker,
@@ -110,6 +109,6 @@ export default function SketchPicker({
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </CanvasContainer>
+    </FlexRow>
   );
 }
