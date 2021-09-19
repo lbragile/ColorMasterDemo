@@ -16,6 +16,7 @@ export interface INumberInput extends ICommon {
 export interface IRangeInput extends ICommon {
   color: string;
   colorRight?: string;
+  width?: string;
 }
 
 export interface IFullSlider extends INumberInput, IRangeInput {

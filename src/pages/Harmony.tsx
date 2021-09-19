@@ -7,7 +7,6 @@ import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
-import FullSlider from "../components/Sliders/FullSlider";
 import Spacers from "../components/Spacers";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import useDebounce from "../hooks/useDebounce";
@@ -17,6 +16,7 @@ import { HarmonySample } from "../utils/codeSamples";
 import { FlexColumn, FlexRow } from "../styles/Flex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
+import RangeInput from "../components/Sliders/RangeInput";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -33,19 +33,69 @@ const typeOptions = [
 
 const effectOptions = ["shades", "tints", "tones"].map((value) => ({ key: value, text: value, value }));
 
-const VerticalMenu = styled.div``;
-
-const SwatchContainer = styled.div`
+const VerticalMenu = styled.div`
+  border: 1px solid hsla(0, 0%, 90%, 1);
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
   position: relative;
+`;
+
+const MenuItem = styled.div.attrs((props: { $active: boolean; $last: boolean }) => props)`
+  padding: 8px;
+  border-bottom: ${(props) => (props.$last ? "none" : "1px solid hsla(0, 0%, 95%, 1)")};
+  text-transform: capitalize;
+  cursor: pointer;
+  background: ${(props) => (props.$active ? "hsla(0, 0%, 90%, 1)" : "transparent")};
+  font-weight: ${(props) => (props.$active ? "bolder" : "normal")};
+
+  &:hover {
+    background: ${(props) => (props.$active ? "hsla(0, 0%, 90%, 1)" : "hsla(0, 0%, 95%, 1)")};
+  }
+`;
+
+const MonoItem = styled.div.attrs((props: { $active: boolean }) => props)`
+  padding: 8px;
+  text-transform: capitalize;
+  cursor: pointer;
+  font-weight: ${(props) => (props.$active ? "bold" : "normal")};
+
+  &:hover {
+    font-weight: bolder;
+  }
+`;
+
+const MonoLabelIndicator = styled.div`
+  background-color: hsla(180, 100%, 40%);
+  color: white;
+  font-weight: bold;
+  padding: 4px;
+  border-radius: 4px;
+  width: fit-content;
+  display: inline-block;
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
 `;
 
 const MonoEffectList = styled.li`
   list-style: none;
   &:before {
-    content: "•";
+    content: "▸";
     margin-right: 4px;
-    font-size: smaller;
   }
+`;
+
+const AmountLabel = styled.div`
+  padding: 4px 8px;
+  background-color: hsla(180, 100%, 40%, 1);
+  width: fit-content;
+  border-radius: 4px 0 4px 0;
+  color: white;
+`;
+
+const SwatchContainer = styled.div`
+  position: relative;
 `;
 
 export default function Harmony(): JSX.Element {
@@ -85,7 +135,7 @@ export default function Harmony(): JSX.Element {
 
   return (
     <FlexRow>
-      <FlexColumn $cols={10}>
+      <FlexColumn $cols={6}>
         <ColorSelectorWidget
           color={color}
           setColor={setColor}
@@ -100,63 +150,69 @@ export default function Harmony(): JSX.Element {
         />
       </FlexColumn>
 
-      <FlexColumn $cols={3}>
+      <FlexColumn $cols={6}>
         <VerticalMenu>
           {typeOptions.map((t) => {
             return (
-              <div
+              <MenuItem
                 key={t.text + "-menu-item"}
-                // active={type === t.value}
+                $active={type === t.value}
+                $last={t.value === "monochromatic"}
                 onClick={() => setType(t.value as THarmony)}
               >
                 {t.text}{" "}
                 {t.text === "monochromatic" && type !== t.value && (
-                  <div>
-                    <FontAwesomeIcon icon={faChevronCircleDown} />
+                  <MonoLabelIndicator>
+                    <FontAwesomeIcon icon={faChevronCircleDown} color="white" />
+                    <Spacers width="2px" />
                     {effectOptions.length}
-                  </div>
+                  </MonoLabelIndicator>
                 )}
                 {type === "monochromatic" && t.text === "monochromatic" && (
-                  <VerticalMenu>
-                    {effectOptions.map((e) => {
-                      return (
-                        <div
-                          key={e.text + "-monochromatic-effect"}
-                          // active={e.text === effect}
-                          onClick={() => {
-                            setEffect(e.text as TMonoEffect);
-                            setType("monochromatic");
-                          }}
-                        >
-                          <MonoEffectList>{e.text}</MonoEffectList>
-                        </div>
-                      );
-                    })}
-
-                    <Spacers height="16px" />
-
+                  <>
+                    <Spacers height="4px" />
                     <div>
-                      <div>Amount</div>
+                      {effectOptions.map((e) => {
+                        return (
+                          <MonoItem
+                            key={e.text + "-monochromatic-effect"}
+                            $active={e.text === effect}
+                            onClick={() => {
+                              setEffect(e.text as TMonoEffect);
+                              setType("monochromatic");
+                            }}
+                          >
+                            <MonoEffectList>{e.text}</MonoEffectList>
+                          </MonoItem>
+                        );
+                      })}
 
-                      {/* <FullSlider
-                        color="hsl(180,100%,35%)"
-                        min="2"
-                        max="10"
-                        format="rgb"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.valueAsNumber)}
-                      /> */}
+                      <Spacers height="16px" />
+
+                      <div>
+                        <AmountLabel>Amount</AmountLabel>
+                        <Spacers height="12px" />
+
+                        <RangeInput
+                          color="hsl(180,100%,40%)"
+                          min="2"
+                          max="10"
+                          value={amount}
+                          width="100%"
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(+e.target.value)}
+                        />
+                      </div>
                     </div>
-                  </VerticalMenu>
+                  </>
                 )}
-              </div>
+              </MenuItem>
             );
           })}
         </VerticalMenu>
 
-        {/*<Container textAlign="center">
-          <CodeModal code={HarmonySample(color, type, effect, amount)} />
-        </Container> */}
+        <Spacers height="32px" />
+
+        <CodeModal code={HarmonySample(color, type, effect, amount)} />
       </FlexColumn>
 
       {!isComputer && !isWideScreen && <Spacers width="20px" />}
@@ -167,7 +223,7 @@ export default function Harmony(): JSX.Element {
             <SwatchContainer key={swatch + "_" + i}>
               <Swatch
                 title={swatch}
-                $radius={65}
+                $radius={harmony.length > 4 ? 75 : 65}
                 $borderRadius="4px"
                 background={swatch}
                 onClick={() => setColor(CM(swatch))}

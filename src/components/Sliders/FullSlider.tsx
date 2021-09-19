@@ -4,6 +4,7 @@ import NumberInput from "./NumberInput";
 import styled from "styled-components";
 import { IFullSlider } from "../../types/Sliders";
 import { FlexRow } from "../../styles/Flex";
+import Spacers from "../Spacers";
 
 const Title = styled.span`
   font-weight: bold;
@@ -26,7 +27,13 @@ export default function FullSlider({
   return (
     <FlexRow>
       <Title>{title}</Title>
+
+      <Spacers width="10px" />
+
       <RangeInput {...CommonProps} color={color} colorRight={colorRight} />
+
+      <Spacers width="10px" />
+
       <NumberInput {...CommonProps} postfix={postfix} />
     </FlexRow>
   );

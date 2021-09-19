@@ -3,7 +3,14 @@ import styled from "styled-components";
 import { IRangeInput } from "../../types/Sliders";
 
 const SliderInput = styled.input.attrs(
-  (props: { value: string | number; min: string; max: string; $color: string; $colorRight?: string }) => {
+  (props: {
+    value: string | number;
+    min: string;
+    max: string;
+    $color: string;
+    $colorRight?: string;
+    $width: string;
+  }) => {
     const val = Number(props.value ?? 0);
     const min = Number(props.min ?? 0);
     const max = Number(props.max ?? 100);
@@ -14,9 +21,8 @@ const SliderInput = styled.input.attrs(
   }
 )`
   -webkit-appearance: none;
-  width: 50%;
+  width: ${(props) => props.$width ?? "50%"};
   height: 8px;
-  margin: 0 16px;
   border-radius: 12px;
   border: ${(props) => (props.$colorRight ? "1px solid hsla(0, 0%, 80%, 1)" : "")};
 
@@ -41,6 +47,7 @@ export default function RangeInput({
   min = "0",
   max = "100",
   format = undefined,
+  width = "50%",
   onChange
 }: IRangeInput): JSX.Element {
   return (
@@ -52,6 +59,7 @@ export default function RangeInput({
       draggable={false}
       $color={color}
       $colorRight={colorRight}
+      $width={width}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         // * sliders are always numeric (base 10), so need to convert to hex (base 16) if format matches
         onChange({ ...e, target: { ...e.target, value: Number(e.target.value).toString(format === "hex" ? 16 : 10) } });
