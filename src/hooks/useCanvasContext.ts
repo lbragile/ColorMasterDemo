@@ -15,15 +15,17 @@ function fitCanvasContainer(
   thickness?: number,
   vertical?: boolean
 ): CanvasRenderingContext2D {
+  const delta = breakpoints.isMobile || breakpoints.isTablet ? 50 : 0;
+
   // vertical hue & alpha pickers
   if (thickness && vertical) {
-    ctx.canvas.style.height = (!breakpoints.isWideScreen ? 0.75 : 1) * ctx.canvas.offsetWidth + "px";
+    ctx.canvas.style.height = ctx.canvas.offsetWidth - delta + "px";
     ctx.canvas.style.width = thickness + "px";
     ctx.canvas.width = thickness;
     ctx.canvas.height = ctx.canvas.offsetHeight;
   } else {
     // non-vertical pickers (hue, alpha, sketch, wheel)
-    ctx.canvas.style.width = !breakpoints.isWideScreen ? "75%" : "";
+    ctx.canvas.style.width = ctx.canvas.offsetWidth - delta + "px";
     ctx.canvas.width = ctx.canvas.offsetWidth;
     ctx.canvas.height = thickness ?? ctx.canvas.offsetWidth;
   }

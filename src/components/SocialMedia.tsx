@@ -1,35 +1,36 @@
 import React from "react";
-import { Icon } from "semantic-ui-react";
-import { SemanticCOLORS } from "semantic-ui-react/dist/commonjs/generic";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
+import { FlexRow } from "../styles/Flex";
+import { faGithub, faNpm, IconDefinition } from "@fortawesome/free-brands-svg-icons";
 
-const LinkIcon = styled(Icon)`
+const LinkIcon = styled(FontAwesomeIcon)`
   cursor: pointer;
 `;
 
-const LINKS: { href: string; name: string; color: SemanticCOLORS }[] = [
+const LINKS: { href: string; icon: IconDefinition; color: string }[] = [
   {
     href: "https://www.github.com/lbragile/ColorMaster",
-    name: "github",
+    icon: faGithub,
     color: "black"
   },
   {
     href: "https://www.npmjs.com/package/colormaster",
-    name: "npm",
+    icon: faNpm,
     color: "red"
   }
 ];
 
 export default function SocialMedia(): JSX.Element {
   return (
-    <React.Fragment>
+    <FlexRow $gap="8px">
       {LINKS.map((link) => {
         return (
-          <a href={link.href} key={link.href}>
-            <LinkIcon name={link.name} color={link.color} size="large" circular title={link.href} />
+          <a key={link.href} title={link.href} href={link.href}>
+            <LinkIcon key={link.href} icon={link.icon} color={link.color} size="2x" />
           </a>
         );
       })}
-    </React.Fragment>
+    </FlexRow>
   );
 }

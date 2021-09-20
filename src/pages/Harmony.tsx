@@ -101,7 +101,7 @@ const SwatchContainer = styled.div`
 export default function Harmony(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
@@ -134,8 +134,8 @@ export default function Harmony(): JSX.Element {
   }, [history, colorDebounce, type, effect, amount]);
 
   return (
-    <FlexRow>
-      <FlexColumn $cols={6}>
+    <FlexRow $wrap="wrap" $gap="20px">
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
         <ColorSelectorWidget
           color={color}
           setColor={setColor}
@@ -150,7 +150,9 @@ export default function Harmony(): JSX.Element {
         />
       </FlexColumn>
 
-      <FlexColumn $cols={6}>
+      <Spacers width={isComputer ? "4px" : "24px"} />
+
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 8 : isComputer ? 5 : 3}>
         <VerticalMenu>
           {typeOptions.map((t) => {
             return (
@@ -210,20 +212,18 @@ export default function Harmony(): JSX.Element {
           })}
         </VerticalMenu>
 
-        <Spacers height="32px" />
+        <Spacers height={isMobile || isTablet ? "8px" : "32px"} />
 
         <CodeModal code={HarmonySample(color, type, effect, amount)} />
       </FlexColumn>
 
-      {!isComputer && !isWideScreen && <Spacers width="20px" />}
-
-      <FlexColumn $cols={8}>
+      <FlexColumn $cols={isMobile || isTablet || isLaptop ? 24 : isComputer ? 9 : 8}>
         <FlexRow $gap="8px" $wrap="wrap">
           {harmony.map((swatch, i) => (
             <SwatchContainer key={swatch + "_" + i}>
               <Swatch
                 title={swatch}
-                $radius={harmony.length > 4 ? 75 : 65}
+                $radius={harmony.length > 5 ? 60 : harmony.length > 4 ? 70 : 65}
                 $borderRadius="4px"
                 background={swatch}
                 onClick={() => setColor(CM(swatch))}

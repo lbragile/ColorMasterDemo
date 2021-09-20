@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
-import useBreakpointMap from "../hooks/useBreakpointMap";
 import SketchPicker from "./Pickers/SketchPicker";
 import WheelPicker from "./Pickers/WheelPicker";
 import ColorIndicator, { Heading } from "./ColorIndicator";
@@ -26,7 +25,7 @@ const BorderedSegment = styled.div`
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 5px 5px 10px 1px rgba(102, 102, 102, 0.5);
-  width: fit-content;
+  width: 100%;
 `;
 
 export const StyledAngleIcon = styled(FontAwesomeIcon).attrs((props: { $disabled: boolean }) => props)`
@@ -63,7 +62,6 @@ export default function ColorSelectorWidget({
   const [picker, setPicker] = useState(pickerOpts.find((x) => x === initPicker) ?? pickerOpts[0]);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-  const { isComputer, isWideScreen } = useBreakpointMap();
   const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });
 
   return (
@@ -113,14 +111,9 @@ export default function ColorSelectorWidget({
         <Spacers height="30px" />
 
         {picker === "sketch" ? (
-          <SketchPicker color={color} setColor={setColor} verticalPickers={isComputer || isWideScreen} />
+          <SketchPicker color={color} setColor={setColor} verticalPickers />
         ) : picker === "wheel" ? (
-          <WheelPicker
-            color={color}
-            setColor={setColor}
-            harmony={harmony}
-            verticalPickers={isComputer || isWideScreen}
-          />
+          <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers />
         ) : (
           currentSliders.sliders
         )}

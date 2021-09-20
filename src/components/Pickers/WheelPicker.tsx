@@ -42,10 +42,10 @@ export default function WheelPicker({
     const radScale = Math.PI / 180;
 
     if (ctxWheel) {
-      const radius = ctxWheel.canvas.width / 2;
+      const radius = ctxWheel.canvas.width / 2 - 5;
 
       ctxWheel.clearRect(0, 0, radius * 2, radius * 2);
-      const [x, y] = [radius, radius];
+      const [x, y] = [radius + 5, radius + 5];
       const { l, a } = color.hsla();
 
       for (let hue = 0; hue < 360; hue++) {
@@ -64,8 +64,8 @@ export default function WheelPicker({
 
   useEffect(() => {
     if (ctxPicker) {
-      const radius = ctxPicker.canvas.width / 2;
-      ctxPicker.clearRect(0, 0, radius * 2 + 5, radius * 2 + 5);
+      const radius = ctxPicker.canvas.width / 2 - 5;
+      ctxPicker.clearRect(0, 0, radius * 2 + 10, radius * 2 + 10);
 
       const colorArr = harmony ?? [color];
       colorArr.forEach((c, i) => {
@@ -77,7 +77,7 @@ export default function WheelPicker({
         const x = radius + hyp * cos0;
         const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
-        ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+        ctxPicker.arc(x + 5, y + 5, pickerRadius, 0, 2 * Math.PI);
 
         const pickerColor = "rgba(0,0,0,0.6)";
         ctxPicker.fillStyle = pickerColor;
@@ -91,7 +91,7 @@ export default function WheelPicker({
           ctxPicker.font = "bold 10px Arial";
           ctxPicker.textAlign = "center";
           ctxPicker.textBaseline = "middle";
-          ctxPicker.fillText((i + 1).toString(), x, y);
+          ctxPicker.fillText((i + 1).toString(), x + 5, y + 5);
         }
       });
     }
