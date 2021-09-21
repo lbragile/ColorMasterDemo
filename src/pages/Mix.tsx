@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Divider, Dropdown, Grid, Header, Icon, Label, Popup } from "semantic-ui-react";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 import { TFormat } from "colormaster/types";
@@ -7,30 +6,63 @@ import { useHistory } from "react-router";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
-import FullSlider from "../components/Sliders/FullSlider";
 import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
 import useQuery from "../hooks/useQuery";
 import { Swatch } from "../styles/Swatch";
 import { MixSample } from "../utils/codeSamples";
+import { FlexColumn, FlexRow } from "../styles/Flex";
+import { Label } from "../styles/Label";
+import useBreakpointMap from "../hooks/useBreakpointMap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowCircleDown, faEquals, faInfoCircle, faPalette, faPlus } from "@fortawesome/free-solid-svg-icons";
+import Dropdown from "../components/Dropdown";
+import { Tooltip } from "../styles/Tooltip";
+import NumberInput from "../components/Sliders/NumberInput";
+import RangeInput from "../components/Sliders/RangeInput";
+import styled from "styled-components";
+import A11yPlugin from "colormaster/plugins/accessibility";
 
-extendPlugins([MixPlugin]);
+extendPlugins([MixPlugin, A11yPlugin]);
 
 type TFormatDropdown = Exclude<TFormat, "invalid" | "name">;
 
-const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"].map(
-  (value, i) => ({ key: i, text: value.toUpperCase(), value })
-);
+const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"];
+
+const DividerWithText = styled(FlexRow)`
+  hr {
+    width: 25%;
+  }
+
+  svg {
+    margin: 10px;
+  }
+`;
+
+const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => props)`
+  position: relative;
+
+  & p {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: ${(props) => (props.$isLight ? "black" : "white")};
+  }
+`;
 
 export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
 
   const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
   const [ratio, setRatio] = useState(query.ratio ? +query.ratio : 0.5);
   const [colorspace, setColorspace] = useState<TFormatDropdown>(
-    (colorspaceOpts.find((item) => item.value === query.colorspace)?.value as TFormatDropdown) ?? "luv"
+    (colorspaceOpts.find((item) => item === query.colorspace) as TFormatDropdown) ?? "luv"
   );
   const [alpha, setAlpha] = useState(true);
   const [mix, setMix] = useState(primary.mix({ color: secondary, ratio, colorspace }).stringHSL({ alpha }));
@@ -54,58 +86,84 @@ export default function Mix(): JSX.Element {
   }, [history, primaryDebounce, secondaryDebounce, ratioDebounce, colorspace]);
 
   return (
-    <Grid columns={3} verticalAlign="middle" stackable centered>
-      <Grid.Column width={5}>
+    <FlexRow $wrap="wrap" $gap="20px">
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
         <ColorSelectorWidget color={primary} setColor={setPrimary} initPicker="sketch">
-          <Label size="big" color="black" attached="top left">
-            Primary
-          </Label>
+          <Label $where="left">Primary</Label>
         </ColorSelectorWidget>
-      </Grid.Column>
+      </FlexColumn>
 
-      <Grid.Column width={6} textAlign="center">
-        <Grid.Row width={6}>
-          <Label size="huge" color="teal" horizontal>
-            Ratio
-          </Label>
-        </Grid.Row>
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10} $gap="20px">
+        <h1>Ratio</h1>
 
-        <Spacers height="12px" />
-
-        <Grid verticalAlign="middle">
-          <FullSlider
+        <FlexRow>
+          <RangeInput
             color={secondary.stringHSL()}
             colorRight={primary.stringHSL()}
             min="0"
             max="100"
             value={ratio * 100}
-            postfix="%"
-            onChange={(e) => setRatio(e.target.valueAsNumber / 100)}
+            onChange={(e) => setRatio(+e.target.value / 100)}
+            width="40%"
           />
-        </Grid>
 
-        <Spacers height="20px" />
+          <Spacers width="6px" />
 
-        <Divider horizontal>
-          <Header as="h2">
-            <Icon name="arrow circle down" color="teal" size="massive" />
-          </Header>
-        </Divider>
+          <NumberInput
+            min="0"
+            max="100"
+            value={ratio * 100}
+            onChange={(e) =>
+              setRatio(Math.max(0, Math.min(Number.isNaN(+e.target.value) ? 0 : +e.target.value, 100)) / 100)
+            }
+            postfix="%"
+          />
+        </FlexRow>
 
-        <Spacers height="16px" />
+        <DividerWithText>
+          <hr />
+          <FontAwesomeIcon icon={faArrowCircleDown} size="3x" color="hsla(180, 100%, 40%, 1)" />
+          <hr />
+        </DividerWithText>
 
-        <Grid verticalAlign="middle" textAlign="center">
-          <Grid.Column computer={8} mobile={14}>
-            <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
-          </Grid.Column>
-        </Grid>
+        <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
 
-        <Spacers height="8px" />
+        <FlexRow $gap="12px">
+          <MixtureSwatch
+            title={primary.stringHSL()}
+            $radius={60}
+            $borderRadius="4px"
+            display="inline-block"
+            position="relative"
+            background={primary.stringHSL()}
+            tabIndex={0}
+            $cursor="help"
+            $isLight={primary.isLight()}
+          >
+            <p>{((1 - ratio) * 100).toFixed(0) + "%"}</p>
+          </MixtureSwatch>
 
-        <Grid.Row>
-          <Swatch
+          <FontAwesomeIcon icon={faPlus} />
+
+          <MixtureSwatch
+            title={secondary.stringHSL()}
+            $radius={60}
+            $borderRadius="4px"
+            display="inline-block"
+            position="relative"
+            background={secondary.stringHSL()}
+            tabIndex={0}
+            $cursor="help"
+            $isLight={secondary.isLight()}
+          >
+            <p>{(ratio * 100).toFixed(0) + "%"}</p>
+          </MixtureSwatch>
+
+          <FontAwesomeIcon icon={faEquals} />
+
+          <MixtureSwatch
             title={mix}
-            $radius={75}
+            $radius={60}
             $borderRadius="4px"
             display="inline-block"
             position="relative"
@@ -113,41 +171,35 @@ export default function Mix(): JSX.Element {
             tabIndex={0}
             $cursor="help"
           />
-        </Grid.Row>
+        </FlexRow>
 
-        <Spacers height="4px" />
-
-        <Grid.Row>
+        <FlexRow>
           <Dropdown
-            compact
-            search
-            selection
-            options={colorspaceOpts}
+            opts={colorspaceOpts}
             value={colorspace}
-            onChange={(e, { value }) => setColorspace(value as TFormatDropdown)}
+            setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
+            icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
+            iconPos="left"
+            switcherPos="left"
+            cols={4}
           />
 
           <Spacers width="4px" />
 
-          <Popup
-            content="The two colors will be converted to this color space when mixing"
-            position="right center"
-            trigger={<Icon name="info circle" color="teal" size="large" />}
-          />
-        </Grid.Row>
-
-        <Divider hidden />
+          <Tooltip>
+            <span>The two colors will be converted to this color space when mixing</span>
+            <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="2x" />
+          </Tooltip>
+        </FlexRow>
 
         <CodeModal code={MixSample(primaryDebounce, secondaryDebounce, ratioDebounce, colorspace, alpha)} />
-      </Grid.Column>
+      </FlexColumn>
 
-      <Grid.Column width={5}>
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
         <ColorSelectorWidget color={secondary} setColor={setSecondary} initPicker="sketch">
-          <Label size="big" color="black" attached="top right">
-            Secondary
-          </Label>
+          <Label $where="right">Secondary</Label>
         </ColorSelectorWidget>
-      </Grid.Column>
-    </Grid>
+      </FlexColumn>
+    </FlexRow>
   );
 }

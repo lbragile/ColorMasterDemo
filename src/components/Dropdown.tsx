@@ -26,6 +26,8 @@ const ItemsWrapper = styled.div`
   width: calc(100% - 2px);
   left: 1px;
   z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
 `;
 
 const Item = styled.div.attrs((props: { $active: boolean; $selected: boolean; $last: boolean }) => props)`
@@ -97,7 +99,7 @@ export default function Dropdown({
       {switcherPos === "left" && (
         <>
           <Switcher adjustSelection={adjustSelection} />
-          <Spacers width="5px" />
+          <Spacers width="2px" />
         </>
       )}
       <Container $cols={cols}>
@@ -129,7 +131,7 @@ export default function Dropdown({
       </Container>
       {switcherPos === "right" && (
         <>
-          <Spacers width="5px" />
+          <Spacers width="2px" />
           <Switcher adjustSelection={adjustSelection} />
         </>
       )}

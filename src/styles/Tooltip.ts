@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Tooltip = styled.div.attrs((props: { $copied: boolean }) => props)`
   position: relative;
   display: inline-block;
+  cursor: help;
 
   span {
     visibility: hidden;

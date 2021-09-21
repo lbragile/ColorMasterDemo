@@ -18,6 +18,9 @@ const Container = styled.div`
   max-width: 90%;
   padding: 24px 0;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 export default function App(): JSX.Element {

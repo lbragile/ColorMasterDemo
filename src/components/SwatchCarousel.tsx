@@ -46,7 +46,7 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
         onClick={() => swatchIndex > 0 && setSwatchIndex(swatchIndex - 1)}
       />
 
-      <Spacers width="4px" />
+      <Spacers width="2px" />
 
       {SWATCH_COLORS.slice(swatchIndex, swatchIndex + numVisibleSwatches.current).map((background) => (
         <Swatch
@@ -61,7 +61,7 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
         />
       ))}
 
-      <Spacers width="4px" />
+      <Spacers width="2px" />
 
       <StyledAngleIcon
         icon={faAngleRight}

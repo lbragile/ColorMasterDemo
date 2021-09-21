@@ -7,7 +7,7 @@ import NamePlugin from "colormaster/plugins/name";
 extendPlugins([MixPlugin, HarmonyPlugin, NamePlugin]);
 
 const nameOpts = { exact: false };
-const precision = [2, 2, 2, 2] as Required<TNumArr>;
+const precision = [0, 0, 0, 2] as Required<TNumArr>;
 
 export function ContrastSample(
   fgColor: ColorMaster,

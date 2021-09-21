@@ -23,7 +23,6 @@ const MenuContainer = styled.div`
 
 const Item = styled(NavLink).attrs((props: { $active: boolean }) => props)`
   color: black;
-  font-family: "Courier New", Courier, monospace;
   margin-right: 24px;
   padding-bottom: 12px;
 

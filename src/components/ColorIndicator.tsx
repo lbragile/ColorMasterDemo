@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import useBreakpointMap from "../hooks/useBreakpointMap";
-// import useCopyToClipboard from "../hooks/useCopytoClipboard";
 import Spacers from "./Spacers";
 import CM, { extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
@@ -11,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faCopy } from "@fortawesome/free-solid-svg-icons";
 import useCopyToClipboard from "../hooks/useCopytoClipboard";
 import { Tooltip } from "../styles/Tooltip";
+import { Heading } from "../styles/Heading";
 
 extendPlugins([NamePlugin]);
 
@@ -34,12 +34,6 @@ const CopyButton = styled.button.attrs((props: { $copied: string | null }) => pr
   cursor: pointer;
 `;
 
-export const Heading = styled.h3.attrs((props: { $color?: string }) => props)`
-  color: ${(props) => props.color ?? "black"};
-  text-align: center;
-  margin: 0;
-`;
-
 interface IColorIndicator {
   color: string;
   alpha: boolean;
@@ -53,7 +47,11 @@ export default function ColorIndicator({ color, alpha, setAlpha, showName = true
 
   return (
     <>
-      {showName && <Heading $color="grey">{CM(color).name({ exact: false })}</Heading>}
+      {showName && (
+        <Heading $color="grey" $size="h2">
+          {CM(color).name({ exact: false })}
+        </Heading>
+      )}
 
       <FlexRow>
         <StyledColorDisplay type="text" value={color} spellCheck={false} readOnly $mobile={isMobile} />
