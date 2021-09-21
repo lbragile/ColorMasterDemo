@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Container, Divider, Dropdown, Grid, Header, Icon, List, Popup } from "semantic-ui-react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import CM from "colormaster";
+import CM, { ColorMaster } from "colormaster";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
@@ -9,57 +8,130 @@ import Spacers from "../components/Spacers";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import useDebounce from "../hooks/useDebounce";
 import useQuery from "../hooks/useQuery";
-import useSliderChange from "../hooks/useSliderChange";
 import { Swatch, SwatchCounter } from "../styles/Swatch";
 import addColor from "../utils/addColor";
 import { ManipulationSample } from "../utils/codeSamples";
+import { FlexColumn, FlexRow } from "../styles/Flex";
+import { Tooltip } from "../styles/Tooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { Heading } from "../styles/Heading";
+import styled from "styled-components";
+import Dropdown from "../components/Dropdown";
+import RangeInput from "../components/Sliders/RangeInput";
+import NumberInput from "../components/Sliders/NumberInput";
+import { Ihsla } from "colormaster/types";
+import { Label } from "../styles/Label";
 
 const INFORMATIVE_TEXT = {
-  adjust: "Color picker & each of the above sliders! Combines both according to dropdown selection.",
+  adjust:
+    "Color picker & each of the above sliders!\n Combines both color picker (input) and slider (delta)\n colors according to dropdown selection.",
   rotate:
-    "Color picker & hue slider from above sliders only! Rotation is simply moving at a fixed radius (arc) along the color wheel.",
+    "Color picker & hue slider from above sliders only!\n Rotation is simply moving at a fixed radius\n (arc) along the color wheel.",
   invert:
-    "Color picker only! Similar to complementary harmony. Rotates 180° and flips the lightness value. Alpha channel included based on selection.",
+    "Color picker only! Similar to complementary harmony.\n Rotates 180° and flips the lightness value.\n Alpha channel included based on selection.",
   grayscale:
-    "Color picker only! Output will vary slightly in most cases. Large variance if lightness is changed. Centered on 2D color wheel for all lightness values."
+    "Color picker only! Output will vary slightly in most cases.\n Large variance if lightness is changed.\n Centered on 2D color wheel for all lightness values."
 };
 
-const ColorAdjustmentOpts = [
-  {
-    key: "inc",
-    text: "Increment",
-    value: "inc"
-  },
-  {
-    key: "dec",
-    text: "Decrement",
-    value: "dec"
-  }
-];
+const ColorAdjustmentOpts = ["Add", "Sub"];
 
-const Information = ({ text }: { text: string }) => {
+interface IAlphaManipulation {
+  adjust: boolean;
+  rotate: boolean;
+  invert: boolean;
+  grayscale: boolean;
+}
+
+interface IGridSwatch {
+  state: ColorMaster;
+  setState: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  alpha: boolean;
+  count: number;
+}
+
+interface IGridRowDetails {
+  type: keyof IAlphaManipulation;
+  state: ColorMaster;
+}
+
+interface IGridRow {
+  arr: IGridRowDetails[];
+  alpha: IAlphaManipulation;
+  setAlpha: React.Dispatch<React.SetStateAction<IAlphaManipulation>>;
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  startCount: number;
+}
+
+const HorizontalLine = styled.hr`
+  width: 75%;
+`;
+
+const LabelledSwatch = styled(Swatch)`
+  position: relative;
+`;
+
+const Title = ({ title, text }: { title: string; text: string }) => {
   return (
-    <Popup
-      trigger={<Icon name="info circle" color="blue" />}
-      position="top center"
-      content={
-        <List.Item>
-          <List.Content>{text}</List.Content>
-        </List.Item>
-      }
-    />
+    <FlexRow>
+      <Heading $size="h1">{title[0].toUpperCase() + title.slice(1)}</Heading>
+      <Spacers width="4px" />
+      <Tooltip $top={text.split("\n").length * -25 - 10}>
+        <span>{text}</span>
+        <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
+      </Tooltip>
+    </FlexRow>
+  );
+};
+
+const GridSwatch = ({ state, setState, alpha, count }: IGridSwatch) => {
+  return (
+    <LabelledSwatch
+      title={state.stringHSL({ precision: [2, 2, 2, 2], alpha })}
+      background={state.stringHSL()}
+      onClick={() => setState(state)}
+      $radius={75}
+      $borderRadius="4px"
+      $cursor="pointer"
+    >
+      <SwatchCounter>{count}</SwatchCounter>
+    </LabelledSwatch>
+  );
+};
+
+const GridRow = ({ arr, alpha, setAlpha, setColor, startCount }: IGridRow) => {
+  return (
+    <FlexRow>
+      {arr.map((item, i) => (
+        <FlexColumn key={item.type} $gap="8px" $cols={10}>
+          <Title title={item.type} text={INFORMATIVE_TEXT[item.type]} />
+
+          <ColorIndicator
+            color={item.state.stringHSL({ precision: [0, 0, 0, 2], alpha: alpha[item.type] })}
+            alpha={alpha[item.type]}
+            setAlpha={(arg) => setAlpha({ ...alpha, [item.type]: arg })}
+          />
+
+          <GridSwatch state={item.state} setState={setColor} alpha={alpha[item.type]} count={i + startCount} />
+        </FlexColumn>
+      ))}
+    </FlexRow>
   );
 };
 
 export default function Manipulate(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
 
-  const [alphaAdjust, setAlphaAdjust] = useState(query.alpha ? JSON.parse(query.alpha)[0] : true);
-  const [alphaRotate, setAlphaRotate] = useState(query.alpha ? JSON.parse(query.alpha)[1] : true);
-  const [alphaInvert, setAlphaInvert] = useState(query.alpha ? JSON.parse(query.alpha)[2] : true);
-  const [alphaGrayscale, setAlphaGrayscale] = useState(query.alpha ? JSON.parse(query.alpha)[3] : true);
+  const [alpha, setAlpha] = useState<IAlphaManipulation>(() => {
+    if (query.alpha) {
+      const alphaArr = JSON.parse(query.alpha);
+      return { adjust: alphaArr[0], rotate: alphaArr[1], invert: alphaArr[2], grayscale: alphaArr[3] };
+    } else {
+      return { adjust: true, rotate: true, invert: true, grayscale: true };
+    }
+  });
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(180, 50%, 50%, 0.5)"));
   const [incrementColor, setIncrementColor] = useState(
@@ -69,28 +141,24 @@ export default function Manipulate(): JSX.Element {
       })`
     )
   );
-  const [isIncrement, setIsIncrement] = useState(true);
-  const [invert, setInvert] = useState(CM(color.hsla()).invert({ alpha: alphaInvert }));
+  const [dropdownValues, setDropdownValues] = useState<("Add" | "Sub")[]>(["Add", "Add", "Add", "Add"]);
+  const [invert, setInvert] = useState(CM(color.hsla()).invert({ alpha: alpha.invert }));
   const [grayscale, setGrayscale] = useState(CM(color.rgba()).grayscale());
-  const [rotate, setRotate] = useState(CM(color.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
+  const [rotate, setRotate] = useState(
+    CM(color.hsla()).rotate((dropdownValues[0] === "Add" ? 1 : -1) * incrementColor.hue)
+  );
 
-  const [adjust, setAdjust] = useState(addColor(color, incrementColor, isIncrement));
+  const [adjust, setAdjust] = useState(addColor(color, incrementColor, dropdownValues));
 
   const colorDebounce = useDebounce(color, 100);
   const incrementColorDebounce = useDebounce(incrementColor, 100);
-  const currentSliders = useSliderChange({
-    color: incrementColor,
-    setColor: setIncrementColor,
-    colorspace: "hsl",
-    min: "0.01"
-  });
 
   useEffect(() => {
-    setInvert(CM(color.hsla()).invert({ alpha: alphaInvert }));
+    setInvert(CM(color.hsla()).invert({ alpha: alpha.invert }));
     setGrayscale(CM(color.rgba()).grayscale());
-    setRotate(CM(color.hsla()).rotate((isIncrement ? 1 : -1) * incrementColor.hue));
-    setAdjust(addColor(color, incrementColor, isIncrement));
-  }, [color, incrementColor, alphaInvert, isIncrement]);
+    setRotate(CM(color.hsla()).rotate((dropdownValues[0] === "Add" ? 1 : -1) * incrementColor.hue));
+    setAdjust(addColor(color, incrementColor, dropdownValues));
+  }, [color, incrementColor, alpha.invert, dropdownValues]);
 
   useEffect(() => {
     const { h, s, l, a } = incrementColorDebounce.hsla();
@@ -99,195 +167,212 @@ export default function Manipulate(): JSX.Element {
       pathname: "/manipulate",
       search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${(
         a * 100
-      ).toFixed(2)}&isIncrement=${isIncrement}&alpha=[${[alphaAdjust, alphaRotate, alphaInvert, alphaGrayscale].join(
+      ).toFixed(2)}&adjustSettings=[${Object.values(dropdownValues).join(",")}]&alpha=[${Object.values(alpha).join(
         ","
       )}]`
     });
-  }, [
-    history,
-    colorDebounce,
-    incrementColorDebounce,
-    isIncrement,
-    alphaAdjust,
-    alphaRotate,
-    alphaInvert,
-    alphaGrayscale
-  ]);
+  }, [history, colorDebounce, incrementColorDebounce, dropdownValues, alpha]);
+
+  const handleChange = useCallback(
+    (channel: keyof Ihsla) => {
+      return (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = +e.target.value;
+
+        if (!Number.isNaN(val)) {
+          setIncrementColor(CM({ ...incrementColor.hsla(), [channel]: channel === "a" ? val / 100 : val }));
+        }
+      };
+    },
+    [incrementColor, setIncrementColor]
+  );
 
   return (
-    <Grid verticalAlign="middle" stackable centered>
-      <Grid.Column width={5}>
+    <FlexRow $wrap="wrap" $gap="12px">
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
         <ColorSelectorWidget
           color={color}
           setColor={setColor}
           initPicker="wheel"
           initColorspace="hsl"
           harmony={[color, adjust, rotate, invert, grayscale]}
-        />
-      </Grid.Column>
+        >
+          <Label $where="left" $bgColor="hsla(0, 0%, 90%, 1)" $color="black">
+            1
+          </Label>
+        </ColorSelectorWidget>
+      </FlexColumn>
 
-      <Spacers width="8px" />
+      <Spacers width="12px" />
 
-      <Grid.Column width={4}>
-        <Header textAlign="center">
-          <Dropdown
-            value={isIncrement ? "inc" : "dec"}
-            compact
-            selection
-            options={ColorAdjustmentOpts}
-            onChange={() => setIsIncrement(!isIncrement)}
+      <FlexColumn $cols={5} $gap="12px">
+        <FlexRow>
+          <RangeInput
+            color={`hsla(${incrementColor.hue}, 100%, 50%, 1)`}
+            min="0"
+            max="360"
+            value={incrementColor.hue}
+            onChange={handleChange("h")}
           />
-          <Spacers width="4px" />
-          By
-        </Header>
 
-        <Spacers height="12px" />
+          <Spacers width="6px" />
 
-        <Grid.Column width={10}>{currentSliders.sliders}</Grid.Column>
-      </Grid.Column>
+          <NumberInput
+            min="0"
+            max="360"
+            value={incrementColor.hue}
+            onChange={handleChange("h")}
+            format="hsl"
+            postfix="°"
+          />
 
-      <Spacers width="8px" />
+          <Spacers width="6px" />
 
-      <Grid.Column width={!isWideScreen ? 5 : 6}>
-        <Grid columns="equal" verticalAlign="middle" textAlign="center">
-          <Grid.Row>
-            <Grid.Column width={8}>
-              <Grid textAlign="center">
-                <Grid.Row>
-                  <Header as="h2">Adjust</Header>
-                  <Spacers width="4px" />
-                  <Information text={INFORMATIVE_TEXT.adjust} />
-                </Grid.Row>
-              </Grid>
+          <Dropdown
+            opts={ColorAdjustmentOpts}
+            value={dropdownValues[0]}
+            setValue={(arg) => setDropdownValues([arg as "Add" | "Sub", ...dropdownValues.slice(1)])}
+            icon={<FontAwesomeIcon icon={faCaretDown} color="gray" />}
+            iconPos="right"
+            switcherPos="right"
+            cols={6}
+          />
+        </FlexRow>
+        <FlexRow>
+          <RangeInput
+            color={`hsla(${incrementColor.hue}, ${incrementColor.saturation}%, 50%, 1)`}
+            min="0"
+            max="100"
+            value={incrementColor.saturation}
+            onChange={handleChange("s")}
+          />
 
-              <ColorIndicator
-                color={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
-                alpha={alphaAdjust}
-                setAlpha={setAlphaAdjust}
-              />
+          <Spacers width="6px" />
 
-              <Spacers height="8px" />
+          <NumberInput
+            min="0"
+            max="100"
+            value={incrementColor.saturation}
+            onChange={handleChange("s")}
+            postfix="%"
+            format="hsl"
+          />
 
-              <Swatch
-                title={adjust.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaAdjust })}
-                position="relative"
-                background={adjust.stringHSL()}
-                onClick={() => setColor(adjust)}
-                $radius={75}
-                $borderRadius="4px"
-                $cursor="pointer"
-              >
-                <SwatchCounter>2</SwatchCounter>
-              </Swatch>
-            </Grid.Column>
+          <Spacers width="6px" />
 
-            <Grid.Column width={8}>
-              <Grid textAlign="center">
-                <Grid.Row>
-                  <Header as="h2">Rotate</Header>
-                  <Spacers width="4px" />
-                  <Information text={INFORMATIVE_TEXT.rotate} />
-                </Grid.Row>
-              </Grid>
+          <Dropdown
+            opts={ColorAdjustmentOpts}
+            value={dropdownValues[1]}
+            setValue={(arg) => setDropdownValues([dropdownValues[0], arg as "Add" | "Sub", ...dropdownValues.slice(2)])}
+            icon={<FontAwesomeIcon icon={faCaretDown} color="gray" />}
+            iconPos="right"
+            switcherPos="right"
+            cols={6}
+          />
+        </FlexRow>
+        <FlexRow>
+          <RangeInput
+            color={`hsla(0, 0%, ${incrementColor.lightness - 5}%, 1)`}
+            min="0"
+            max="100"
+            value={incrementColor.lightness}
+            onChange={handleChange("l")}
+          />
 
-              <ColorIndicator
-                color={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
-                alpha={alphaRotate}
-                setAlpha={setAlphaRotate}
-              />
+          <Spacers width="6px" />
 
-              <Spacers height="8px" />
+          <NumberInput
+            min="0"
+            max="100"
+            value={incrementColor.lightness}
+            onChange={handleChange("l")}
+            postfix="%"
+            format="hsl"
+          />
 
-              <Swatch
-                title={rotate.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaRotate })}
-                position="relative"
-                background={rotate.stringHSL()}
-                onClick={() => setColor(rotate)}
-                $radius={75}
-                $borderRadius="4px"
-                $cursor="pointer"
-              >
-                <SwatchCounter>3</SwatchCounter>
-              </Swatch>
-            </Grid.Column>
-          </Grid.Row>
-          <Divider />
-          <Grid.Row>
-            <Grid.Column width={8}>
-              <Grid textAlign="center">
-                <Grid.Row>
-                  <Header as="h2">Invert</Header>
-                  <Spacers width="4px" />
-                  <Information text={INFORMATIVE_TEXT.invert} />
-                </Grid.Row>
-              </Grid>
+          <Spacers width="6px" />
 
-              <ColorIndicator
-                color={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
-                alpha={alphaInvert}
-                setAlpha={setAlphaInvert}
-              />
+          <Dropdown
+            opts={ColorAdjustmentOpts}
+            value={dropdownValues[2]}
+            setValue={(arg) =>
+              setDropdownValues([...dropdownValues.slice(0, 2), arg as "Add" | "Sub", dropdownValues[3]])
+            }
+            icon={<FontAwesomeIcon icon={faCaretDown} color="gray" />}
+            iconPos="right"
+            switcherPos="right"
+            cols={6}
+          />
+        </FlexRow>
+        <FlexRow>
+          <RangeInput
+            color="rgba(0, 0, 0, 0.6)"
+            min="0"
+            max="100"
+            value={incrementColor.alpha * 100}
+            onChange={handleChange("a")}
+          />
 
-              <Spacers height="8px" />
+          <Spacers width="6px" />
 
-              <Swatch
-                title={invert.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaInvert })}
-                position="relative"
-                background={invert.stringHSL()}
-                onClick={() => setColor(invert)}
-                $radius={75}
-                $borderRadius="4px"
-                $cursor="pointer"
-              >
-                <SwatchCounter>4</SwatchCounter>
-              </Swatch>
-            </Grid.Column>
+          <NumberInput
+            min="0"
+            max="100"
+            value={incrementColor.alpha * 100}
+            onChange={handleChange("a")}
+            format="hsl"
+            postfix="%"
+          />
 
-            <Grid.Column width={8}>
-              <Grid textAlign="center">
-                <Grid.Row>
-                  <Header as="h2">Grayscale</Header>
-                  <Spacers width="4px" />
-                  <Information text={INFORMATIVE_TEXT.grayscale} />
-                </Grid.Row>
-              </Grid>
+          <Spacers width="6px" />
 
-              <ColorIndicator
-                color={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}
-                alpha={alphaGrayscale}
-                setAlpha={setAlphaGrayscale}
-              />
+          <Dropdown
+            opts={ColorAdjustmentOpts}
+            value={dropdownValues[3]}
+            setValue={(arg) => setDropdownValues([...dropdownValues.slice(0, 3), arg as "Add" | "Sub"])}
+            icon={<FontAwesomeIcon icon={faCaretDown} color="gray" />}
+            iconPos="right"
+            switcherPos="right"
+            cols={6}
+          />
+        </FlexRow>
+      </FlexColumn>
 
-              <Spacers height="8px" />
-
-              <Swatch
-                title={grayscale.stringHSL({ precision: [2, 2, 2, 2], alpha: alphaGrayscale })}
-                position="relative"
-                background={grayscale.stringHSL()}
-                onClick={() => setColor(grayscale)}
-                $radius={75}
-                $borderRadius="4px"
-                $cursor="pointer"
-              >
-                <SwatchCounter>5</SwatchCounter>
-              </Swatch>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+      <FlexColumn $cols={12}>
+        {(
+          [
+            [
+              { type: "adjust", state: adjust },
+              { type: "rotate", state: rotate }
+            ],
+            [
+              { type: "invert", state: invert },
+              { type: "grayscale", state: grayscale }
+            ]
+          ] as IGridRowDetails[][]
+        ).map((arr, i) => (
+          <>
+            <GridRow
+              key={arr[0].type + arr[1].type}
+              arr={arr}
+              alpha={alpha}
+              setAlpha={setAlpha}
+              setColor={setColor}
+              startCount={(i + 1) * 2}
+            />
+            {i === 0 && (
+              <>
+                <Spacers height="20px" />
+                <HorizontalLine />
+                <Spacers height="12px" />
+              </>
+            )}
+          </>
+        ))}
 
         <Spacers height="32px" />
 
-        <Container textAlign="center">
-          <CodeModal
-            code={ManipulationSample(colorDebounce, incrementColorDebounce, isIncrement, {
-              adjust: alphaAdjust,
-              rotate: alphaRotate,
-              invert: alphaInvert,
-              grayscale: alphaGrayscale
-            })}
-          />
-        </Container>
-      </Grid.Column>
-    </Grid>
+        <CodeModal code={ManipulationSample(colorDebounce, incrementColorDebounce, dropdownValues, alpha)} />
+      </FlexColumn>
+    </FlexRow>
   );
 }

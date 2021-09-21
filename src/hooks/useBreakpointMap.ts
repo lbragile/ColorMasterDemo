@@ -13,6 +13,7 @@ export default function useBreakpointMap(): IBreakpointMap {
 
   function handleWindowSizeChange() {
     setWidth(window.innerWidth);
+    window.location.reload();
   }
 
   useEffect(() => {

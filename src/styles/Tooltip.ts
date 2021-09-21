@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Tooltip = styled.div.attrs((props: { $copied: boolean }) => props)`
+export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: number }) => props)`
   position: relative;
   display: inline-block;
   cursor: help;
@@ -8,12 +8,12 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean }) => props)`
   span {
     visibility: hidden;
     position: absolute;
-    top: -90%;
+    top: ${(props) => (props.$top ?? -45) + 5 + "px"};
     left: 50%;
-    transform: translate(-50%, -5px);
+    transform: translateX(-50%);
     background: hsla(0, 0%, 10%, 1);
     color: white;
-    white-space: nowrap;
+    white-space: pre;
     padding: 12px;
     border-radius: 4px;
     opacity: 0;
@@ -34,6 +34,6 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean }) => props)`
   &:hover span {
     visibility: ${(props) => (props.$copied ? "hidden" : "visible")};
     opacity: 1;
-    top: -100%;
+    top: ${(props) => (props.$top ?? -45) + "px"};
   }
 `;

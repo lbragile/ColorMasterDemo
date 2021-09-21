@@ -44,7 +44,7 @@ export default function WheelPicker({
     if (ctxWheel) {
       const radius = ctxWheel.canvas.width / 2 - 5;
 
-      ctxWheel.clearRect(0, 0, radius * 2, radius * 2);
+      ctxWheel.clearRect(0, 0, radius * 2 + 10, radius * 2 + 10);
       const [x, y] = [radius + 5, radius + 5];
       const { l, a } = color.hsla();
 

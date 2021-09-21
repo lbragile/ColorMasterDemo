@@ -229,7 +229,11 @@ export default function Harmony(): JSX.Element {
                 onClick={() => setColor(CM(swatch))}
                 $cursor="pointer"
               />
-              {swatch !== "transparent" && <SwatchCounter>{i + 1}</SwatchCounter>}
+              {swatch !== "transparent" && (
+                <SwatchCounter $top="1px" $left="1px">
+                  {i + 1}
+                </SwatchCounter>
+              )}
               {CM(swatch).stringHSL({ precision: [2, 2, 2, 2] }) === color.stringHSL({ precision: [2, 2, 2, 2] }) && (
                 <CurrentColorIcon icon={faCheckCircle} color={color.isDark() ? "white" : "black"} size="2x" />
               )}
