@@ -30,15 +30,15 @@ export const CurrentColorIcon = styled(FontAwesomeIcon)`
   transform: translate(-50%, -50%);
 `;
 
-export const SwatchCounter = styled.div.attrs((props: { $top: string; $left: string }) => props)`
+export const SwatchCounter = styled.div.attrs((props: { $top: string; $left: string; $isLight: boolean }) => props)`
   border-radius: 2px 0;
   color: black;
   position: absolute;
   top: ${(props) => props.$top ?? "0px"};
   left: ${(props) => props.$left ?? "0px"};
   padding: 4px 8px;
-  background-color: hsla(0, 0%, 90%);
-  color: black;
+  background-color: ${(props) => (props.$isLight ? "hsla(0, 0%, 30%)" : "hsla(0, 0%, 90%)")};
+  color: ${(props) => (props.$isLight ? "white" : "black")};
   font-weight: bold;
   display: flex;
   justify-content: center;

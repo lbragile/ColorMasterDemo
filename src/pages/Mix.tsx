@@ -15,13 +15,12 @@ import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Label } from "../styles/Label";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowCircleDown, faEquals, faInfoCircle, faPalette, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEquals, faInfoCircle, faPalette, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "../components/Dropdown";
 import { Tooltip } from "../styles/Tooltip";
-import NumberInput from "../components/Sliders/NumberInput";
-import RangeInput from "../components/Sliders/RangeInput";
 import styled from "styled-components";
 import A11yPlugin from "colormaster/plugins/accessibility";
+import NumberInput from "../components/Sliders/NumberInput";
 
 extendPlugins([MixPlugin, A11yPlugin]);
 
@@ -29,27 +28,49 @@ type TFormatDropdown = Exclude<TFormat, "invalid" | "name">;
 
 const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"];
 
-const DividerWithText = styled(FlexRow)`
-  hr {
-    width: 25%;
-  }
-
-  svg {
-    margin: 10px;
-  }
-`;
-
 const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => props)`
   position: relative;
 
-  & p {
+  & span {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 1.5rem;
+    max-width: 100%;
     font-weight: bold;
     color: ${(props) => (props.$isLight ? "black" : "white")};
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    & input {
+      background-color: transparent;
+      color: ${(props) => (props.$isLight ? "black" : "white")};
+      border: 1px solid ${(props) => (props.$isLight ? "black" : "white")};
+      width: 5ch;
+      text-align: right;
+    }
+
+    & button {
+      width: 12px;
+      background: ${(props) => (props.$isLight ? "black" : "white")};
+
+      &:hover {
+        background: ${(props) => (props.$isLight ? "hsla(0, 0%, 0%, 0.6)" : "hsla(0, 0%, 100%, 0.6)")};
+      }
+
+      & svg {
+        transform: scale(0.5);
+        color: ${(props) => (props.$isLight ? "white" : "black")};
+      }
+    }
+
+    &::after {
+      content: "%";
+      padding-left: 2px;
+    }
   }
 `;
 
@@ -94,38 +115,6 @@ export default function Mix(): JSX.Element {
       </FlexColumn>
 
       <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10} $gap="20px">
-        <h1>Ratio</h1>
-
-        <FlexRow>
-          <RangeInput
-            color={secondary.stringHSL()}
-            colorRight={primary.stringHSL()}
-            min="0"
-            max="100"
-            value={ratio * 100}
-            onChange={(e) => setRatio(+e.target.value / 100)}
-            width="40%"
-          />
-
-          <Spacers width="6px" />
-
-          <NumberInput
-            min="0"
-            max="100"
-            value={ratio * 100}
-            onChange={(e) =>
-              setRatio(Math.max(0, Math.min(Number.isNaN(+e.target.value) ? 0 : +e.target.value, 100)) / 100)
-            }
-            postfix="%"
-          />
-        </FlexRow>
-
-        <DividerWithText>
-          <hr />
-          <FontAwesomeIcon icon={faArrowCircleDown} size="3x" color="hsla(180, 100%, 40%, 1)" />
-          <hr />
-        </DividerWithText>
-
         <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
 
         <FlexRow $gap="12px">
@@ -140,7 +129,16 @@ export default function Mix(): JSX.Element {
             $cursor="help"
             $isLight={primary.isLight()}
           >
-            <p>{((1 - ratio) * 100).toFixed(0) + "%"}</p>
+            <span>
+              <NumberInput
+                min="0"
+                max="100"
+                value={(1 - ratio) * 100}
+                onChange={(e) =>
+                  setRatio(Math.max(0, Math.min(Number.isNaN(+e.target.value) ? 0 : 100 - +e.target.value, 100)) / 100)
+                }
+              />
+            </span>
           </MixtureSwatch>
 
           <FontAwesomeIcon icon={faPlus} />
@@ -156,7 +154,7 @@ export default function Mix(): JSX.Element {
             $cursor="help"
             $isLight={secondary.isLight()}
           >
-            <p>{(ratio * 100).toFixed(0) + "%"}</p>
+            <span>{(ratio * 100).toFixed(0)}</span>
           </MixtureSwatch>
 
           <FontAwesomeIcon icon={faEquals} />

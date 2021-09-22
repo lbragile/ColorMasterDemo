@@ -90,12 +90,12 @@ console.log(mix.stringHSL({ alpha: ${alpha} })); // ${mix.stringHSL({ alpha })} 
 export function ManipulationSample(
   color: ColorMaster,
   incrementColor: ColorMaster,
-  dropdownValues: ("Add" | "Sub")[],
+  incArr: boolean[],
   alpha: { [K in "adjust" | "rotate" | "invert" | "grayscale"]: boolean }
 ): string {
   const { h, s, l, a } = incrementColor.hsla();
 
-  const signs = dropdownValues.map((val) => (val === "Add" ? 1 : -1));
+  const signs = incArr.map((val) => (val ? 1 : -1));
   const rotate = CM(color.hsla()).hueBy(signs[0] * h);
   const adjust = CM(rotate.hsla())
     .saturateBy(signs[1] * s)

@@ -17,7 +17,9 @@ export default function Checkbox({ value, setValue, label }: ICheckbox): JSX.Ele
     <>
       <CheckboxInput type="checkbox" id="label" name="label" checked={value} onChange={() => setValue(!value)} />
       <Spacers width="2px" />
-      <label htmlFor="label">{label}</label>
+      <label htmlFor="label">
+        <b>{label}</b>
+      </label>
     </>
   );
 }
