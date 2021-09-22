@@ -54,7 +54,7 @@ interface IDropdown {
   icon: JSX.Element;
   iconPos: "left" | "right";
   /** The up/down angle brackets that let the user adjust dropdown values without opening it */
-  switcherPos: "left" | "right";
+  switcherPos: "left" | "right" | "none";
   cols?: number;
 }
 

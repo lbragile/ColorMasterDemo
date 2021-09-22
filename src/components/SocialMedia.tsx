@@ -5,7 +5,7 @@ import { faGithub, faNpm, IconDefinition } from "@fortawesome/free-brands-svg-ic
 
 const LinkIcon = styled(FontAwesomeIcon)`
   cursor: pointer;
-  margin: 0 4px;
+  margin: 0 8px;
 `;
 
 const LINKS: { href: string; icon: IconDefinition; color: string }[] = [

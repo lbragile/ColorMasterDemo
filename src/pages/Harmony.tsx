@@ -135,20 +135,18 @@ export default function Harmony(): JSX.Element {
 
   return (
     <FlexRow $wrap="wrap" $gap="20px">
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
-        <ColorSelectorWidget
-          color={color}
-          setColor={setColor}
-          initPicker="wheel"
-          initColorspace="hsl"
-          harmony={
-            // only show harmonies if not shades or tints
-            type !== "monochromatic" || (type === "monochromatic" && effect === "tones")
-              ? color.harmony({ type, effect, amount })
-              : undefined
-          }
-        />
-      </FlexColumn>
+      <ColorSelectorWidget
+        color={color}
+        setColor={setColor}
+        initPicker="wheel"
+        initColorspace="hsl"
+        harmony={
+          // only show harmonies if not shades or tints
+          type !== "monochromatic" || (type === "monochromatic" && effect === "tones")
+            ? color.harmony({ type, effect, amount })
+            : undefined
+        }
+      />
 
       <Spacers width={isComputer ? "4px" : "24px"} />
 

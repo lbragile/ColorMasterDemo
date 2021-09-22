@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox, Grid, Header, Icon, Label, Radio, Table } from "semantic-ui-react";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../../hooks/useDebounce";
-import useBreakpointMap from "../../hooks/useBreakpointMap";
 import styled from "styled-components";
 import { ContrastSample } from "../../utils/codeSamples";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
-import BreadcrumbPath from "../../components/BreadcrumbPath";
 import CodeModal from "../../components/CodeModal";
 import ColorSelectorWidget from "../../components/ColorSelectorWidget";
 import Spacers from "../../components/Spacers";
+import { FlexColumn, FlexRow } from "../../styles/Flex";
+import { Label } from "../../styles/Label";
+import Checkbox from "../../components/Checkbox";
+import { Heading } from "../../styles/Heading";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCheckCircle, faCircle, faSquareFull, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import Dropdown from "../../components/Dropdown";
 
 extendPlugins([A11yPlugin]);
 
-const SampleOutput = styled.div.attrs((props: { background: string; color: string; size: "body" | "large" }) => props)`
+const SampleOutput = styled.div.attrs(
+  (props: { background: string; color: string; size: "body" | "large" | "image" }) => props
+)`
   background-color: ${(props) => props.background};
   color: ${(props) => props.color};
   border-radius: 4px;
-  padding: 12px;
+  padding: ${(props) => (props.size === "image" ? "12px 24px" : "12px")};
   font-size: ${(props) => (props.size === "large" ? "14pt" : "1rem")};
   font-weight: ${(props) => (props.size === "large" ? "bold" : "normal")};
   border: 1px solid hsla(0, 0%, 90%, 1);
@@ -28,10 +34,56 @@ const SampleOutput = styled.div.attrs((props: { background: string; color: strin
   margin-top: 12px;
 `;
 
+const StyledTable = styled.table`
+  border-spacing: 0;
+  border-collapse: collapse;
+  font-size: 1.2rem;
+
+  & *:not(svg) {
+    border: 1px solid hsla(0, 0%, 80%, 1);
+    padding: 20px;
+  }
+
+  & th {
+    background: hsla(0, 0%, 95%, 1);
+
+    &:empty {
+      visibility: hidden;
+    }
+  }
+`;
+
+const TableCell = styled.td.attrs((props: { $positive?: boolean; $negative?: boolean }) => props)`
+  position: relative;
+  background: ${(props) =>
+    props.$positive ? "hsla(120, 100%, 90%, 1)" : props.$negative ? "hsla(0, 100%, 90%, 1)" : "transparent"};
+  color: ${(props) =>
+    props.$positive ? "hsla(120, 100%, 25%, 1)" : props.$negative ? "hsla(0, 100%, 25%, 1)" : "black"};
+  text-align: center;
+
+  & svg {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+  }
+`;
+
+const RadioInput = styled.span`
+  display: inline-flex;
+  align-items: center;
+
+  & label {
+    font-size: 1.2rem;
+  }
+
+  & * {
+    cursor: pointer;
+  }
+`;
+
 export default function Contrast(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile } = useBreakpointMap();
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
   const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
@@ -39,6 +91,7 @@ export default function Contrast(): JSX.Element {
   const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
   const [isLarge, setIsLarge] = useState(query.size ? query.size === "large" : true);
   const [ratio, setRatio] = useState(query.ratio ? query.ratio === "true" : true);
+  const [sampleOutput, setSampleOutput] = useState("text");
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
@@ -66,126 +119,123 @@ export default function Contrast(): JSX.Element {
   }, [history, fgDebounce, bgDebounce, ratio, isLarge]);
 
   return (
-    <>
-      {isMobile && <Spacers height="24px" />}
+    <FlexRow $wrap="wrap" $gap="48px">
+      <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
+        <Label $where="left">Foreground</Label>
+      </ColorSelectorWidget>
 
-      <BreadcrumbPath path="Contrast" />
+      <FlexColumn $gap="12px" $cols={10}>
+        <Heading $size="h1">Sample Output</Heading>
 
-      <Spacers height={isMobile ? "40px" : "20px"} />
+        <Spacers height="4px" />
 
-      <Grid columns={3} verticalAlign="middle" stackable centered>
-        <Grid.Row>
-          <Grid.Column width={5}>
-            <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
-              <Label size="big" color="black" attached="top left">
-                {isMobile ? "FG" : "Foreground"}
-              </Label>
-            </ColorSelectorWidget>
-          </Grid.Column>
+        <FlexRow>
+          <Dropdown
+            opts={["text", "image"]}
+            value={sampleOutput}
+            setValue={setSampleOutput}
+            icon={<FontAwesomeIcon icon={faCaretDown} color="dimgray" />}
+            iconPos="right"
+            switcherPos="right"
+          />
+        </FlexRow>
 
-          <Grid.Column width={6} textAlign="center">
-            <Header as="h2">
-              Sample Output
-              <Spacers height="16px" />
-              <Header.Subheader>
-                <Grid centered>
-                  <Grid.Row columns={2}>
-                    <Grid.Column width={8} textAlign="right">
-                      <Radio label="Body" name="radioGroup" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
-                    </Grid.Column>
-                    <Grid.Column width={8} textAlign="left">
-                      <Radio label="Large" name="radioGroup" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
-                    </Grid.Column>
+        {sampleOutput === "text" ? (
+          <React.Fragment>
+            <Spacers height="4px" />
 
-                    <SampleOutput
-                      background={bgDebounce.stringRGB()}
-                      color={fgDebounce.stringRGB()}
-                      size={isLarge ? "large" : "body"}
-                    >
-                      The quick brown fox jumps over the lazy dog.
-                    </SampleOutput>
-                  </Grid.Row>
-                </Grid>
-              </Header.Subheader>
-            </Header>
+            <FlexRow $gap="20px">
+              <RadioInput onClick={() => isLarge && setIsLarge(false)}>
+                <input type="radio" name="body" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
+                <Spacers width="4px" />
+                <label htmlFor="body">
+                  <b>Body</b>
+                </label>
+              </RadioInput>
 
-            <Spacers height="8px" />
+              <RadioInput onClick={() => !isLarge && setIsLarge(true)}>
+                <input type="radio" name="large" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
+                <Spacers width="4px" />
+                <label htmlFor="large">
+                  <b>Large</b>
+                </label>
+              </RadioInput>
+            </FlexRow>
+            <SampleOutput
+              background={bgDebounce.stringRGB()}
+              color={fgDebounce.stringRGB()}
+              size={isLarge ? "large" : "body"}
+            >
+              The quick brown fox jumps over the lazy dog.
+            </SampleOutput>
+          </React.Fragment>
+        ) : (
+          <SampleOutput background={bgDebounce.stringRGB()} color={fgDebounce.stringRGB()} size="image">
+            <FlexRow $gap="8px">
+              <FontAwesomeIcon icon={faCircle} size="3x" />
+              <FontAwesomeIcon icon={faSquareFull} size="3x" />
+            </FlexRow>
+          </SampleOutput>
+        )}
 
-            <Header as="h2" textAlign="center">
-              Contrast
-              <Spacers height="8px" />
-              <Header.Subheader>
-                <Grid textAlign="center">
-                  <Grid.Row>
-                    <Grid.Column width={1} />
-                    <Grid.Column textAlign="right">
-                      <b>{contrast}</b>
-                    </Grid.Column>
-                    <Grid.Column width={1} />
-                    <Grid.Column width={1} textAlign="left">
-                      <Checkbox label="Ratio" checked={ratio} onChange={() => setRatio(!ratio)} />
-                    </Grid.Column>
-                  </Grid.Row>
-                </Grid>
-              </Header.Subheader>
-            </Header>
+        <Spacers height="8px" />
 
-            <Spacers height="8px" />
+        <Heading $size="h1">Contrast</Heading>
 
-            <Header as="h2" textAlign="center">
-              ReadableOn
-              <Spacers height="8px" />
-              <Header.Subheader>
-                <Table definition celled textAlign="center">
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.HeaderCell></Table.HeaderCell>
-                      <Table.HeaderCell>Minimum (AA)</Table.HeaderCell>
-                      <Table.HeaderCell>Enhanced (AAA)</Table.HeaderCell>
-                    </Table.Row>
-                  </Table.Header>
+        <Heading $size="h2" $color="grey">
+          {contrast}
+        </Heading>
 
-                  <Table.Body>
-                    <Table.Row>
-                      <Table.Cell>Body</Table.Cell>
-                      <Table.Cell positive={readableOn[0]} negative={!readableOn[0]}>
-                        <Icon name={readableOn[0] ? "checkmark" : "x"} /> 4.5:1
-                      </Table.Cell>
-                      <Table.Cell positive={readableOn[1]} negative={!readableOn[1]}>
-                        <Icon name={readableOn[1] ? "checkmark" : "x"} />
-                        7.0:1
-                      </Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                      <Table.Cell>Large</Table.Cell>
-                      <Table.Cell positive={readableOn[2]} negative={!readableOn[2]}>
-                        <Icon name={readableOn[2] ? "checkmark" : "x"} />
-                        3.0:1
-                      </Table.Cell>
+        <span>
+          <Checkbox label="Ratio" value={ratio} setValue={setRatio} />
+        </span>
 
-                      <Table.Cell positive={readableOn[3]} negative={!readableOn[3]}>
-                        <Icon name={readableOn[3] ? "checkmark" : "x"} /> 4.5:1
-                      </Table.Cell>
-                    </Table.Row>
-                  </Table.Body>
-                </Table>
-              </Header.Subheader>
-            </Header>
+        <Spacers height="8px" />
 
-            <Spacers height="12px" />
+        <Heading $size="h1">ReadableOn</Heading>
 
-            <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce, ratio)} />
-          </Grid.Column>
+        <StyledTable>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Minimum (AA)</th>
+              <th>Enhanced (AAA)</th>
+            </tr>
+          </thead>
 
-          <Grid.Column width={5}>
-            <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
-              <Label size="big" color="black" attached="top right">
-                {isMobile ? "BG" : "Background"}
-              </Label>
-            </ColorSelectorWidget>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    </>
+          <tbody>
+            <tr>
+              <th>Body</th>
+              <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
+                <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
+              </TableCell>
+              <TableCell $positive={readableOn[1]} $negative={!readableOn[1]}>
+                <FontAwesomeIcon icon={readableOn[1] ? faCheckCircle : faTimesCircle} />
+                7.0:1
+              </TableCell>
+            </tr>
+            <tr>
+              <th>Large</th>
+              <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
+                <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
+                3.0:1
+              </TableCell>
+
+              <TableCell $positive={readableOn[3]} $negative={!readableOn[3]}>
+                <FontAwesomeIcon icon={readableOn[3] ? faCheckCircle : faTimesCircle} /> 4.5:1
+              </TableCell>
+            </tr>
+          </tbody>
+        </StyledTable>
+
+        <Spacers height="12px" />
+
+        <CodeModal code={ContrastSample(fgDebounce, bgDebounce, contrastDebounce, readableOnDebounce, ratio)} />
+      </FlexColumn>
+
+      <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
+        <Label $where="right">Background</Label>
+      </ColorSelectorWidget>
+    </FlexRow>
   );
 }

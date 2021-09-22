@@ -185,25 +185,23 @@ export default function Manipulate(): JSX.Element {
 
   return (
     <FlexRow $wrap="wrap" $gap="12px">
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
-        <ColorSelectorWidget
-          color={color}
-          setColor={setColor}
-          initPicker="wheel"
-          initColorspace="hsl"
-          harmony={[
-            color,
-            adjust,
-            CM({ ...color.hsla(), h: adjust.hue }),
-            CM(adjust.hsla()).invert({ alpha: alpha.invert }),
-            CM(adjust.hsla()).grayscale()
-          ]}
-        >
-          <Label $where="left" $bgColor="hsla(0, 0%, 90%, 1)" $color="black">
-            1
-          </Label>
-        </ColorSelectorWidget>
-      </FlexColumn>
+      <ColorSelectorWidget
+        color={color}
+        setColor={setColor}
+        initPicker="wheel"
+        initColorspace="hsl"
+        harmony={[
+          color,
+          adjust,
+          CM({ ...color.hsla(), h: adjust.hue }),
+          CM(adjust.hsla()).invert({ alpha: alpha.invert }),
+          CM(adjust.hsla()).grayscale()
+        ]}
+      >
+        <Label $where="left" $bgColor="hsla(0, 0%, 90%, 1)" $color="black">
+          1
+        </Label>
+      </ColorSelectorWidget>
 
       <Spacers width="16px" />
 
@@ -213,7 +211,7 @@ export default function Manipulate(): JSX.Element {
             color={`hsla(${incrementColor.hue}, 100%, 50%, 1)`}
             value={incrementColor.hue}
             onChange={handleChange("h")}
-            min="0.01"
+            min="0"
             max="359.99"
             format="hsl"
             postfix="°"

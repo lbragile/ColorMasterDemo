@@ -29,7 +29,8 @@ const MenuContainer = styled.nav`
 const Item = styled(NavLink).attrs((props: { $active: boolean }) => props)`
   color: black;
   margin-right: 24px;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
+  text-decoration: none;
 
   font-size: 1.2rem;
   border-bottom: 2px solid ${(props) => (props.$active ? "black" : "none")};
@@ -48,22 +49,9 @@ export default function Navigation(): JSX.Element {
 
   return (
     <MenuContainer>
-      {/* <Dropdown item text="Accessibility">
-            <Dropdown.Menu>
-              {MENU_TABS.slice(0, 2).map((item) => {
-                const path = "/accessibility/" + item;
-                return (
-                  <Dropdown.Item as={NavLink} key={path} to={path} active={active === path} onClick={() => setActive(path)}>
-                    {item[0].toUpperCase() + item.slice(1)}
-                  </Dropdown.Item>
-                );
-              })}
-            </Dropdown.Menu>
-          </Dropdown> */}
-
       <span>
-        {MENU_TABS.slice(2).map((item) => {
-          const path = "/" + item.type;
+        {MENU_TABS.map((item, i) => {
+          const path = `/${i < 2 ? "accessibility/" : ""}${item.type}`;
           return (
             <Item key={path} to={path} $active={active === path} onClick={() => setActive(path)}>
               <FontAwesomeIcon icon={item.icon} />
@@ -77,6 +65,7 @@ export default function Navigation(): JSX.Element {
           );
         })}
       </span>
+
       <SocialMedia />
     </MenuContainer>
   );

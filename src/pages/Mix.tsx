@@ -50,11 +50,12 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
       color: ${(props) => (props.$isLight ? "black" : "white")};
       border: 1px solid ${(props) => (props.$isLight ? "black" : "white")};
       width: 5ch;
+      font-size: 1.5rem;
       text-align: right;
     }
 
     & button {
-      width: 12px;
+      width: 14px;
       background: ${(props) => (props.$isLight ? "black" : "white")};
 
       &:hover {
@@ -62,7 +63,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
       }
 
       & svg {
-        transform: scale(0.5);
+        transform: scale(0.8);
         color: ${(props) => (props.$isLight ? "white" : "black")};
       }
     }
@@ -108,11 +109,9 @@ export default function Mix(): JSX.Element {
 
   return (
     <FlexRow $wrap="wrap" $gap="20px">
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
-        <ColorSelectorWidget color={primary} setColor={setPrimary} initPicker="sketch">
-          <Label $where="left">Primary</Label>
-        </ColorSelectorWidget>
-      </FlexColumn>
+      <ColorSelectorWidget color={primary} setColor={setPrimary} initPicker="sketch">
+        <Label $where="left">Primary</Label>
+      </ColorSelectorWidget>
 
       <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10} $gap="20px">
         <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
@@ -193,11 +192,9 @@ export default function Mix(): JSX.Element {
         <CodeModal code={MixSample(primaryDebounce, secondaryDebounce, ratioDebounce, colorspace, alpha)} />
       </FlexColumn>
 
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
-        <ColorSelectorWidget color={secondary} setColor={setSecondary} initPicker="sketch">
-          <Label $where="right">Secondary</Label>
-        </ColorSelectorWidget>
-      </FlexColumn>
+      <ColorSelectorWidget color={secondary} setColor={setSecondary} initPicker="sketch">
+        <Label $where="right">Secondary</Label>
+      </ColorSelectorWidget>
     </FlexRow>
   );
 }
