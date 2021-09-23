@@ -59,7 +59,7 @@ export default function ColorSelectorWidget({
   initPicker = pickerOpts[0],
   harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
-  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
 
   const [alpha, setAlpha] = useState(true);
   const [colorspace, setColorspace] = useState(colorspaceOpts.find((x) => x === initColorspace) ?? colorspaceOpts[0]);
@@ -69,7 +69,7 @@ export default function ColorSelectorWidget({
   const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });
 
   return (
-    <BorderedSegment $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}>
+    <BorderedSegment $cols={isMobile ? 24 : isTablet ? 16 : isLaptop ? 12 : isComputer ? 10 : isWideScreen ? 8 : 6}>
       {children}
 
       <Swatch $radius={50} background={color.stringHSL()} title={color.stringHSL()} $cursor="help" />

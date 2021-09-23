@@ -10,10 +10,11 @@ export const FlexRow = styled.div.attrs((props: { $gap: string; $wrap: string })
   width: 100%;
 `;
 
-export const FlexColumn = styled.div.attrs((props: { $gap: string; $cols?: number }) => props)`
+export const FlexColumn = styled.div.attrs((props: { $gap: string; $cols?: number; $order?: number }) => props)`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: ${(props) => props.$gap ?? ""};
   width: ${(props) => ((props.$cols ?? 24) * 100) / 24 + "%"};
+  order: ${(props) => props.$order ?? 0};
 `;

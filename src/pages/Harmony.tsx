@@ -42,7 +42,8 @@ const VerticalMenu = styled.div`
 `;
 
 const MenuItem = styled.div.attrs((props: { $active: boolean; $last: boolean }) => props)`
-  padding: 8px;
+  padding: 16px;
+  font-size: 1.2rem;
   border-bottom: ${(props) => (props.$last ? "none" : "1px solid hsla(0, 0%, 95%, 1)")};
   text-transform: capitalize;
   cursor: pointer;
@@ -74,8 +75,8 @@ const MonoLabelIndicator = styled.div`
   width: fit-content;
   display: inline-block;
   position: absolute;
-  right: 4px;
-  bottom: 4px;
+  right: 12px;
+  bottom: 12px;
 `;
 
 const MonoEffectList = styled.li`
@@ -148,9 +149,7 @@ export default function Harmony(): JSX.Element {
         }
       />
 
-      <Spacers width={isComputer ? "4px" : "24px"} />
-
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 8 : isComputer ? 5 : 3}>
+      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 8 : isComputer ? 12 : 6}>
         <VerticalMenu>
           {typeOptions.map((t) => {
             return (
@@ -215,7 +214,7 @@ export default function Harmony(): JSX.Element {
         <CodeModal code={HarmonySample(color, type, effect, amount)} />
       </FlexColumn>
 
-      <FlexColumn $cols={isMobile || isTablet || isLaptop ? 24 : isComputer ? 9 : 8}>
+      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 21 : isComputer ? 18 : 8}>
         <FlexRow $gap="8px" $wrap="wrap">
           {harmony.map((swatch, i) => (
             <SwatchContainer key={swatch + "_" + i}>

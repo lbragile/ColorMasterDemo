@@ -30,7 +30,8 @@ export default function useBreakpointMap(): IBreakpointMap {
       isTablet: 576 < width && width <= 992,
       isLaptop: 992 < width && width <= 1200,
       isComputer: 1200 < width && width <= 1500,
-      isWideScreen: 1500 < width
+      isWideScreen: 1500 < width && width <= 1800,
+      isUltraWideScreen: 1800 < width
     }),
     [width]
   );

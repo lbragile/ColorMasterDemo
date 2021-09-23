@@ -53,6 +53,7 @@ export default function RangeInput({
   return (
     <SliderInput
       type="range"
+      step="1"
       min={min}
       max={max}
       value={value}

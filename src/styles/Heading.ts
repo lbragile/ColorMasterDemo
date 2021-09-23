@@ -6,7 +6,6 @@ export const Heading = styled.p.attrs(
   color: ${(props) => props.$color ?? "black"};
   text-align: center;
   margin: 0;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-weight: bold;
   font-size: ${(props) =>
     props.$size === "h1"

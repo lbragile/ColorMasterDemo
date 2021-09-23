@@ -10,7 +10,8 @@ const PrimaryButton = styled.button`
   background-color: hsla(210, 100%, 60%, 1);
   border: none;
   color: white;
-  font-weight: bold;
+  font-weight: bolder;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
 

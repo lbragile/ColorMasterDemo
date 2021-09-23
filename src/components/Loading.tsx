@@ -35,6 +35,7 @@ const Loader = styled.div`
   & div:nth-child(1):after {
     top: 63px;
     left: 63px;
+    background-color: hsla(0, 100%, 40%, 1);
   }
 
   & div:nth-child(2) {
@@ -44,6 +45,7 @@ const Loader = styled.div`
   & div:nth-child(2):after {
     top: 68px;
     left: 56px;
+    background-color: hsla(45, 100%, 40%, 1);
   }
 
   & div:nth-child(3) {
@@ -53,6 +55,7 @@ const Loader = styled.div`
   & div:nth-child(3):after {
     top: 71px;
     left: 48px;
+    background-color: hsla(90, 100%, 40%, 1);
   }
 
   & div:nth-child(4) {
@@ -62,6 +65,7 @@ const Loader = styled.div`
   & div:nth-child(4):after {
     top: 72px;
     left: 40px;
+    background-color: hsla(135, 100%, 40%, 1);
   }
 
   & div:nth-child(5) {
@@ -71,6 +75,7 @@ const Loader = styled.div`
   & div:nth-child(5):after {
     top: 71px;
     left: 32px;
+    background-color: hsla(180, 100%, 40%, 1);
   }
 
   & div:nth-child(6) {
@@ -80,6 +85,7 @@ const Loader = styled.div`
   & div:nth-child(6):after {
     top: 68px;
     left: 24px;
+    background-color: hsla(225, 100%, 40%, 1);
   }
 
   & div:nth-child(7) {
@@ -89,6 +95,7 @@ const Loader = styled.div`
   & div:nth-child(7):after {
     top: 63px;
     left: 17px;
+    background-color: hsla(270, 100%, 40%, 1);
   }
 
   & div:nth-child(8) {
@@ -98,6 +105,7 @@ const Loader = styled.div`
   & div:nth-child(8):after {
     top: 56px;
     left: 12px;
+    background-color: hsla(315, 100%, 40%, 1);
   }
 
   @keyframes lds-roller {

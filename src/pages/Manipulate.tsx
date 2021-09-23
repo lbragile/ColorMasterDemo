@@ -184,7 +184,7 @@ export default function Manipulate(): JSX.Element {
   };
 
   return (
-    <FlexRow $wrap="wrap" $gap="12px">
+    <FlexRow $wrap="wrap" $gap={isMobile || isTablet ? "32px" : "12px"}>
       <ColorSelectorWidget
         color={color}
         setColor={setColor}
@@ -203,9 +203,7 @@ export default function Manipulate(): JSX.Element {
         </Label>
       </ColorSelectorWidget>
 
-      <Spacers width="16px" />
-
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 5} $gap="12px">
+      <FlexColumn $cols={isMobile ? 24 : isTablet ? 20 : isLaptop ? 10 : isComputer ? 8 : 5} $gap="12px">
         <FlexRow>
           <FullSlider
             color={`hsla(${incrementColor.hue}, 100%, 50%, 1)`}
@@ -272,7 +270,7 @@ export default function Manipulate(): JSX.Element {
         </FlexRow>
       </FlexColumn>
 
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 24 : 12} $gap="24px">
+      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer ? 16 : 10} $gap="24px">
         {(
           [
             [

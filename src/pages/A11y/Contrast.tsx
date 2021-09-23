@@ -16,6 +16,7 @@ import { Heading } from "../../styles/Heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCheckCircle, faCircle, faSquareFull, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "../../components/Dropdown";
+import useBreakpointMap from "../../hooks/useBreakpointMap";
 
 extendPlugins([A11yPlugin]);
 
@@ -32,6 +33,10 @@ const SampleOutput = styled.div.attrs(
   text-align: left;
   line-height: 2rem;
   margin-top: 12px;
+
+  & svg {
+    font-size: 3rem;
+  }
 `;
 
 const StyledTable = styled.table`
@@ -84,6 +89,7 @@ const RadioInput = styled.span`
 export default function Contrast(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
   const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
@@ -121,10 +127,14 @@ export default function Contrast(): JSX.Element {
   return (
     <FlexRow $wrap="wrap" $gap="48px">
       <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
-        <Label $where="left">Foreground</Label>
+        <Label $where="left">{isMobile || isTablet ? "FG" : "Foreground"}</Label>
       </ColorSelectorWidget>
 
-      <FlexColumn $gap="12px" $cols={10}>
+      <FlexColumn
+        $gap="12px"
+        $cols={isMobile || isTablet ? 24 : isLaptop ? 18 : isComputer ? 12 : isWideScreen ? 6 : 10}
+        $order={isComputer ? 1 : 0}
+      >
         <Heading $size="h1">Sample Output</Heading>
 
         <Spacers height="4px" />
@@ -137,6 +147,7 @@ export default function Contrast(): JSX.Element {
             icon={<FontAwesomeIcon icon={faCaretDown} color="dimgray" />}
             iconPos="right"
             switcherPos="right"
+            cols={isMobile || isTablet ? 12 : 6}
           />
         </FlexRow>
 
@@ -171,9 +182,12 @@ export default function Contrast(): JSX.Element {
           </React.Fragment>
         ) : (
           <SampleOutput background={bgDebounce.stringRGB()} color={fgDebounce.stringRGB()} size="image">
-            <FlexRow $gap="8px">
-              <FontAwesomeIcon icon={faCircle} size="3x" />
-              <FontAwesomeIcon icon={faSquareFull} size="3x" />
+            <FlexRow $gap="20px">
+              <svg height="48" width="48" fill={fgDebounce.stringRGB()}>
+                <polygon points="24,0 0,48 48,48" />
+              </svg>
+              <FontAwesomeIcon icon={faCircle} />
+              <FontAwesomeIcon icon={faSquareFull} />
             </FlexRow>
           </SampleOutput>
         )}
@@ -204,27 +218,41 @@ export default function Contrast(): JSX.Element {
           </thead>
 
           <tbody>
-            <tr>
-              <th>Body</th>
-              <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
-                <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
-              </TableCell>
-              <TableCell $positive={readableOn[1]} $negative={!readableOn[1]}>
-                <FontAwesomeIcon icon={readableOn[1] ? faCheckCircle : faTimesCircle} />
-                7.0:1
-              </TableCell>
-            </tr>
-            <tr>
-              <th>Large</th>
-              <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
-                <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
-                3.0:1
-              </TableCell>
+            {sampleOutput === "text" ? (
+              <>
+                <tr>
+                  <th>Body</th>
+                  <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
+                    <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
+                  </TableCell>
+                  <TableCell $positive={readableOn[1]} $negative={!readableOn[1]}>
+                    <FontAwesomeIcon icon={readableOn[1] ? faCheckCircle : faTimesCircle} />
+                    7.0:1
+                  </TableCell>
+                </tr>
+                <tr>
+                  <th>Large</th>
+                  <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
+                    <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
+                    3.0:1
+                  </TableCell>
 
-              <TableCell $positive={readableOn[3]} $negative={!readableOn[3]}>
-                <FontAwesomeIcon icon={readableOn[3] ? faCheckCircle : faTimesCircle} /> 4.5:1
-              </TableCell>
-            </tr>
+                  <TableCell $positive={readableOn[3]} $negative={!readableOn[3]}>
+                    <FontAwesomeIcon icon={readableOn[3] ? faCheckCircle : faTimesCircle} /> 4.5:1
+                  </TableCell>
+                </tr>
+              </>
+            ) : (
+              <tr>
+                <th>Image</th>
+                <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
+                  <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
+                  3.0:1
+                </TableCell>
+
+                <TableCell>N/A</TableCell>
+              </tr>
+            )}
           </tbody>
         </StyledTable>
 
@@ -234,7 +262,7 @@ export default function Contrast(): JSX.Element {
       </FlexColumn>
 
       <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
-        <Label $where="right">Background</Label>
+        <Label $where="right">{isMobile || isTablet ? "BG" : "Background"}</Label>
       </ColorSelectorWidget>
     </FlexRow>
   );

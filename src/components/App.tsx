@@ -6,11 +6,17 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
 
-const Contrast = lazy(() => import("../pages/A11y/Contrast"));
-const Statistics = lazy(() => import("../pages/A11y/Statistics"));
-const Harmony = lazy(() => import("../pages/Harmony"));
-const Mix = lazy(() => import("../pages/Mix"));
-const Manipulate = lazy(() => import("../pages/Manipulate"));
+// Based on https://stackoverflow.com/a/54159114/4298115, add a MINIMUM delay of x seconds on original load
+const paths = ["A11y/Contrast", "A11y/Statistics", "Harmony", "Mix", "Manipulate"];
+const DELAY_IN_SECONDS = 1.5;
+const [Contrast, Statistics, Harmony, Mix, Manipulate] = paths.map((path) => {
+  return lazy(() =>
+    Promise.all([
+      import("../pages/" + path),
+      new Promise((resolve) => setTimeout(resolve, DELAY_IN_SECONDS * 1000))
+    ]).then(([moduleExports]) => moduleExports)
+  );
+});
 
 const Container = styled.div`
   position: relative;

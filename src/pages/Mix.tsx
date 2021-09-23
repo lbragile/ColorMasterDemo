@@ -30,6 +30,7 @@ const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", 
 
 const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => props)`
   position: relative;
+  flex-shrink: 0;
 
   & span {
     position: absolute;
@@ -38,7 +39,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
     transform: translate(-50%, -50%);
     font-size: 1.5rem;
     max-width: 100%;
-    font-weight: bold;
+    font-weight: normal;
     color: ${(props) => (props.$isLight ? "black" : "white")};
     display: flex;
     flex-direction: row;
@@ -50,12 +51,12 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
       color: ${(props) => (props.$isLight ? "black" : "white")};
       border: 1px solid ${(props) => (props.$isLight ? "black" : "white")};
       width: 5ch;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       text-align: right;
     }
 
     & button {
-      width: 14px;
+      width: 10px;
       background: ${(props) => (props.$isLight ? "black" : "white")};
 
       &:hover {
@@ -78,7 +79,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
 export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
 
   const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
@@ -110,13 +111,17 @@ export default function Mix(): JSX.Element {
   return (
     <FlexRow $wrap="wrap" $gap="20px">
       <ColorSelectorWidget color={primary} setColor={setPrimary} initPicker="sketch">
-        <Label $where="left">Primary</Label>
+        <Label $where="left">{isMobile ? "1st" : "Primary"}</Label>
       </ColorSelectorWidget>
 
-      <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10} $gap="20px">
+      <FlexColumn
+        $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10}
+        $gap="20px"
+        $order={isComputer || isWideScreen ? 1 : 0}
+      >
         <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
 
-        <FlexRow $gap="12px">
+        <FlexRow $gap="12px" $wrap="wrap">
           <MixtureSwatch
             title={primary.stringHSL()}
             $radius={60}
@@ -178,14 +183,14 @@ export default function Mix(): JSX.Element {
             icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
             iconPos="left"
             switcherPos="left"
-            cols={4}
+            cols={isMobile ? 8 : 4}
           />
 
           <Spacers width="4px" />
 
           <Tooltip>
             <span>The two colors will be converted to this color space when mixing</span>
-            <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="2x" />
+            <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
           </Tooltip>
         </FlexRow>
 
@@ -193,7 +198,7 @@ export default function Mix(): JSX.Element {
       </FlexColumn>
 
       <ColorSelectorWidget color={secondary} setColor={setSecondary} initPicker="sketch">
-        <Label $where="right">Secondary</Label>
+        <Label $where="right">{isMobile ? "2nd" : "Secondary"}</Label>
       </ColorSelectorWidget>
     </FlexRow>
   );
