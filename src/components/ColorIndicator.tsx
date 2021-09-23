@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import useBreakpointMap from "../hooks/useBreakpointMap";
-import Spacers from "./Spacers";
 import CM, { extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
 import { FlexRow } from "../styles/Flex";
@@ -34,14 +33,25 @@ const CopyButton = styled.button.attrs((props: { $copied: string | null }) => pr
   cursor: pointer;
 `;
 
+const RowOrCol = styled(FlexRow).attrs((props: { $dir?: "row" | "column" }) => props)`
+  flex-direction: ${(props) => props.$dir ?? "row"};
+`;
+
 interface IColorIndicator {
   color: string;
   alpha: boolean;
   setAlpha: React.Dispatch<React.SetStateAction<boolean>>;
   showName?: boolean;
+  dir?: "row" | "column";
 }
 
-export default function ColorIndicator({ color, alpha, setAlpha, showName = true }: IColorIndicator): JSX.Element {
+export default function ColorIndicator({
+  color,
+  alpha,
+  setAlpha,
+  showName = true,
+  dir = "row"
+}: IColorIndicator): JSX.Element {
   const [copy, setCopy] = useCopyToClipboard();
   const { isMobile } = useBreakpointMap();
 
@@ -53,19 +63,21 @@ export default function ColorIndicator({ color, alpha, setAlpha, showName = true
         </Heading>
       )}
 
-      <FlexRow>
-        <StyledColorDisplay type="text" value={color} spellCheck={false} readOnly $mobile={isMobile} />
-        <Tooltip $copied={!!copy}>
-          <span>Copy to clipboard</span>
-          <CopyButton $copied={copy} onClick={() => setCopy(color)} onBlur={() => setCopy("")}>
-            <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} color="white" />
-          </CopyButton>
-        </Tooltip>
+      <RowOrCol $gap="12px" $wrap="wrap" $dir={dir}>
+        <span>
+          <StyledColorDisplay type="text" value={color} spellCheck={false} readOnly $mobile={isMobile} />
+          <Tooltip $copied={!!copy}>
+            <span>Copy to clipboard</span>
+            <CopyButton $copied={copy} onClick={() => setCopy(color)} onBlur={() => setCopy("")}>
+              <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} color="white" />
+            </CopyButton>
+          </Tooltip>
+        </span>
 
-        <Spacers width="8px" />
-
-        <Checkbox value={alpha} setValue={setAlpha} label="Alpha" />
-      </FlexRow>
+        <span>
+          <Checkbox value={alpha} setValue={setAlpha} label="Alpha" />
+        </span>
+      </RowOrCol>
     </>
   );
 }

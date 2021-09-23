@@ -135,7 +135,7 @@ export default function Harmony(): JSX.Element {
   }, [history, colorDebounce, type, effect, amount]);
 
   return (
-    <FlexRow $wrap="wrap" $gap="20px">
+    <FlexRow $wrap="wrap" $gap="28px">
       <ColorSelectorWidget
         color={color}
         setColor={setColor}

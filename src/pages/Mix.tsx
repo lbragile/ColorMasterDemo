@@ -79,7 +79,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
 export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
 
   const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
@@ -115,11 +115,11 @@ export default function Mix(): JSX.Element {
       </ColorSelectorWidget>
 
       <FlexColumn
-        $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 10}
+        $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}
         $gap="20px"
-        $order={isComputer || isWideScreen ? 1 : 0}
+        $order={isComputer ? 1 : 0}
       >
-        <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} />
+        <ColorIndicator color={mix} alpha={alpha} setAlpha={setAlpha} dir="column" />
 
         <FlexRow $gap="12px" $wrap="wrap">
           <MixtureSwatch
@@ -183,7 +183,7 @@ export default function Mix(): JSX.Element {
             icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
             iconPos="left"
             switcherPos="left"
-            cols={isMobile ? 8 : 4}
+            cols={isMobile || isTablet ? 8 : 6}
           />
 
           <Spacers width="4px" />

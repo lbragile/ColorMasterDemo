@@ -27,7 +27,7 @@ const BorderedSegment = styled(FlexColumn)`
   border: 1px solid hsla(0, 0%, 75%, 1);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 5px 5px 10px 1px rgba(102, 102, 102, 0.5);
+  box-shadow: 2px 2px 6px 1px rgba(102, 102, 102, 0.5);
 `;
 
 export const StyledAngleIcon = styled(FontAwesomeIcon).attrs((props: { $disabled: boolean }) => props)`

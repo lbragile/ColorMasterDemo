@@ -162,6 +162,7 @@ export default function Manipulate(): JSX.Element {
               color={item.state.stringHSL({ precision: [0, 0, 0, 2], alpha: alpha[item.type] })}
               alpha={alpha[item.type]}
               setAlpha={(arg) => setAlpha({ ...alpha, [item.type]: arg })}
+              dir="column"
             />
 
             <GridSwatch state={item.state} alpha={alpha[item.type]} count={i + startCount} />
@@ -184,7 +185,7 @@ export default function Manipulate(): JSX.Element {
   };
 
   return (
-    <FlexRow $wrap="wrap" $gap={isMobile || isTablet ? "32px" : "12px"}>
+    <FlexRow $wrap="wrap" $gap={isMobile || isTablet ? "32px" : "28px"}>
       <ColorSelectorWidget
         color={color}
         setColor={setColor}

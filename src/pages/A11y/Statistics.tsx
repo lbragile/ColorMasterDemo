@@ -15,6 +15,7 @@ import styled from "styled-components";
 import useBreakpointMap from "../../hooks/useBreakpointMap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFire, faMoon, faSnowflake, faSun, faTimes } from "@fortawesome/free-solid-svg-icons";
+import Spacers from "../../components/Spacers";
 
 extendPlugins([A11yPlugin]);
 
@@ -119,6 +120,7 @@ export default function Statistics(): JSX.Element {
               color={item.state.stringHSL({ precision: [0, 0, 0, 2], alpha: alpha[item.type] })}
               alpha={alpha[item.type]}
               setAlpha={(arg) => setAlpha({ ...alpha, [item.type]: arg })}
+              dir="column"
             />
 
             <GridSwatch state={item.state} alpha={alpha[item.type]} count={i + startCount} />
@@ -129,7 +131,7 @@ export default function Statistics(): JSX.Element {
   };
 
   return (
-    <FlexRow $wrap="wrap" $gap="32px">
+    <FlexRow $wrap="wrap" $gap={isMobile || isTablet || isLaptop || isComputer ? "32px" : "28px"}>
       <ColorSelectorWidget
         color={color}
         setColor={setColor}
@@ -138,7 +140,10 @@ export default function Statistics(): JSX.Element {
         harmony={[closest.warm, closest.cool, closest.pure, closest.web]}
       />
 
-      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 11 : isComputer ? 10 : 7} $gap="32px">
+      <FlexColumn
+        $cols={isMobile || isTablet ? 24 : isLaptop ? 11 : isComputer ? 10 : isWideScreen ? 4 : 6}
+        $gap="32px"
+      >
         <FlexColumn $gap="8px">
           <Heading $size="h1">Brightness</Heading>
           <Heading $size="h2" $color="grey">
@@ -186,25 +191,22 @@ export default function Statistics(): JSX.Element {
         </FlexColumn>
 
         <FlexColumn $gap="8px">
-          <Heading $size="h1">Tinted | Shaded | Toned</Heading>
-          <Heading $size="h2" $color="grey">
-            {pureHue.reason !== "N/A" ? pureHue.reason[0].toUpperCase() + pureHue.reason.slice(1) : "N/A"}
-          </Heading>
-        </FlexColumn>
-
-        <FlexColumn $gap="8px">
           <Heading $size="h1">Pure Hue?</Heading>
           <Heading $size="h2" $color="grey">
             {pureHue.pure ? (
               <FontAwesomeIcon icon={faCheck} color="hsla(120, 100%, 40%, 1)" />
             ) : (
-              <FontAwesomeIcon icon={faTimes} color="hsla(0, 100%, 40%, 1)" />
+              <span>
+                {pureHue.reason[0].toUpperCase() + pureHue.reason.slice(1)}
+                <Spacers width="4px" />
+                <FontAwesomeIcon icon={faTimes} color="hsla(0, 100%, 40%, 1)" />
+              </span>
             )}
           </Heading>
         </FlexColumn>
       </FlexColumn>
 
-      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer || isWideScreen ? 16 : 10} $gap="24px">
+      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer ? 16 : 11} $gap="24px">
         {(
           [
             [
