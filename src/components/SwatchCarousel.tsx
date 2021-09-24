@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { Swatch } from "../styles/Swatch";
 import Spacers from "./Spacers";
 import { StyledAngleIcon } from "./ColorSelectorWidget";
 import CM from "colormaster";
 import { FlexRow } from "../styles/Flex";
-import useBreakpointMap from "../hooks/useBreakpointMap";
+import { BreakpointsContext } from "./App";
 
 const SWATCH_COLORS = [
   "hsla(0, 100%, 50%, 1)",
@@ -33,7 +33,7 @@ interface ISwatchCarousel {
 }
 
 export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): JSX.Element {
-  const { isMobile, isTablet } = useBreakpointMap();
+  const { isMobile, isTablet } = useContext(BreakpointsContext);
   const numVisibleSwatches = useRef(isMobile || isTablet ? 7 : num);
   const [swatchIndex, setSwatchIndex] = useState(0);
 

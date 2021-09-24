@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { useHistory } from "react-router";
 import useQuery from "../../hooks/useQuery";
@@ -12,10 +12,11 @@ import ColorSelectorWidget from "../../components/ColorSelectorWidget";
 import { FlexColumn, FlexRow } from "../../styles/Flex";
 import { Heading } from "../../styles/Heading";
 import styled from "styled-components";
-import useBreakpointMap from "../../hooks/useBreakpointMap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFire, faMoon, faSnowflake, faSun, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Spacers from "../../components/Spacers";
+import { BreakpointsContext } from "../../components/App";
+import { FadeIn } from "../../styles/Fade";
 
 extendPlugins([A11yPlugin]);
 
@@ -55,7 +56,7 @@ const LabelledSwatch = styled(Swatch)`
 export default function Statistics(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(45, 75%, 50%, 1)"));
   const [pureHue, setPureHue] = useState<IPureHue>(color.isPureHue() as IPureHue);
@@ -131,7 +132,7 @@ export default function Statistics(): JSX.Element {
   };
 
   return (
-    <FlexRow $wrap="wrap" $gap={isMobile || isTablet || isLaptop || isComputer ? "32px" : "28px"}>
+    <FadeIn $wrap="wrap" $gap={isMobile || isTablet || isLaptop || isComputer ? "32px" : "28px"}>
       <ColorSelectorWidget
         color={color}
         setColor={setColor}
@@ -224,6 +225,6 @@ export default function Statistics(): JSX.Element {
 
         <CodeModal code={A11yStatisticsSample(colorDebounce, alpha)} />
       </FlexColumn>
-    </FlexRow>
+    </FadeIn>
   );
 }

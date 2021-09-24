@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../../hooks/useDebounce";
@@ -16,7 +16,8 @@ import { Heading } from "../../styles/Heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCheckCircle, faCircle, faSquareFull, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "../../components/Dropdown";
-import useBreakpointMap from "../../hooks/useBreakpointMap";
+import { BreakpointsContext } from "../../components/App";
+import { FadeIn } from "../../styles/Fade";
 
 extendPlugins([A11yPlugin]);
 
@@ -73,9 +74,13 @@ const StyledTable = styled.table`
 const TableCell = styled.td.attrs((props: { $positive?: boolean; $negative?: boolean }) => props)`
   position: relative;
   background: ${(props) =>
-    props.$positive ? "hsla(120, 100%, 90%, 1)" : props.$negative ? "hsla(0, 100%, 90%, 1)" : "transparent"};
+    props.$positive ? props.theme.colors.bgPositive : props.$negative ? props.theme.colors.bgNegative : "transparent"};
   color: ${(props) =>
-    props.$positive ? "hsla(120, 100%, 25%, 1)" : props.$negative ? "hsla(0, 100%, 25%, 1)" : "black"};
+    props.$positive
+      ? props.theme.colors.bgPositiveDark
+      : props.$negative
+      ? props.theme.colors.bgNegativeDark
+      : "black"};
   text-align: center;
 
   & svg {
@@ -101,7 +106,7 @@ const RadioInput = styled.span`
 export default function Contrast(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
   const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
@@ -137,7 +142,7 @@ export default function Contrast(): JSX.Element {
   }, [history, fgDebounce, bgDebounce, ratio, isLarge]);
 
   return (
-    <FlexRow $wrap="wrap" $gap="48px">
+    <FadeIn $wrap="wrap" $gap="48px">
       <ColorSelectorWidget color={fgColor} setColor={setFgColor}>
         <Label $where="left">{isMobile || isTablet ? "FG" : "Foreground"}</Label>
       </ColorSelectorWidget>
@@ -276,6 +281,6 @@ export default function Contrast(): JSX.Element {
       <ColorSelectorWidget color={bgColor} setColor={setBgColor} initPicker="sketch">
         <Label $where="right">{isMobile || isTablet ? "BG" : "Background"}</Label>
       </ColorSelectorWidget>
-    </FlexRow>
+    </FadeIn>
   );
 }

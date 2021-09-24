@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import HarmonyPlugin from "colormaster/plugins/harmony";
@@ -8,7 +8,6 @@ import styled from "styled-components";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
-import useBreakpointMap from "../hooks/useBreakpointMap";
 import useDebounce from "../hooks/useDebounce";
 import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter, CurrentColorIcon } from "../styles/Swatch";
@@ -17,147 +16,24 @@ import { FlexColumn, FlexRow } from "../styles/Flex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
 import RangeInput from "../components/Sliders/RangeInput";
+import { BreakpointsContext } from "../components/App";
+import { FadeIn } from "../styles/Fade";
+import { HarmonyIcons } from "../utils/harmonyIcons";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
-const StyledSVG = styled.svg`
-  transform: scale(0.5);
-`;
-
-const LinearGradientCheckpoint = styled.stop.attrs((props: { stopColor: string }) => props)`
-  stop-color: ${(props) => props.stopColor};
-  stop-opacity: 1;
-`;
-
-const typeOptions = [
-  {
-    type: "analogous",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="50" x2="4" y2="7" />
-          <line x1="25" y1="50" x2="25" y2="4" />
-          <line x1="25" y1="50" x2="46" y2="7" />
-          <circle cx="25" cy="4" r="3" />
-          <circle cx="4" cy="7" r="3" />
-          <circle cx="46" cy="7" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "complementary",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="2" x2="25" y2="48" />
-          <circle cx="25" cy="46" r="3" />
-          <circle cx="25" cy="4" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "split-complementary",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="25" x2="15" y2="43" />
-          <line x1="25" y1="25" x2="25" y2="0" />
-          <line x1="25" y1="25" x2="35" y2="43" />
-          <circle cx="25" cy="4" r="3" />
-          <circle cx="15" cy="43" r="3" />
-          <circle cx="35" cy="43" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "double-split-complementary",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="25" x2="10" y2="7" />
-          <line x1="25" y1="25" x2="40" y2="7" />
-          <line x1="25" y1="25" x2="10" y2="43" />
-          <line x1="25" y1="25" x2="25" y2="0" />
-          <line x1="25" y1="25" x2="40" y2="43" />
-          <circle cx="10" cy="7" r="3" />
-          <circle cx="40" cy="7" r="3" />
-          <circle cx="25" cy="4" r="3" />
-          <circle cx="10" cy="43" r="3" />
-          <circle cx="40" cy="43" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "triad",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="25" x2="4" y2="43" />
-          <line x1="25" y1="25" x2="25" y2="0" />
-          <line x1="25" y1="25" x2="46" y2="43" />
-          <circle cx="25" cy="4" r="3" />
-          <circle cx="4" cy="43" r="3" />
-          <circle cx="46" cy="43" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "rectangle",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="25" x2="15" y2="7" />
-          <line x1="25" y1="25" x2="35" y2="7" />
-          <line x1="25" y1="25" x2="15" y2="43" />
-          <line x1="25" y1="25" x2="35" y2="43" />
-          <circle cx="15" cy="7" r="3" />
-          <circle cx="35" cy="7" r="3" />
-          <circle cx="15" cy="43" r="3" />
-          <circle cx="35" cy="43" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "square",
-    icon: (
-      <StyledSVG height="50" width="50">
-        <g stroke="black" strokeWidth="1" fill="black">
-          <line x1="25" y1="25" x2="0" y2="25" />
-          <line x1="25" y1="25" x2="25" y2="0" />
-          <line x1="25" y1="25" x2="50" y2="25" />
-          <line x1="25" y1="25" x2="25" y2="50" />
-          <circle cx="4" cy="25" r="3" />
-          <circle cx="25" cy="4" r="3" />
-          <circle cx="46" cy="25" r="3" />
-          <circle cx="25" cy="46" r="3" />
-        </g>
-      </StyledSVG>
-    )
-  },
-  {
-    type: "monochromatic",
-    icon: (
-      <StyledSVG width="50" height="50">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <LinearGradientCheckpoint offset="0%" stopColor="hsla(0, 0%, 50%, 1)" />
-            <LinearGradientCheckpoint offset="100%" stopColor="hsla(0, 0%, 100%, 1)" />
-          </linearGradient>
-        </defs>
-
-        <path d="M 0 50 L 40 0 A 10 10 0 0 1 50 10 L 0 50 Z" strokeWidth="1" stroke="black" fill="url(#grad)" />
-      </StyledSVG>
-    )
-  }
+const typeOptions: THarmony[] = [
+  "analogous",
+  "complementary",
+  "split-complementary",
+  "double-split-complementary",
+  "triad",
+  "rectangle",
+  "square",
+  "monochromatic"
 ];
 
-const effectOptions = ["shades", "tints", "tones"];
+const effectOptions: TMonoEffect[] = ["shades", "tints", "tones"];
 
 const VerticalMenu = styled.div`
   border: 1px solid hsla(0, 0%, 90%, 1);
@@ -236,12 +112,12 @@ const SwatchContainer = styled.div`
 export default function Harmony(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer } = useContext(BreakpointsContext);
 
   const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
   const [type, setType] = useState<THarmony>(
-    (typeOptions.find((item) => item.type === query.type)?.type as THarmony) ?? "analogous"
+    (typeOptions.find((item) => item === query.type) as THarmony) ?? "analogous"
   );
   const [effect, setEffect] = useState<TMonoEffect>(
     (effectOptions.find((item) => item === query.effect) as TMonoEffect) ?? "shades"
@@ -269,7 +145,7 @@ export default function Harmony(): JSX.Element {
   }, [history, colorDebounce, type, effect, amount]);
 
   return (
-    <FlexRow $wrap="wrap" $gap="28px">
+    <FadeIn $wrap="wrap" $gap="28px">
       <ColorSelectorWidget
         color={color}
         setColor={setColor}
@@ -285,63 +161,59 @@ export default function Harmony(): JSX.Element {
 
       <FlexColumn $cols={isMobile ? 24 : isTablet || isLaptop ? 8 : isComputer ? 12 : 6}>
         <VerticalMenu>
-          {typeOptions.map((t) => {
-            return (
-              <MenuItem
-                key={t.type + "-menu-item"}
-                $active={type === t.type}
-                $last={t.type === "monochromatic"}
-                onClick={() => setType(t.type as THarmony)}
-              >
-                <LeftAlignedFlexRow>
-                  {t.icon} {t.type.includes("double") ? "Double Split-Complementary" : t.type}
-                </LeftAlignedFlexRow>
-                {t.type === "monochromatic" && type !== t.type && (
-                  <MonoLabelIndicator>
-                    <FontAwesomeIcon icon={faChevronCircleDown} color="white" />
-                    <Spacers width="2px" />
-                    {effectOptions.length}
-                  </MonoLabelIndicator>
-                )}
-                {type === t.type && t.type === "monochromatic" && (
-                  <>
-                    <LeftAlignedFlexColumn $gap="4px">
-                      {effectOptions.map((e) => {
-                        return (
-                          <MonoItem
-                            key={e + "-monochromatic-effect"}
-                            $active={e === effect}
-                            onClick={() => {
-                              setEffect(e as TMonoEffect);
-                              setType("monochromatic");
-                            }}
-                          >
-                            <MonoEffectList>{e}</MonoEffectList>
-                          </MonoItem>
-                        );
-                      })}
+          {typeOptions.map((t) => (
+            <MenuItem
+              key={t + "-menu-item"}
+              $active={type === t}
+              $last={t === "monochromatic"}
+              onClick={() => setType(t)}
+            >
+              <LeftAlignedFlexRow>
+                {HarmonyIcons[t]} {t.includes("double") ? "Double Split-Complementary" : t}
+              </LeftAlignedFlexRow>
+              {t === "monochromatic" && t !== type && (
+                <MonoLabelIndicator>
+                  <FontAwesomeIcon icon={faChevronCircleDown} color="white" />
+                  <Spacers width="2px" />
+                  {effectOptions.length}
+                </MonoLabelIndicator>
+              )}
+              {t === "monochromatic" && t === type && (
+                <>
+                  <LeftAlignedFlexColumn $gap="4px">
+                    {effectOptions.map((e) => (
+                      <MonoItem
+                        key={e + "-monochromatic-effect"}
+                        $active={e === effect}
+                        onClick={() => {
+                          setEffect(e);
+                          setType("monochromatic");
+                        }}
+                      >
+                        <MonoEffectList>{e}</MonoEffectList>
+                      </MonoItem>
+                    ))}
 
-                      <Spacers height="8px" />
+                    <Spacers height="8px" />
 
-                      <AmountLabel>Amount</AmountLabel>
+                    <AmountLabel>Amount</AmountLabel>
 
-                      <Spacers height="8px" />
+                    <Spacers height="8px" />
 
-                      <RangeInput
-                        color="hsl(180,100%,40%)"
-                        min="2"
-                        max="10"
-                        value={amount}
-                        width="100%"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(+e.target.value)}
-                      />
-                    </LeftAlignedFlexColumn>
-                    <Spacers height="16px" />
-                  </>
-                )}
-              </MenuItem>
-            );
-          })}
+                    <RangeInput
+                      color="hsl(180,100%,40%)"
+                      min="2"
+                      max="10"
+                      value={amount}
+                      width="100%"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(+e.target.value)}
+                    />
+                  </LeftAlignedFlexColumn>
+                  <Spacers height="16px" />
+                </>
+              )}
+            </MenuItem>
+          ))}
         </VerticalMenu>
 
         <Spacers height={isMobile || isTablet ? "8px" : "32px"} />
@@ -373,6 +245,6 @@ export default function Harmony(): JSX.Element {
           ))}
         </FlexRow>
       </FlexColumn>
-    </FlexRow>
+    </FadeIn>
   );
 }

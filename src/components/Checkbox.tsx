@@ -8,18 +8,22 @@ interface ICheckbox {
   label: string;
 }
 
-const CheckboxInput = styled.input`
-  cursor: pointer;
+const CheckboxContainer = styled.span`
+  & * {
+    cursor: pointer;
+  }
 `;
 
 export default function Checkbox({ value, setValue, label }: ICheckbox): JSX.Element {
+  const toggleValue = () => setValue(!value);
+
   return (
-    <>
-      <CheckboxInput type="checkbox" id="label" name="label" checked={value} onChange={() => setValue(!value)} />
+    <CheckboxContainer>
+      <input type="checkbox" checked={value} onChange={toggleValue} />
       <Spacers width="2px" />
-      <label htmlFor="label">
+      <label onClick={toggleValue}>
         <b>{label}</b>
       </label>
-    </>
+    </CheckboxContainer>
   );
 }

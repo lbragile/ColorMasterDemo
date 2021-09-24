@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import useBreakpointMap from "../hooks/useBreakpointMap";
 import CM, { extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
 import { FlexRow } from "../styles/Flex";
@@ -13,9 +12,7 @@ import { Heading } from "../styles/Heading";
 
 extendPlugins([NamePlugin]);
 
-const StyledColorDisplay = styled.input.attrs(
-  (props: { $mobile: boolean; action: { color: string; [key: string]: unknown } }) => props
-)`
+const StyledColorDisplay = styled.input`
   height: 36px;
   padding: 0 10px;
   border-radius: 4px 0 0 4px;
@@ -54,7 +51,6 @@ export default function ColorIndicator({
   dir = "row"
 }: IColorIndicator): JSX.Element {
   const [copy, setCopy] = useCopyToClipboard();
-  const { isMobile } = useBreakpointMap();
 
   return (
     <>
@@ -66,10 +62,21 @@ export default function ColorIndicator({
 
       <RowOrCol $gap="12px" $wrap="wrap" $dir={dir}>
         <span>
-          <StyledColorDisplay type="text" value={color} spellCheck={false} readOnly $mobile={isMobile} />
+          <StyledColorDisplay
+            type="text"
+            value={color}
+            spellCheck={false}
+            readOnly
+            aria-label="Color Indicator Display"
+          />
           <Tooltip $copied={!!copy}>
             <span>Copy to clipboard</span>
-            <CopyButton $copied={copy} onClick={() => setCopy(color)} onBlur={() => setCopy("")}>
+            <CopyButton
+              $copied={copy}
+              onClick={() => setCopy(color)}
+              onBlur={() => setCopy("")}
+              aria-label="Copy to Clipboard"
+            >
               <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} color="white" />
             </CopyButton>
           </Tooltip>

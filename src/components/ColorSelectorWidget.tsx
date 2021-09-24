@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { Swatch } from "../styles/Swatch";
 import SketchPicker from "./Pickers/SketchPicker";
@@ -15,7 +15,7 @@ import { faCrosshairs, faPalette } from "@fortawesome/free-solid-svg-icons";
 import SwatchCarousel from "./SwatchCarousel";
 import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
-import useBreakpointMap from "../hooks/useBreakpointMap";
+import { BreakpointsContext } from "./App";
 
 extendPlugins([NamePlugin]);
 
@@ -60,7 +60,7 @@ export default function ColorSelectorWidget({
   initPicker = pickerOpts[0],
   harmony = undefined
 }: IColorSelectorWidget): JSX.Element {
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [alpha, setAlpha] = useState(true);
   const [colorspace, setColorspace] = useState(colorspaceOpts.find((x) => x === initColorspace) ?? colorspaceOpts[0]);

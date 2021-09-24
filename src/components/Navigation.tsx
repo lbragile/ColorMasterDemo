@@ -1,10 +1,10 @@
 import { faMix, IconDefinition } from "@fortawesome/free-brands-svg-icons";
 import { faAdjust, faChartPie, faDharmachakra, faSlidersH } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
-import useBreakpointMap from "../hooks/useBreakpointMap";
+import { BreakpointsContext } from "./App";
 import SocialMedia from "./SocialMedia";
 import Spacers from "./Spacers";
 
@@ -20,7 +20,7 @@ const MenuContainer = styled.nav`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-bottom: 2px solid hsla(0, 0%, 90%, 1);
+  border-bottom: 2px solid ${(props) => props.theme.colors.borderLight};
   padding-bottom: 3px;
   margin-bottom: 20px;
   width: 100%;
@@ -43,7 +43,7 @@ const Item = styled(NavLink).attrs((props: { $active: boolean }) => props)`
 export default function Navigation(): JSX.Element {
   const location = useLocation();
   const [active, setActive] = useState("");
-  const { isMobile, isTablet } = useBreakpointMap();
+  const { isMobile, isTablet } = useContext(BreakpointsContext);
 
   useEffect(() => setActive(location.pathname), [location]);
 

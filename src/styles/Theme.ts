@@ -2,8 +2,8 @@ import { DefaultTheme } from "styled-components";
 
 const theme: DefaultTheme = {
   colors: {
-    primaryBtn: "hsla(210, 100%, 60%, 1)",
-    primaryBtnHover: "hsla(210, 100%, 55%, 1)",
+    primaryBtn: "hsla(225, 100%, 60%, 1)",
+    primaryBtnHover: "hsla(225, 100%, 55%, 1)",
     boxShadow: "hsla(0, 0%, 40%, 0.5)",
     border: "hsla(0, 0%, 75%, 1)",
     borderSlider: "hsla(0, 0%, 80%, 1)",

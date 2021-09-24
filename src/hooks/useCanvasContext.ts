@@ -1,17 +1,12 @@
-import { RefObject, useEffect, useState } from "react";
-import useBreakpointMap from "./useBreakpointMap";
+import { RefObject, useContext, useEffect, useState } from "react";
+import { BreakpointsContext } from "../components/App";
+import { IBreakpointsMap } from "../types/breakpoints";
 
 type TRefCanvas = RefObject<HTMLCanvasElement>;
 
 function fitCanvasContainer(
   ctx: CanvasRenderingContext2D,
-  breakpoints: {
-    isMobile: boolean;
-    isTablet: boolean;
-    isLaptop: boolean;
-    isComputer: boolean;
-    isWideScreen: boolean;
-  },
+  breakpoints: IBreakpointsMap,
   thickness?: number,
   vertical?: boolean
 ): CanvasRenderingContext2D {
@@ -50,7 +45,7 @@ export default function useCanvasContext(
   const [main, setMain] = useState<CanvasRenderingContext2D>();
   const [picker, setPicker] = useState<CanvasRenderingContext2D>();
 
-  const breakpoints = useBreakpointMap();
+  const breakpoints = useContext(BreakpointsContext);
 
   useEffect(() => {
     const ctxMain = refMain.current?.getContext("2d");

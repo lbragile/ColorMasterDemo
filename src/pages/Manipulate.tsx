@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
-import useBreakpointMap from "../hooks/useBreakpointMap";
 import useDebounce from "../hooks/useDebounce";
 import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter } from "../styles/Swatch";
@@ -21,18 +20,20 @@ import { Label } from "../styles/Label";
 import FullSlider from "../components/Sliders/FullSlider";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
+import { BreakpointsContext } from "../components/App";
+import { FadeIn } from "../styles/Fade";
 
 extendPlugins([A11yPlugin]);
 
 const INFORMATIVE_TEXT = {
   adjust:
-    "Color picker & each of the above sliders!\n Combines both color picker (input) and slider (delta)\n colors according to dropdown selection.",
+    "Color picker & each of the above sliders!\nCombines both color picker (input) and slider (delta)\ncolors according to dropdown selection.",
   rotate:
-    "Color picker & hue slider from above sliders only!\n Rotation is simply moving at a fixed radius\n (arc) along the color wheel.",
+    "Color picker & hue slider from above sliders only!\nRotation is simply moving at a fixed radius\n(arc) along the color wheel.",
   invert:
-    'Based on "Adjust". Similar to complementary harmony.\n Rotates 180° and flips the lightness value.\n Alpha channel included based on selection.',
+    'Based on "Adjust". Similar to complementary harmony.\nRotates 180° and flips the lightness value.\nAlpha channel included based on selection.',
   grayscale:
-    'Based on "Adjust". Output will vary slightly in most cases.\n Large variance if lightness is changed.\n Centered on 2D color wheel for all lightness values.'
+    'Based on "Adjust". Output will vary slightly in most cases.\nLarge variance if lightness is changed.\nCentered on 2D color wheel for all lightness values.'
 };
 
 interface IAlphaManipulation {
@@ -70,7 +71,7 @@ const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) =
 export default function Manipulate(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer } = useContext(BreakpointsContext);
 
   const [alpha, setAlpha] = useState<IAlphaManipulation>(() => {
     if (query.alpha) {
@@ -128,7 +129,7 @@ export default function Manipulate(): JSX.Element {
       <FlexRow>
         <Heading $size="h1">{title[0].toUpperCase() + title.slice(1)}</Heading>
         <Spacers width="4px" />
-        <Tooltip $top={text.split("\n").length * -25 - 10}>
+        <Tooltip $top={text.split("\n").length * -30 - 10}>
           <span>{text}</span>
           <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
         </Tooltip>
@@ -185,7 +186,7 @@ export default function Manipulate(): JSX.Element {
   };
 
   return (
-    <FlexRow $wrap="wrap" $gap={isMobile || isTablet ? "32px" : "28px"}>
+    <FadeIn $wrap="wrap" $gap={isMobile || isTablet ? "32px" : "28px"}>
       <ColorSelectorWidget
         color={color}
         setColor={setColor}
@@ -289,6 +290,6 @@ export default function Manipulate(): JSX.Element {
 
         <CodeModal code={ManipulationSample(colorDebounce, incrementColorDebounce, incrementArr, alpha)} />
       </FlexColumn>
-    </FlexRow>
+    </FadeIn>
   );
 }

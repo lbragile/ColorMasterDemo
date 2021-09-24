@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 import { TFormat } from "colormaster/types";
@@ -13,7 +13,6 @@ import { Swatch } from "../styles/Swatch";
 import { MixSample } from "../utils/codeSamples";
 import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Label } from "../styles/Label";
-import useBreakpointMap from "../hooks/useBreakpointMap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEquals, faInfoCircle, faPalette, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "../components/Dropdown";
@@ -21,6 +20,8 @@ import { Tooltip } from "../styles/Tooltip";
 import styled from "styled-components";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import NumberInput from "../components/Sliders/NumberInput";
+import { BreakpointsContext } from "../components/App";
+import { FadeIn } from "../styles/Fade";
 
 extendPlugins([MixPlugin, A11yPlugin]);
 
@@ -79,7 +80,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
 export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
@@ -109,7 +110,7 @@ export default function Mix(): JSX.Element {
   }, [history, primaryDebounce, secondaryDebounce, ratioDebounce, colorspace]);
 
   return (
-    <FlexRow $wrap="wrap" $gap="20px">
+    <FadeIn $wrap="wrap" $gap="20px">
       <ColorSelectorWidget color={primary} setColor={setPrimary} initPicker="sketch">
         <Label $where="left">{isMobile ? "1st" : "Primary"}</Label>
       </ColorSelectorWidget>
@@ -200,6 +201,6 @@ export default function Mix(): JSX.Element {
       <ColorSelectorWidget color={secondary} setColor={setSecondary} initPicker="sketch">
         <Label $where="right">{isMobile ? "2nd" : "Secondary"}</Label>
       </ColorSelectorWidget>
-    </FlexRow>
+    </FadeIn>
   );
 }

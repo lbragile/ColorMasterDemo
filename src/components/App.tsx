@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useMemo, createContext } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { GlobalStyle } from "../styles/Global";
 import Loading from "./Loading";
@@ -6,6 +6,8 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
 import theme from "../styles/Theme";
+import useBreakpointMap from "../hooks/useBreakpointMap";
+import { IBreakpointsMap } from "../types/breakpoints";
 
 // Based on https://stackoverflow.com/a/54159114/4298115, add a MINIMUM delay of x seconds on original load
 const paths = ["A11y/Contrast", "A11y/Statistics", "Harmony", "Mix", "Manipulate"];
@@ -30,27 +32,41 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
+export const BreakpointsContext = createContext<IBreakpointsMap>({
+  isMobile: false,
+  isTablet: false,
+  isLaptop: false,
+  isComputer: false,
+  isWideScreen: false,
+  isUltraWideScreen: false
+});
+
 export default function App(): JSX.Element {
+  const breakpoints = useBreakpointMap();
+  const providerValue = useMemo(() => breakpoints, [breakpoints]);
+
   return (
     <Container>
       <GlobalStyle />
 
-      <Navigation />
+      <ThemeProvider theme={theme}>
+        <BreakpointsContext.Provider value={providerValue}>
+          <Navigation />
 
-      <Suspense fallback={<Loading />}>
-        <ThemeProvider theme={theme}>
-          <Switch>
-            <Route path="/accessibility/contrast" component={Contrast} />
-            <Route path="/accessibility/statistics" component={Statistics} />
-            <Route path="/harmony" component={Harmony} />
-            <Route path="/mix" component={Mix} />
-            <Route path="/manipulate" component={Manipulate} />
-            <Redirect from="/" to="/harmony" />
-          </Switch>
-        </ThemeProvider>
-      </Suspense>
+          <Suspense fallback={<Loading />}>
+            <Switch>
+              <Route path="/accessibility/contrast" component={Contrast} />
+              <Route path="/accessibility/statistics" component={Statistics} />
+              <Route path="/harmony" component={Harmony} />
+              <Route path="/mix" component={Mix} />
+              <Route path="/manipulate" component={Manipulate} />
+              <Redirect from="/" to="/harmony" />
+            </Switch>
+          </Suspense>
 
-      <Footer />
+          <Footer />
+        </BreakpointsContext.Provider>
+      </ThemeProvider>
     </Container>
   );
 }

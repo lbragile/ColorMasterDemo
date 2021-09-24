@@ -14,6 +14,7 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: numbe
     background: hsla(0, 0%, 10%, 1);
     color: white;
     white-space: pre;
+    line-height: 1.5;
     padding: 12px;
     border-radius: 4px;
     opacity: 0;
