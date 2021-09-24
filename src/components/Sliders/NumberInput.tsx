@@ -17,12 +17,12 @@ const InputContainer = styled.div`
 
 const StyledNumberInput = styled.input`
   width: 90px;
-  height: 36px;
   border: 1px solid hsla(0, 0%, 90%, 1);
-  border-radius: 4px;
   padding: 6px;
+  border-radius: 4px;
   text-align: center;
   outline: none;
+  font-size: 1.1rem;
 
   &:focus {
     border: 1px solid hsla(210, 100%, 75%, 1);

@@ -41,20 +41,32 @@ const SampleOutput = styled.div.attrs(
 
 const StyledTable = styled.table`
   border-spacing: 0;
-  border-collapse: collapse;
+  border-collapse: separate;
   font-size: 1.2rem;
+  empty-cells: hide;
 
   & *:not(svg) {
-    border: 1px solid hsla(0, 0%, 80%, 1);
     padding: 20px;
+    border: 1px solid hsla(0, 0%, 80%, 1);
   }
 
   & th {
     background: hsla(0, 0%, 95%, 1);
+  }
 
-    &:empty {
-      visibility: hidden;
-    }
+  & .top-left,
+  & .left-top,
+  & .image-cell {
+    border-top-left-radius: 10px;
+  }
+
+  & .top-right {
+    border-top-right-radius: 10px;
+  }
+
+  & .left-bottom,
+  & .image-cell {
+    border-bottom-left-radius: 10px;
   }
 `;
 
@@ -212,8 +224,8 @@ export default function Contrast(): JSX.Element {
           <thead>
             <tr>
               <th></th>
-              <th>Minimum (AA)</th>
-              <th>Enhanced (AAA)</th>
+              <th className="top-left">Minimum (AA)</th>
+              <th className="top-right">Enhanced (AAA)</th>
             </tr>
           </thead>
 
@@ -221,7 +233,7 @@ export default function Contrast(): JSX.Element {
             {sampleOutput === "text" ? (
               <>
                 <tr>
-                  <th>Body</th>
+                  <th className="left-top">Body</th>
                   <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
                     <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
                   </TableCell>
@@ -231,7 +243,7 @@ export default function Contrast(): JSX.Element {
                   </TableCell>
                 </tr>
                 <tr>
-                  <th>Large</th>
+                  <th className="left-bottom">Large</th>
                   <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
                     <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
                     3.0:1
@@ -244,7 +256,7 @@ export default function Contrast(): JSX.Element {
               </>
             ) : (
               <tr>
-                <th>Image</th>
+                <th className="image-cell">Image</th>
                 <TableCell $positive={readableOn[2]} $negative={!readableOn[2]}>
                   <FontAwesomeIcon icon={readableOn[2] ? faCheckCircle : faTimesCircle} />
                   3.0:1

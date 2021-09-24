@@ -11,7 +11,7 @@ const PrimaryButton = styled.button`
   border: none;
   color: white;
   font-weight: bolder;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
 

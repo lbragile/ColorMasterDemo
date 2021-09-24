@@ -16,7 +16,7 @@ export function ContrastSample(
   readableOn: boolean[],
   ratio: boolean
 ): string {
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 
 extendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin
@@ -36,7 +36,7 @@ console.log(fgColor.readableOn({ bgColor, level: "enhanced", size: "large" })); 
 export function HarmonySample(color: ColorMaster, type: THarmony, effect: TMonoEffect, amount: number): string {
   const harmonyArr = color.harmony({ type, effect, amount });
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 
 extendPlugins([HarmonyPlugin]); // add ColorMaster's harmony plugin
@@ -72,7 +72,7 @@ export function MixSample(
 ): string {
   const mix = primary.mix({ color: secondary, ratio, colorspace });
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 
 extendPlugins([MixPlugin]); // add ColorMaster's mix plugin
@@ -105,7 +105,7 @@ export function ManipulationSample(
   const invert = CM(color.hsla()).invert({ alpha: alpha.invert });
   const grayscale = CM(color.hsla()).grayscale();
 
-  return `import CM from 'colormaster';
+  return `import CM from "colormaster";
 
 const color = CM("${color.stringHSL({ precision })}"); // ${color.name(nameOpts)}
 const incrementColor = CM("${incrementColor.stringHSL({ precision })}"); // ${incrementColor.name(nameOpts)}
@@ -159,7 +159,7 @@ export function A11yStatisticsSample(
   const pure = CM(color.hsla()).closestPureHue();
   const web = CM(color.hsla()).closestWebSafe();
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 
 extendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin
