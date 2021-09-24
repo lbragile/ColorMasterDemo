@@ -79,7 +79,7 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
 export default function Mix(): JSX.Element {
   const history = useHistory();
   const query = useQuery();
-  const { isMobile, isTablet, isLaptop, isComputer } = useBreakpointMap();
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useBreakpointMap();
 
   const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
@@ -115,7 +115,7 @@ export default function Mix(): JSX.Element {
       </ColorSelectorWidget>
 
       <FlexColumn
-        $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isComputer ? 8 : 6}
+        $cols={isMobile ? 24 : isTablet || isLaptop ? 12 : isWideScreen ? 6 : 10}
         $gap="20px"
         $order={isComputer ? 1 : 0}
       >

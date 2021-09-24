@@ -24,6 +24,11 @@ const StyledSVG = styled.svg`
   transform: scale(0.5);
 `;
 
+const LinearGradientCheckpoint = styled.stop.attrs((props: { stopColor: string }) => props)`
+  stop-color: ${(props) => props.stopColor};
+  stop-opacity: 1;
+`;
+
 const typeOptions = [
   {
     type: "analogous",
@@ -137,7 +142,18 @@ const typeOptions = [
   },
   {
     type: "monochromatic",
-    icon: <StyledSVG height="50" width="50" />
+    icon: (
+      <StyledSVG width="50" height="50">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <LinearGradientCheckpoint offset="0%" stopColor="hsla(0, 0%, 50%, 1)" />
+            <LinearGradientCheckpoint offset="100%" stopColor="hsla(0, 0%, 100%, 1)" />
+          </linearGradient>
+        </defs>
+
+        <path d="M 0 50 L 40 0 A 10 10 0 0 1 50 10 L 0 50 Z" strokeWidth="1" stroke="black" fill="url(#grad)" />
+      </StyledSVG>
+    )
   }
 ];
 
@@ -151,13 +167,10 @@ const VerticalMenu = styled.div`
   position: relative;
 `;
 
-const MenuItem = styled(FlexRow).attrs((props: { $active: boolean; $last: boolean }) => props)`
+const MenuItem = styled.div.attrs((props: { $active: boolean; $last: boolean }) => props)`
   padding: 4px 16px 0 4px;
   border-bottom: ${(props) => (props.$last ? "none" : "1px solid hsla(0, 0%, 95%, 1)")};
   text-transform: capitalize;
-  justify-content: start;
-  align-items: ${(props) => (props.$last ? "start" : "center")};
-  flex-direction: ${(props) => (props.$last ? "column" : "row")};
   cursor: pointer;
   background: ${(props) => (props.$active ? "hsla(0, 0%, 90%, 1)" : "transparent")};
   font-weight: ${(props) => (props.$active ? "bolder" : "normal")};
@@ -174,7 +187,7 @@ const MonoItem = styled.div.attrs((props: { $active: boolean }) => props)`
   font-weight: ${(props) => (props.$active ? "bold" : "normal")};
 
   &:hover {
-    font-weight: bolder;
+    font-weight: bold;
   }
 `;
 
@@ -197,6 +210,15 @@ const MonoEffectList = styled.li`
     content: "▸";
     margin-right: 4px;
   }
+`;
+
+const LeftAlignedFlexColumn = styled(FlexColumn)`
+  align-items: start;
+  padding: 0 10px;
+`;
+
+const LeftAlignedFlexRow = styled(FlexRow)`
+  justify-content: start;
 `;
 
 const AmountLabel = styled.div`
@@ -266,12 +288,14 @@ export default function Harmony(): JSX.Element {
           {typeOptions.map((t) => {
             return (
               <MenuItem
-                key={t + "-menu-item"}
+                key={t.type + "-menu-item"}
                 $active={type === t.type}
                 $last={t.type === "monochromatic"}
                 onClick={() => setType(t.type as THarmony)}
               >
-                {t.icon} {t.type.includes("double") ? "Double Split-Complementary" : t.type}{" "}
+                <LeftAlignedFlexRow>
+                  {t.icon} {t.type.includes("double") ? "Double Split-Complementary" : t.type}
+                </LeftAlignedFlexRow>
                 {t.type === "monochromatic" && type !== t.type && (
                   <MonoLabelIndicator>
                     <FontAwesomeIcon icon={faChevronCircleDown} color="white" />
@@ -279,10 +303,9 @@ export default function Harmony(): JSX.Element {
                     {effectOptions.length}
                   </MonoLabelIndicator>
                 )}
-                {type === "monochromatic" && t.type === "monochromatic" && (
+                {type === t.type && t.type === "monochromatic" && (
                   <>
-                    <Spacers height="4px" />
-                    <div>
+                    <LeftAlignedFlexColumn $gap="4px">
                       {effectOptions.map((e) => {
                         return (
                           <MonoItem
@@ -298,22 +321,22 @@ export default function Harmony(): JSX.Element {
                         );
                       })}
 
-                      <Spacers height="16px" />
+                      <Spacers height="8px" />
 
-                      <div>
-                        <AmountLabel>Amount</AmountLabel>
-                        <Spacers height="12px" />
+                      <AmountLabel>Amount</AmountLabel>
 
-                        <RangeInput
-                          color="hsl(180,100%,40%)"
-                          min="2"
-                          max="10"
-                          value={amount}
-                          width="100%"
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(+e.target.value)}
-                        />
-                      </div>
-                    </div>
+                      <Spacers height="8px" />
+
+                      <RangeInput
+                        color="hsl(180,100%,40%)"
+                        min="2"
+                        max="10"
+                        value={amount}
+                        width="100%"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(+e.target.value)}
+                      />
+                    </LeftAlignedFlexColumn>
+                    <Spacers height="16px" />
                   </>
                 )}
               </MenuItem>
