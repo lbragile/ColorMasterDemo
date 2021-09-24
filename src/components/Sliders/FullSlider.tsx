@@ -2,9 +2,9 @@ import React from "react";
 import RangeInput from "./RangeInput";
 import NumberInput from "./NumberInput";
 import styled from "styled-components";
-import { IFullSlider } from "../../types/Sliders";
 import { FlexRow } from "../../styles/Flex";
 import Spacers from "../Spacers";
+import { IFullSlider } from "../../types/slider";
 
 const Title = styled.span`
   font-weight: bold;

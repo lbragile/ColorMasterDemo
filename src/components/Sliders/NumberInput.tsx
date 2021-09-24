@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { INumberInput } from "../../types/Sliders";
+import { INumberInput } from "../../types/slider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FlexColumn } from "../../styles/Flex";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
@@ -17,7 +17,7 @@ const InputContainer = styled.div`
 
 const StyledNumberInput = styled.input`
   width: 90px;
-  border: 1px solid hsla(0, 0%, 90%, 1);
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
   padding: 6px;
   border-radius: 4px;
   text-align: center;
@@ -25,7 +25,7 @@ const StyledNumberInput = styled.input`
   font-size: 1.1rem;
 
   &:focus {
-    border: 1px solid hsla(210, 100%, 75%, 1);
+    border: 1px solid ${(props) => props.theme.colors.borderFocus};
   }
 `;
 
@@ -34,7 +34,7 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   left: 1px;
   top: ${(props) => (props.$dir === "up" ? "1px" : "")};
   bottom: ${(props) => (props.$dir === "down" ? "1px" : "")};
-  background-color: hsla(0, 0%, 90%, 1);
+  background-color: ${(props) => props.theme.colors.borderLight};
   height: calc(50% - 1px);
   border-radius: ${(props) => (props.$dir === "up" ? "2px 0 0 0" : "0 0 0 2px")};
   padding: 0 4px;
@@ -42,12 +42,12 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   align-items: center;
   justify-content: center;
   border: none;
-  border-bottom: ${(props) => (props.$dir === "up" ? "1px solid hsla(0, 0%, 75%, 1)" : "")};
+  border-bottom: ${(props) => (props.$dir === "up" ? `1px solid ${props.theme.colors.border}` : "")};
   outline: none;
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   &:hover {
-    background-color: hsla(0, 0%, 80%, 1);
+    background-color: ${(props) => props.theme.colors.bgDark};
   }
 
   & path {
@@ -61,12 +61,16 @@ const StyledLabel = styled.div`
   top: 1px;
   width: 20px;
   height: calc(100% - 2px);
-  background: hsla(0, 0%, 90%, 1);
+  background: ${(props) => props.theme.colors.bgActive};
   border-radius: 0 4px 4px 0;
   font-weight: bolder;
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const ArrowIcon = styled(FontAwesomeIcon)`
+  color: ${(props) => props.theme.colors.arrowColor};
 `;
 
 export default function NumberInput({
@@ -147,7 +151,7 @@ export default function NumberInput({
           onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "top")}
           onPointerUp={clearHold}
         >
-          <FontAwesomeIcon icon={faCaretUp} color="hsla(0, 0%, 25%, 1)" />
+          <ArrowIcon icon={faCaretUp} />
         </ArrowButton>
 
         <ArrowButton
@@ -156,7 +160,7 @@ export default function NumberInput({
           onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "bottom")}
           onPointerUp={clearHold}
         >
-          <FontAwesomeIcon icon={faCaretDown} color="hsla(0, 0%, 25%, 1)" />
+          <ArrowIcon icon={faCaretDown} />
         </ArrowButton>
       </FlexColumn>
 

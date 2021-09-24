@@ -20,7 +20,8 @@ const StyledColorDisplay = styled.input.attrs(
   padding: 0 10px;
   border-radius: 4px 0 0 4px;
   text-align: center;
-  border: 1px solid hsla(0, 0%, 80%, 1);
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-right: none;
   outline: none;
 `;
 

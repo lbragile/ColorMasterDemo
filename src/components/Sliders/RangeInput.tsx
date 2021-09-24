@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { IRangeInput } from "../../types/Sliders";
+import { IRangeInput } from "../../types/slider";
 
 const SliderInput = styled.input.attrs(
   (props: {

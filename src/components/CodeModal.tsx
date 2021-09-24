@@ -7,7 +7,7 @@ import styled from "styled-components";
 const PrimaryButton = styled.button`
   padding: 8px 24px;
   border-radius: 10em;
-  background-color: hsla(210, 100%, 60%, 1);
+  background-color: ${(props) => props.theme.colors.primaryBtn};
   border: none;
   color: white;
   font-weight: bolder;
@@ -16,7 +16,7 @@ const PrimaryButton = styled.button`
   transition: background-color 0.3s ease-in-out;
 
   &:hover {
-    background-color: hsla(210, 100%, 55%, 1);
+    background-color: ${(props) => props.theme.colors.primaryBtnHover};
   }
 `;
 
