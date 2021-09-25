@@ -19,8 +19,8 @@ export default function Checkbox({ value, setValue, label }: ICheckbox): JSX.Ele
 
   return (
     <CheckboxContainer>
-      <input type="checkbox" checked={value} onChange={toggleValue} />
-      <Spacers width="2px" />
+      <input type="checkbox" checked={value} onChange={toggleValue} aria-label="Toggle alpha channel visibility" />
+      <Spacers width="3px" />
       <label onClick={toggleValue}>
         <b>{label}</b>
       </label>

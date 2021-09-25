@@ -8,6 +8,7 @@ import Footer from "./Footer";
 import theme from "../styles/Theme";
 import useBreakpointMap from "../hooks/useBreakpointMap";
 import { IBreakpointsMap } from "../types/breakpoints";
+import useDarkMode from "../hooks/useDarkMode";
 
 // Based on https://stackoverflow.com/a/54159114/4298115, add a MINIMUM delay of x seconds on original load
 const paths = ["A11y/Contrast", "A11y/Statistics", "Harmony", "Mix", "Manipulate"];
@@ -25,11 +26,12 @@ const Container = styled.div`
   position: relative;
   min-height: 100vh;
   max-width: 90%;
-  padding: 24px 0;
+  padding: 24px 8px;
   margin: auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 `;
 
 export const BreakpointsContext = createContext<IBreakpointsMap>({
@@ -43,14 +45,16 @@ export const BreakpointsContext = createContext<IBreakpointsMap>({
 
 export default function App(): JSX.Element {
   const breakpoints = useBreakpointMap();
-  const providerValue = useMemo(() => breakpoints, [breakpoints]);
+  const BREAKPOINT_MAP = useMemo(() => breakpoints, [breakpoints]);
+
+  const { isDarkMode } = useDarkMode();
+  const APP_THEME = useMemo(() => (isDarkMode ? theme.dark : theme.light), [isDarkMode]);
 
   return (
     <Container>
-      <GlobalStyle />
-
-      <ThemeProvider theme={theme}>
-        <BreakpointsContext.Provider value={providerValue}>
+      <ThemeProvider theme={APP_THEME}>
+        <BreakpointsContext.Provider value={BREAKPOINT_MAP}>
+          <GlobalStyle />
           <Navigation />
 
           <Suspense fallback={<Loading />}>
