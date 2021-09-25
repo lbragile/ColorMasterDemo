@@ -1,22 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
-import useDebounce from "../../hooks/useDebounce";
+import useDebounce from "../hooks/useDebounce";
 import { useHistory } from "react-router";
-import useQuery from "../../hooks/useQuery";
-import { Swatch, SwatchCounter } from "../../styles/Swatch";
-import { A11yStatisticsSample } from "../../utils/codeSamples";
+import useQuery from "../hooks/useQuery";
+import { Swatch, SwatchCounter } from "../styles/Swatch";
+import { A11yStatisticsSample } from "../utils/codeSamples";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
-import CodeModal from "../../components/CodeModal";
-import ColorIndicator from "../../components/ColorIndicator";
-import ColorSelectorWidget from "../../components/ColorSelectorWidget";
-import { FlexColumn, FlexRow } from "../../styles/Flex";
-import { Heading } from "../../styles/Heading";
+import CodeModal from "../components/CodeModal";
+import ColorIndicator from "../components/ColorIndicator";
+import ColorSelectorWidget from "../components/ColorSelectorWidget";
+import { FlexColumn, FlexRow } from "../styles/Flex";
+import { Heading } from "../styles/Heading";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFire, faMoon, faSnowflake, faSun, faTimes } from "@fortawesome/free-solid-svg-icons";
-import Spacers from "../../components/Spacers";
-import { BreakpointsContext } from "../../components/App";
-import { FadeIn } from "../../styles/Fade";
+import Spacers from "../components/Spacers";
+import { BreakpointsContext } from "../components/App";
+import { FadeIn } from "../styles/Fade";
 
 extendPlugins([A11yPlugin]);
 
@@ -90,7 +90,7 @@ export default function Statistics(): JSX.Element {
 
   useEffect(() => {
     history.replace({
-      pathname: "/accessibility/statistics",
+      pathname: "/statistics",
       search: `?color=${colorDebounce.stringHEX().slice(1).toLowerCase()}&alpha=[${Object.values(alpha).join(",")}]`
     });
   }, [history, colorDebounce, alpha]);

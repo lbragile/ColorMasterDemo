@@ -127,8 +127,9 @@ export default function Navigation(): JSX.Element {
         <Bars icon={faBars} size="2x" $responsive={responsive} onClick={openMenu} />
 
         <List ref={listRef} $dir={dir} $height={listHeight} $show={show} $responsive={responsive} onClick={closeMenu}>
-          {MENU_TABS.map((item, i) => {
-            const path = `/${i < 2 ? "accessibility/" : ""}${item.type}`;
+          {MENU_TABS.map((item) => {
+            const path = `/${item.type}`;
+
             return (
               <Item key={path}>
                 <Anchor to={path} $active={active === path} $responsive={responsive} onClick={() => setActive(path)}>

@@ -11,7 +11,7 @@ import { IBreakpointsMap } from "../types/breakpoints";
 import useDarkMode from "../hooks/useDarkMode";
 
 // Based on https://stackoverflow.com/a/54159114/4298115, add a MINIMUM delay of x seconds on original load
-const paths = ["A11y/Contrast", "A11y/Statistics", "Harmony", "Mix", "Manipulate"];
+const paths = ["Contrast", "Statistics", "Harmony", "Mix", "Manipulate"];
 const DELAY_IN_SECONDS = 1.5;
 const [Contrast, Statistics, Harmony, Mix, Manipulate] = paths.map((path) => {
   return lazy(() =>
@@ -59,12 +59,12 @@ export default function App(): JSX.Element {
 
           <Suspense fallback={<Loading />}>
             <Switch>
-              <Route path="/accessibility/contrast" component={Contrast} />
-              <Route path="/accessibility/statistics" component={Statistics} />
+              <Route path="/contrast" component={Contrast} />
+              <Route path="/statistics" component={Statistics} />
               <Route path="/harmony" component={Harmony} />
               <Route path="/mix" component={Mix} />
               <Route path="/manipulate" component={Manipulate} />
-              <Redirect from="/" to="/harmony" />
+              <Redirect from="/" to="/contrast" />
             </Switch>
           </Suspense>
 

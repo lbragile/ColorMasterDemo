@@ -143,7 +143,7 @@ export default function NumberInput({
   };
 
   return (
-    <InputContainer aria-label="Color Channel Value">
+    <InputContainer>
       <FlexColumn $cols={1}>
         <ArrowButton
           $dir="up"
@@ -168,6 +168,7 @@ export default function NumberInput({
 
       <StyledNumberInput
         ref={inputRef}
+        aria-label="Color Channel Value"
         type="text"
         min={min}
         max={max}

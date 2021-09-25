@@ -1,23 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
-import useDebounce from "../../hooks/useDebounce";
+import useDebounce from "../hooks/useDebounce";
 import styled from "styled-components";
-import { ContrastSample } from "../../utils/codeSamples";
+import { ContrastSample } from "../utils/codeSamples";
 import { useHistory } from "react-router";
-import useQuery from "../../hooks/useQuery";
-import CodeModal from "../../components/CodeModal";
-import ColorSelectorWidget from "../../components/ColorSelectorWidget";
-import Spacers from "../../components/Spacers";
-import { FlexColumn, FlexRow } from "../../styles/Flex";
-import { Label } from "../../styles/Label";
-import Checkbox from "../../components/Checkbox";
-import { Heading } from "../../styles/Heading";
+import useQuery from "../hooks/useQuery";
+import CodeModal from "../components/CodeModal";
+import ColorSelectorWidget from "../components/ColorSelectorWidget";
+import Spacers from "../components/Spacers";
+import { FlexColumn, FlexRow } from "../styles/Flex";
+import { Label } from "../styles/Label";
+import Checkbox from "../components/Checkbox";
+import { Heading } from "../styles/Heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCheckCircle, faCircle, faSquareFull, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import Dropdown from "../../components/Dropdown";
-import { BreakpointsContext } from "../../components/App";
-import { FadeIn } from "../../styles/Fade";
+import Dropdown from "../components/Dropdown";
+import { BreakpointsContext } from "../components/App";
+import { FadeIn } from "../styles/Fade";
 
 extendPlugins([A11yPlugin]);
 
@@ -135,7 +135,7 @@ export default function Contrast(): JSX.Element {
 
   useEffect(() => {
     history.replace({
-      pathname: "/accessibility/contrast",
+      pathname: "/contrast",
       search: `?fgColor=${fgDebounce.stringHEX().slice(1).toLowerCase()}&bgColor=${bgDebounce
         .stringHEX()
         .slice(1)
@@ -176,7 +176,13 @@ export default function Contrast(): JSX.Element {
 
             <FlexRow $gap="20px">
               <RadioInput onClick={() => isLarge && setIsLarge(false)}>
-                <input type="radio" name="body" checked={!isLarge} onChange={() => setIsLarge(!isLarge)} />
+                <input
+                  type="radio"
+                  name="body"
+                  checked={!isLarge}
+                  onChange={() => setIsLarge(!isLarge)}
+                  aria-label="Body (Regular) Text Contrast Check Selection"
+                />
                 <Spacers width="4px" />
                 <label htmlFor="body">
                   <b>Body</b>
@@ -184,7 +190,13 @@ export default function Contrast(): JSX.Element {
               </RadioInput>
 
               <RadioInput onClick={() => !isLarge && setIsLarge(true)}>
-                <input type="radio" name="large" checked={isLarge} onChange={() => setIsLarge(!isLarge)} />
+                <input
+                  type="radio"
+                  name="large"
+                  checked={isLarge}
+                  onChange={() => setIsLarge(!isLarge)}
+                  aria-label="Large Text Contrast Check Selection"
+                />
                 <Spacers width="4px" />
                 <label htmlFor="large">
                   <b>Large</b>
