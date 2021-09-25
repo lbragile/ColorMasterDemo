@@ -1,7 +1,7 @@
 import { faMix, IconDefinition } from "@fortawesome/free-brands-svg-icons";
 import { faAdjust, faBars, faChartPie, faDharmachakra, faSlidersH } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { BreakpointsContext } from "./App";
@@ -39,7 +39,7 @@ const List = styled.ul.attrs(
 )`
   display: flex;
   flex-direction: ${(props) => props.$dir};
-  gap: ${(props) => (props.$responsive ? "24px" : "16px")};
+  gap: ${(props) => (props.$responsive ? "24px" : "32px")};
   ${(props) =>
     props.$responsive
       ? css`
@@ -109,6 +109,17 @@ export default function Navigation(): JSX.Element {
   };
 
   const closeMenu = () => setShow(false);
+
+  const handleScroll = useCallback(() => {
+    if (responsive && show) {
+      setShow(false);
+    }
+  }, [responsive, show]);
+
+  useEffect(() => {
+    document.addEventListener("scroll", handleScroll);
+    return () => document.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   return (
     <MenuContainer $responsive={responsive}>

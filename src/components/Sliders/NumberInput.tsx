@@ -143,13 +143,14 @@ export default function NumberInput({
   };
 
   return (
-    <InputContainer>
+    <InputContainer aria-label="Color Channel Value">
       <FlexColumn $cols={1}>
         <ArrowButton
           $dir="up"
           disabled={Number(value) === Number(max)}
           onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "top")}
           onPointerUp={clearHold}
+          aria-label="Number Input Increment Button"
         >
           <ArrowIcon icon={faCaretUp} />
         </ArrowButton>
@@ -159,6 +160,7 @@ export default function NumberInput({
           disabled={Number(value) === Number(min)}
           onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(e, "bottom")}
           onPointerUp={clearHold}
+          aria-label="Number Input Decrement Button"
         >
           <ArrowIcon icon={faCaretDown} />
         </ArrowButton>

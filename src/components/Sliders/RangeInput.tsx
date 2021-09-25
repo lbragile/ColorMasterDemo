@@ -65,6 +65,7 @@ export default function RangeInput({
         // * sliders are always numeric (base 10), so need to convert to hex (base 16) if format matches
         onChange({ ...e, target: { ...e.target, value: Number(e.target.value).toString(format === "hex" ? 16 : 10) } });
       }}
+      aria-label="Color Channel Adjustment Slider"
     />
   );
 }

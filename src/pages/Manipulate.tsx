@@ -179,8 +179,18 @@ export default function Manipulate(): JSX.Element {
 
     return (
       <FlexColumn $cols={1}>
-        <AdjustIcon icon={faPlus} $active={incrementArr[channel]} onClick={() => setIncrementArr(newArr)} />
-        <AdjustIcon icon={faMinus} $active={!incrementArr[channel]} onClick={() => setIncrementArr(newArr)} />
+        <AdjustIcon
+          icon={faPlus}
+          $active={incrementArr[channel]}
+          onClick={() => setIncrementArr(newArr)}
+          aria-label="Trigger to increment channel by adjustment color"
+        />
+        <AdjustIcon
+          icon={faMinus}
+          $active={!incrementArr[channel]}
+          onClick={() => setIncrementArr(newArr)}
+          aria-label="Trigger to decrement channel by adjustment color"
+        />
       </FlexColumn>
     );
   };
