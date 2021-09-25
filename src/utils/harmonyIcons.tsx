@@ -4,6 +4,11 @@ import { THarmony } from "colormaster/types";
 
 const StyledSVG = styled.svg`
   transform: scale(0.5);
+
+  & g {
+    stroke: ${(props) => props.theme.colors.text};
+    fill: ${(props) => props.theme.colors.text};
+  }
 `;
 
 const RadialStop = styled.stop.attrs((props: { stopColor: string }) => props)`
@@ -14,7 +19,7 @@ const RadialStop = styled.stop.attrs((props: { stopColor: string }) => props)`
 export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   analogous: (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="50" x2="4" y2="7" />
         <line x1="25" y1="50" x2="25" y2="4" />
         <line x1="25" y1="50" x2="46" y2="7" />
@@ -26,7 +31,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   complementary: (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="2" x2="25" y2="48" />
         <circle cx="25" cy="46" r="3" />
         <circle cx="25" cy="4" r="3" />
@@ -35,7 +40,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   "split-complementary": (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="25" x2="15" y2="43" />
         <line x1="25" y1="25" x2="25" y2="0" />
         <line x1="25" y1="25" x2="35" y2="43" />
@@ -47,7 +52,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   "double-split-complementary": (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="25" x2="10" y2="7" />
         <line x1="25" y1="25" x2="40" y2="7" />
         <line x1="25" y1="25" x2="10" y2="43" />
@@ -63,7 +68,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   triad: (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="25" x2="4" y2="43" />
         <line x1="25" y1="25" x2="25" y2="0" />
         <line x1="25" y1="25" x2="46" y2="43" />
@@ -75,7 +80,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   rectangle: (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="25" x2="15" y2="7" />
         <line x1="25" y1="25" x2="35" y2="7" />
         <line x1="25" y1="25" x2="15" y2="43" />
@@ -89,7 +94,7 @@ export const HarmonyIcons: Record<THarmony, JSX.Element> = {
   ),
   square: (
     <StyledSVG height="50" width="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="black" strokeWidth="1" fill="black">
+      <g strokeWidth="1">
         <line x1="25" y1="25" x2="0" y2="25" />
         <line x1="25" y1="25" x2="25" y2="0" />
         <line x1="25" y1="25" x2="50" y2="25" />

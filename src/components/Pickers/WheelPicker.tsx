@@ -131,6 +131,7 @@ export default function WheelPicker({
   return (
     <FlexRow $gap="4px">
       <CanvasGroup
+        className="wheel"
         mainRef={colorWheel}
         picker={{
           ref: colorPicker,

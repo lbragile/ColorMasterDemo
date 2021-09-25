@@ -1,9 +1,7 @@
 import styled from "styled-components";
 
-export const Heading = styled.p.attrs(
-  (props: { $color?: string; $size?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }) => props
-)`
-  color: ${(props) => props.$color ?? "black"};
+export const Heading = styled.p.attrs((props: { $size?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }) => props)`
+  color: ${(props) => (props.$size === "h1" ? props.theme.colors.text : props.theme.colors.heading)};
   text-align: center;
   margin: 0;
   font-weight: bold;

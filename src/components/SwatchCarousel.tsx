@@ -2,10 +2,10 @@ import React, { useContext, useRef, useState } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { Swatch } from "../styles/Swatch";
 import Spacers from "./Spacers";
-import { StyledAngleIcon } from "./ColorSelectorWidget";
 import CM from "colormaster";
 import { FlexRow } from "../styles/Flex";
 import { BreakpointsContext } from "./App";
+import { StyledAngleIcon } from "../styles/AngleIcon";
 
 const SWATCH_COLORS = [
   "hsla(0, 100%, 50%, 1)",
@@ -41,7 +41,6 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
     <FlexRow $gap="4px">
       <StyledAngleIcon
         icon={faAngleLeft}
-        color="gray"
         $disabled={swatchIndex === 0}
         onClick={() => swatchIndex > 0 && setSwatchIndex(swatchIndex - 1)}
       />
@@ -65,7 +64,6 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
 
       <StyledAngleIcon
         icon={faAngleRight}
-        color="gray"
         $disabled={swatchIndex === SWATCH_COLORS.length - numVisibleSwatches.current}
         onClick={() =>
           swatchIndex < SWATCH_COLORS.length - numVisibleSwatches.current && setSwatchIndex(swatchIndex + 1)

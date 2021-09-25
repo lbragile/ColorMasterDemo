@@ -1,8 +1,8 @@
 import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import { StyledAngleIcon } from "../styles/AngleIcon";
 import { FlexColumn } from "../styles/Flex";
-import { StyledAngleIcon } from "./ColorSelectorWidget";
 import Spacers from "./Spacers";
 
 const Container = styled.div.attrs((props: { $cols: number }) => props)`
@@ -13,6 +13,7 @@ const Container = styled.div.attrs((props: { $cols: number }) => props)`
 const Button = styled.button`
   padding: 10px;
   background-color: transparent;
+  color: ${(props) => props.theme.colors.text};
   border: 1px solid ${(props) => props.theme.colors.border};
   border-radius: 4px;
   width: 100%;
@@ -34,7 +35,8 @@ const Item = styled.div.attrs((props: { $active: boolean; $selected: boolean; $l
   border: 1px solid ${(props) => props.theme.colors.borderLight};
   border-top: none;
   border-radius: ${(props) => (props.$last ? "0 0 10px 10px" : "")};
-  background-color: ${(props) => (props.$active ? "hsla(0, 0%, 95%, 1)" : "white")};
+  background-color: ${(props) => (props.$active ? props.theme.colors.bgActive : props.theme.colors.bgDefault)};
+  color: ${(props) => props.theme.colors.text};
   font-weight: ${(props) => (props.$selected ? "bold" : "normal")};
   width: 100%;
   padding: 10px;
@@ -45,6 +47,7 @@ const StyledIcon = styled.span.attrs((props: { $iconPos: "right" | "left" }) => 
   position: absolute;
   left: ${(props) => (props.$iconPos === "left" ? "8px" : "")};
   right: ${(props) => (props.$iconPos === "right" ? "8px" : "")};
+  color: ${(props) => props.theme.colors.arrowColor};
 `;
 
 interface IDropdown {
@@ -63,13 +66,11 @@ const Switcher = ({ adjustSelection }: { adjustSelection: (dir: "up" | "down") =
     <FlexColumn $cols={1}>
       <StyledAngleIcon
         icon={faAngleUp}
-        color="gray"
         onClick={() => adjustSelection("up")}
         aria-label="Automatically switch dropdown value up"
       />
       <StyledAngleIcon
         icon={faAngleDown}
-        color="gray"
         onClick={() => adjustSelection("down")}
         aria-label="Automatically switch dropdown value down"
       />

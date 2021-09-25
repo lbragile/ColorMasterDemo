@@ -54,11 +54,7 @@ export default function ColorIndicator({
 
   return (
     <>
-      {showName && (
-        <Heading $color="grey" $size="h2">
-          {CM(color).name({ exact: false })}
-        </Heading>
-      )}
+      {showName && <Heading $size="h2">{CM(color).name({ exact: false })}</Heading>}
 
       <RowOrCol $gap="12px" $wrap="wrap" $dir={dir}>
         <span>

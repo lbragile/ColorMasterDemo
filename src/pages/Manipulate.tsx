@@ -64,7 +64,7 @@ const LabelledSwatch = styled(Swatch)`
 `;
 
 const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) => props)`
-  color: ${(props) => (props.$active ? "black" : "hsla(0, 0%, 85%, 1)")};
+  color: ${(props) => (props.$active ? props.theme.colors.arrowColor : props.theme.colors.arrowColorHover)};
   cursor: pointer;
 `;
 

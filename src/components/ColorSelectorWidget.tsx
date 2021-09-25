@@ -31,18 +31,6 @@ const BorderedSegment = styled(FlexColumn)`
   overflow: hidden;
 `;
 
-export const StyledAngleIcon = styled(FontAwesomeIcon).attrs((props: { $disabled: boolean }) => props)`
-  cursor: ${(props) => (props.$disabled ? "not-allowed" : "pointer")};
-
-  & path {
-    opacity: ${(props) => (props.$disabled ? 0.5 : 1)};
-
-    &:hover {
-      fill: ${(props) => (props.$disabled ? "grey" : "black")};
-    }
-  }
-`;
-
 interface IColorSelectorWidget {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
@@ -77,9 +65,7 @@ export default function ColorSelectorWidget({
 
       <Spacers height="15px" />
 
-      <Heading $color="grey" $size="h2">
-        {colorNameDebounce}
-      </Heading>
+      <Heading $size="h2">{colorNameDebounce}</Heading>
 
       <Spacers height="15px" />
 
@@ -92,7 +78,7 @@ export default function ColorSelectorWidget({
           opts={colorspaceOpts}
           value={colorspace}
           setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
-          icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
+          icon={<FontAwesomeIcon icon={faPalette} />}
           iconPos="left"
           switcherPos="left"
           cols={isMobile ? 10 : 8}
@@ -104,7 +90,7 @@ export default function ColorSelectorWidget({
           opts={pickerOpts}
           value={picker}
           setValue={setPicker as React.Dispatch<React.SetStateAction<string>>}
-          icon={<FontAwesomeIcon icon={faCrosshairs} color="dimgray" />}
+          icon={<FontAwesomeIcon icon={faCrosshairs} />}
           iconPos="right"
           switcherPos="right"
           cols={isMobile ? 10 : 8}

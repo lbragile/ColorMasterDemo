@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const CopyrightText = styled.span`
   text-align: center;
-  max-width: 70%;
+  max-width: 75%;
   margin: 16px auto 0 auto;
   font-weight: bold;
 `;

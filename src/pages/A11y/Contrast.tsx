@@ -30,7 +30,7 @@ const SampleOutput = styled.div.attrs(
   padding: ${(props) => (props.size === "image" ? "12px 24px" : "12px")};
   font-size: ${(props) => (props.size === "large" ? "14pt" : "1rem")};
   font-weight: ${(props) => (props.size === "large" ? "bold" : "normal")};
-  border: 1px solid hsla(0, 0%, 90%, 1);
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
   text-align: left;
   line-height: 2rem;
   margin-top: 12px;
@@ -43,16 +43,18 @@ const SampleOutput = styled.div.attrs(
 const StyledTable = styled.table`
   border-spacing: 0;
   border-collapse: separate;
-  font-size: 1.2rem;
+  margin: auto;
+  font-size: 1.1rem;
   empty-cells: hide;
+  color: ${(props) => props.theme.colors.text};
 
   & *:not(svg) {
-    padding: 20px;
+    padding: 16px;
     border: 1px solid hsla(0, 0%, 80%, 1);
   }
 
   & th {
-    background: hsla(0, 0%, 95%, 1);
+    background: ${(props) => props.theme.colors.bgActive};
   }
 
   & .top-left,
@@ -80,7 +82,7 @@ const TableCell = styled.td.attrs((props: { $positive?: boolean; $negative?: boo
       ? props.theme.colors.bgPositiveDark
       : props.$negative
       ? props.theme.colors.bgNegativeDark
-      : "black"};
+      : props.theme.colors.text};
   text-align: center;
 
   & svg {
@@ -161,7 +163,7 @@ export default function Contrast(): JSX.Element {
             opts={["text", "image"]}
             value={sampleOutput}
             setValue={setSampleOutput}
-            icon={<FontAwesomeIcon icon={faCaretDown} color="dimgray" />}
+            icon={<FontAwesomeIcon icon={faCaretDown} />}
             iconPos="right"
             switcherPos="right"
             cols={isMobile || isTablet ? 12 : 6}
@@ -213,9 +215,7 @@ export default function Contrast(): JSX.Element {
 
         <Heading $size="h1">Contrast</Heading>
 
-        <Heading $size="h2" $color="grey">
-          {contrast}
-        </Heading>
+        <Heading $size="h2">{contrast}</Heading>
 
         <span>
           <Checkbox label="Ratio" value={ratio} setValue={setRatio} />

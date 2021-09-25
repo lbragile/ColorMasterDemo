@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyBlock, dracula } from "react-code-blocks";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { BreakpointsContext } from "./App";
 
 const PrimaryButton = styled.button`
   padding: 8px 24px;
@@ -14,6 +15,7 @@ const PrimaryButton = styled.button`
   font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
+  outline: none;
 
   &:hover {
     background-color: ${(props) => props.theme.colors.primaryBtnHover};
@@ -34,13 +36,24 @@ const Modal = styled.div.attrs((props: { $open: boolean }) => props)`
   z-index: 10;
 `;
 
-const Content = styled.div`
+const ContentContainer = styled.div.attrs((props: { $responsive: boolean }) => props)`
   position: relative;
+  ${(props) =>
+    props.$responsive
+      ? css`
+          width: 80%;
+          height: 80%;
+        `
+      : ""}
+`;
+
+const Content = styled.div`
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  max-width: 80%;
+  max-width: 100%;
   max-height: 100%;
+  overflow: auto;
 
   & div {
     border-radius: 8px;
@@ -59,17 +72,35 @@ const CloseIcon = styled(FontAwesomeIcon)`
 `;
 
 export default function CodeModal({ code }: { code: string }): JSX.Element {
-  const [open, setOpen] = useState(false);
+  const { isMobile, isTablet } = useContext(BreakpointsContext);
+
+  const [show, setShow] = useState(false);
+
+  const open = () => setShow(true);
+  const close = () => setShow(false);
+
+  const handleEscape = useCallback((e) => {
+    if (e.key === "Escape") {
+      setShow(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [handleEscape]);
 
   return (
     <React.Fragment>
-      <PrimaryButton onClick={() => setOpen(true)}>Code</PrimaryButton>
+      <PrimaryButton onClick={open}>Code</PrimaryButton>
 
-      <Modal $open={open}>
-        <Content>
-          <CopyBlock text={code} theme={dracula} language="typescript" wrapLines />
-          <CloseIcon icon={faTimes} onClick={() => setOpen(false)} color="white" size="2x" />
-        </Content>
+      <Modal $open={show}>
+        <ContentContainer $responsive={isMobile || isTablet}>
+          <Content>
+            <CopyBlock text={code} theme={dracula} language="typescript" wrapLines />
+          </Content>
+          <CloseIcon icon={faTimes} onClick={close} color="white" size="2x" />
+        </ContentContainer>
       </Modal>
     </React.Fragment>
   );

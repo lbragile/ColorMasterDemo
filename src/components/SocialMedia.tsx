@@ -3,16 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 import { faGithub, faNpm, IconDefinition } from "@fortawesome/free-brands-svg-icons";
 
-const LinkIcon = styled(FontAwesomeIcon)`
+const LinkIcon = styled(FontAwesomeIcon).attrs((props: { color: string }) => props)`
   cursor: pointer;
   margin: 0 8px;
+  color: ${(props) => props.color ?? props.theme.colors.text};
 `;
 
-const LINKS: { href: string; icon: IconDefinition; color: string; label: string }[] = [
+const LINKS: { href: string; icon: IconDefinition; color?: string; label: string }[] = [
   {
     href: "https://www.github.com/lbragile/ColorMaster",
     icon: faGithub,
-    color: "black",
+    color: undefined,
     label: "GitHub"
   },
   {

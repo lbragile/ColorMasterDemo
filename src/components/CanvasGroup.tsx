@@ -31,6 +31,10 @@ const GroupContainer = styled.div.attrs((props: { $canvas: HTMLCanvasElement | n
     cursor: crosshair;
     touch-action: none;
     background: transparent;
+
+    &:not(.wheel) {
+      border: 1px solid ${(props) => props.theme.colors.borderLight};
+    }
   }
 `;
 

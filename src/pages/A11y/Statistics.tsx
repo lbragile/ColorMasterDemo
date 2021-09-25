@@ -147,24 +147,18 @@ export default function Statistics(): JSX.Element {
       >
         <FlexColumn $gap="8px">
           <Heading $size="h1">Brightness</Heading>
-          <Heading $size="h2" $color="grey">
-            {color.brightness()}
-          </Heading>
+          <Heading $size="h2">{color.brightness()}</Heading>
         </FlexColumn>
 
         <FlexColumn $gap="8px">
           <Heading $size="h1">Luminance</Heading>
-          <Heading $size="h2" $color="grey">
-            {color.luminance()}
-          </Heading>
+          <Heading $size="h2">{color.luminance()}</Heading>
         </FlexColumn>
 
         <FlexColumn $gap="8px">
           <Heading $size="h1">Light | Dark</Heading>
           <FlexRow $gap="8px">
-            <Heading $size="h2" $color="grey">
-              {color.isLight() ? "Light" : "Dark"}
-            </Heading>
+            <Heading $size="h2">{color.isLight() ? "Light" : "Dark"}</Heading>
             <h2>
               {color.isLight() ? (
                 <FontAwesomeIcon icon={faSun} color="hsla(30, 100%, 50%, 1)" />
@@ -178,9 +172,7 @@ export default function Statistics(): JSX.Element {
         <FlexColumn $gap="8px">
           <Heading $size="h1">Warm | Cool</Heading>
           <FlexRow $gap="8px">
-            <Heading $size="h2" $color="grey">
-              {color.isWarm() ? "Warm" : "Cool"}
-            </Heading>
+            <Heading $size="h2">{color.isWarm() ? "Warm" : "Cool"}</Heading>
             <h2>
               {color.isWarm() ? (
                 <FontAwesomeIcon icon={faFire} color="hsla(0, 100%, 40%, 1)" />
@@ -193,7 +185,7 @@ export default function Statistics(): JSX.Element {
 
         <FlexColumn $gap="8px">
           <Heading $size="h1">Pure Hue?</Heading>
-          <Heading $size="h2" $color="grey">
+          <Heading $size="h2">
             {pureHue.pure ? (
               <FontAwesomeIcon icon={faCheck} color="hsla(120, 100%, 40%, 1)" />
             ) : (

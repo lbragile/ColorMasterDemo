@@ -24,6 +24,8 @@ declare module "styled-components" {
       arrowColor: string;
       arrowColorHover: string;
       heading: string;
+      text: string;
+      textInverse: string;
     };
   }
 }

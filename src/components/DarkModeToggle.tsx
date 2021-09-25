@@ -42,7 +42,7 @@ const Toggle = styled.button.attrs((props: { $isDark: boolean }) => props)`
 
 export default function DarkModeToggle({ isDarkMode, toggle }: IUseDarkModeOutput): JSX.Element {
   return (
-    <Toggle onClick={toggle} $isDark={isDarkMode}>
+    <Toggle onClick={toggle} $isDark={isDarkMode} aria-label="Toggle for Application Theme (Light or Dark mode)">
       <FontAwesomeIcon icon={isDarkMode ? faMoon : faSun} />
       <Switch $isDark={isDarkMode} />
     </Toggle>

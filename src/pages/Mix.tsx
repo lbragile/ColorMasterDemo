@@ -181,7 +181,7 @@ export default function Mix(): JSX.Element {
             opts={colorspaceOpts}
             value={colorspace}
             setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
-            icon={<FontAwesomeIcon icon={faPalette} color="dimgray" />}
+            icon={<FontAwesomeIcon icon={faPalette} />}
             iconPos="left"
             switcherPos="left"
             cols={isMobile || isTablet ? 8 : 6}
