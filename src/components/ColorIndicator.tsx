@@ -1,99 +1,91 @@
-import React, { useMemo } from "react";
-import { Popup, Icon, Grid, Checkbox, Input, Header } from "semantic-ui-react";
+import React from "react";
 import styled from "styled-components";
-import useBreakpointMap from "../hooks/useBreakpointMap";
-import useCopyToClipboard from "../hooks/useCopytoClipboard";
-import Spacers from "./Spacers";
 import CM, { extendPlugins } from "colormaster";
 import NamePlugin from "colormaster/plugins/name";
+import { FlexRow } from "../styles/Flex";
+import Checkbox from "./Checkbox";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle, faCopy } from "@fortawesome/free-solid-svg-icons";
+import useCopyToClipboard from "../hooks/useCopytoClipboard";
+import { Tooltip } from "../styles/Tooltip";
+import { Heading } from "../styles/Heading";
 
 extendPlugins([NamePlugin]);
 
-const StyledColorDisplay = styled(Input).attrs(
-  (props: { $mobile: boolean; action: { color: string; [key: string]: unknown } }) => props
-)`
-  && {
-    & > input {
-      text-align: center;
-      font-size: ${(props) => (props.$mobile ? "0.95em" : "1em")};
-      padding: 0;
-    }
-
-    & .button:hover,
-    & .button:focus {
-      background-color: ${(props) => (props.action.color === "teal" ? "rgba(0, 196, 196, 1)" : "rgba(0, 196, 0, 1)")};
-    }
-  }
+const StyledColorDisplay = styled.input`
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 4px 0 0 4px;
+  text-align: center;
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  background-color: ${(props) => props.theme.colors.bgDefault};
+  color: ${(props) => props.theme.colors.text};
+  border-right: none;
+  outline: none;
+  line-height: 1.8em;
 `;
+
+const CopyButton = styled.button.attrs((props: { $copied: string | null }) => props)`
+  height: 36px;
+  padding: 0 10px;
+  background: ${(props) => `hsl(${props.$copied ? 120 : 180}, 100%, 40%)`};
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+`;
+
+const RowOrCol = styled(FlexRow).attrs((props: { $dir?: "row" | "column" }) => props)`
+  flex-direction: ${(props) => props.$dir ?? "row"};
+`;
+
+interface IColorIndicator {
+  color: string;
+  alpha: boolean;
+  setAlpha: React.Dispatch<React.SetStateAction<boolean>>;
+  showName?: boolean;
+  dir?: "row" | "column";
+}
 
 export default function ColorIndicator({
   color,
   alpha,
   setAlpha,
-  showName = true
-}: {
-  color: string;
-  alpha: boolean;
-  setAlpha: React.Dispatch<React.SetStateAction<boolean>>;
-  showName?: boolean;
-}): JSX.Element {
+  showName = true,
+  dir = "row"
+}: IColorIndicator): JSX.Element {
   const [copy, setCopy] = useCopyToClipboard();
-  const { isMobile } = useBreakpointMap();
-
-  const copyAction = useMemo(
-    () =>
-      function (text: string) {
-        return {
-          icon: (
-            <Popup
-              content="Copy to clipboard"
-              position="top center"
-              inverted
-              trigger={<Icon name={copy ? "check circle" : "copy"} />}
-            />
-          ),
-          color: copy ? "green" : "teal",
-          onClick: () => setCopy(text),
-          onBlur: () => setCopy("")
-        };
-      },
-    [copy, setCopy]
-  );
 
   return (
     <>
-      {showName && (
-        <>
-          <Grid.Row>
-            <Header as="h3" color="grey">
-              {CM(color).name({ exact: false })}
-            </Header>
-          </Grid.Row>
+      {showName && <Heading $size="h2">{CM(color).name({ exact: false })}</Heading>}
 
-          <Spacers height="6px" />
-        </>
-      )}
-
-      <Grid.Row columns={2}>
-        <Grid.Column computer={12}>
+      <RowOrCol $gap="12px" $wrap="wrap" $dir={dir}>
+        <span>
           <StyledColorDisplay
             type="text"
             value={color}
             spellCheck={false}
-            size="large"
             readOnly
-            fluid
-            action={copyAction(color)}
-            $mobile={isMobile}
+            aria-label="Color Indicator Display"
           />
-        </Grid.Column>
+          <Tooltip $copied={!!copy}>
+            <span>Copy to clipboard</span>
+            <CopyButton
+              $copied={copy}
+              onClick={() => setCopy(color)}
+              onBlur={() => setCopy("")}
+              aria-label="Copy to Clipboard"
+            >
+              <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} color="white" />
+            </CopyButton>
+          </Tooltip>
+        </span>
 
-        <Spacers height="12px" />
-
-        <Grid.Column computer={2}>
-          <Checkbox label="Alpha" checked={alpha} onChange={() => setAlpha(!alpha)} />
-        </Grid.Column>
-      </Grid.Row>
+        <span>
+          <Checkbox value={alpha} setValue={setAlpha} label="Alpha" />
+        </span>
+      </RowOrCol>
     </>
   );
 }

@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../../hooks/useCanvasContext";
+import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
-import { CanvasContainer } from "../../styles/Canvas";
+import { FadeIn } from "../../styles/Fade";
 
 interface IWheelPicker {
   color: ColorMaster;
@@ -12,7 +12,7 @@ interface IWheelPicker {
   pickerRadius?: number;
   rotate?: number;
   harmony?: ColorMaster[];
-  verticalPickers?: boolean;
+  vertical?: boolean;
 }
 
 /**
@@ -30,22 +30,21 @@ export default function WheelPicker({
   pickerRadius = 5,
   rotate = 90,
   harmony = undefined,
-  verticalPickers = true
+  vertical = true
 }: IWheelPicker): JSX.Element {
-  const colorWheel = useRef<HTMLCanvasElement>(null);
-  const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxWheel, ctxPicker] = useCanvasContext(colorWheel, colorPicker);
+  const [refWheel, ctxWheel] = useCanvas();
+  const [refPicker, ctxPicker] = useCanvas();
 
   useEffect(() => {
     const radScale = Math.PI / 180;
 
     if (ctxWheel) {
-      const radius = ctxWheel.canvas.width / 2;
+      const radius = ctxWheel.canvas.width / 2 - 5;
 
-      ctxWheel.clearRect(0, 0, radius * 2, radius * 2);
-      const [x, y] = [radius, radius];
+      ctxWheel.clearRect(0, 0, radius * 2 + 10, radius * 2 + 10);
+      const [x, y] = [radius + 5, radius + 5];
       const { l, a } = color.hsla();
 
       for (let hue = 0; hue < 360; hue++) {
@@ -64,8 +63,8 @@ export default function WheelPicker({
 
   useEffect(() => {
     if (ctxPicker) {
-      const radius = ctxPicker.canvas.width / 2;
-      ctxPicker.clearRect(0, 0, radius * 2 + 5, radius * 2 + 5);
+      const radius = ctxPicker.canvas.width / 2 - 5;
+      ctxPicker.clearRect(0, 0, radius * 2 + 10, radius * 2 + 10);
 
       const colorArr = harmony ?? [color];
       colorArr.forEach((c, i) => {
@@ -77,7 +76,7 @@ export default function WheelPicker({
         const x = radius + hyp * cos0;
         const y = radius - (rotate < h && h < rotate + 180 ? -1 : 1) * hyp * Math.sqrt(1 - Math.pow(cos0, 2));
 
-        ctxPicker.arc(x, y, pickerRadius, 0, 2 * Math.PI);
+        ctxPicker.arc(x + 5, y + 5, pickerRadius, 0, 2 * Math.PI);
 
         const pickerColor = "rgba(0,0,0,0.6)";
         ctxPicker.fillStyle = pickerColor;
@@ -91,7 +90,7 @@ export default function WheelPicker({
           ctxPicker.font = "bold 10px Arial";
           ctxPicker.textAlign = "center";
           ctxPicker.textBaseline = "middle";
-          ctxPicker.fillText((i + 1).toString(), x, y);
+          ctxPicker.fillText((i + 1).toString(), x + 5, y + 5);
         }
       });
     }
@@ -126,15 +125,15 @@ export default function WheelPicker({
     canDrag.current = false;
   };
 
-  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
+  const CommonProps = { thickness: 15, vertical, color, setColor };
 
   return (
-    <CanvasContainer $vertical={verticalPickers}>
+    <FadeIn $gap="8px">
       <CanvasGroup
-        className="main wheel"
-        mainRef={colorWheel}
+        className="wheel"
+        mainRef={refWheel}
         picker={{
-          ref: colorPicker,
+          ref: refPicker,
           onPointerDown: handlePointerDown,
           onPointerMove: handlePointerMove,
           onPointerUp: handlePointerUp
@@ -143,6 +142,6 @@ export default function WheelPicker({
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </CanvasContainer>
+    </FadeIn>
   );
 }

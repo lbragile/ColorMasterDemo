@@ -1,104 +1,76 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
-import { Container, Divider, Dropdown, Menu } from "semantic-ui-react";
-import styled from "styled-components";
+import React, { lazy, Suspense, useMemo, createContext } from "react";
+import styled, { ThemeProvider } from "styled-components";
 import { GlobalStyle } from "../styles/Global";
 import Loading from "./Loading";
-import { Switch, Route, NavLink, useLocation, Redirect } from "react-router-dom";
-import SocialMedia from "./SocialMedia";
+import { Switch, Route, Redirect } from "react-router-dom";
+import Navigation from "./Navigation";
+import Footer from "./Footer";
+import theme from "../styles/Theme";
 import useBreakpointMap from "../hooks/useBreakpointMap";
+import { IBreakpointsMap } from "../types/breakpoints";
+import useDarkMode from "../hooks/useDarkMode";
 
-const ContrastAnalysis = lazy(() => import("./Analysis/ContrastAnalysis"));
-const HarmonyAnalysis = lazy(() => import("./Analysis/HarmonyAnalysis"));
-const MixAnalysis = lazy(() => import("./Analysis/MixAnalysis"));
-const ManipulateAnalysis = lazy(() => import("./Analysis/ManipulateAnalysis"));
-const A11yStatisticsAnalysis = lazy(() => import("./Analysis/A11yStatisticsAnalysis"));
+// Based on https://stackoverflow.com/a/54159114/4298115, add a MINIMUM delay of x seconds on original load
+const paths = ["Contrast", "Statistics", "Harmony", "Mix", "Manipulate"];
+const DELAY_IN_SECONDS = 1.5;
+const [Contrast, Statistics, Harmony, Mix, Manipulate] = paths.map((path) => {
+  return lazy(() =>
+    Promise.all([
+      import("../pages/" + path),
+      new Promise((resolve) => setTimeout(resolve, DELAY_IN_SECONDS * 1000))
+    ]).then(([moduleExports]) => moduleExports)
+  );
+});
 
-const StyledContainer = styled(Container)`
-  && {
-    position: relative;
-    width: 90%;
-    max-width: 95%;
-    height: 100vh;
-  }
+const Container = styled.div`
+  position: relative;
+  min-height: 100vh;
+  max-width: 90%;
+  padding: 24px 8px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 `;
 
-const Content = styled.div.attrs((props: { $mobile: boolean }) => props)`
-  ${(props) =>
-    !props.$mobile
-      ? {
-          position: "absolute",
-          top: "50%",
-          transform: "translateY(-50%)"
-        }
-      : {}}
-`;
-
-const MENU_TABS = ["contrast", "statistics", "harmony", "mix", "manipulate"];
+export const BreakpointsContext = createContext<IBreakpointsMap>({
+  isMobile: false,
+  isTablet: false,
+  isLaptop: false,
+  isComputer: false,
+  isWideScreen: false,
+  isUltraWideScreen: false
+});
 
 export default function App(): JSX.Element {
-  const location = useLocation();
-  const [active, setActive] = useState("");
+  const breakpoints = useBreakpointMap();
+  const BREAKPOINT_MAP = useMemo(() => breakpoints, [breakpoints]);
 
-  const { isMobile } = useBreakpointMap();
-
-  useEffect(() => {
-    setActive(location.pathname);
-  }, [location]);
+  const { isDarkMode } = useDarkMode();
+  const APP_THEME = useMemo(() => (isDarkMode ? theme.dark : theme.light), [isDarkMode]);
 
   return (
-    <StyledContainer>
-      <GlobalStyle />
+    <Container>
+      <ThemeProvider theme={APP_THEME}>
+        <BreakpointsContext.Provider value={BREAKPOINT_MAP}>
+          <GlobalStyle />
+          <Navigation />
 
-      <Suspense fallback={<Loading />}>
-        {isMobile && <Divider hidden />}
+          <Suspense fallback={<Loading />}>
+            <Switch>
+              <Route path="/contrast" component={Contrast} />
+              <Route path="/statistics" component={Statistics} />
+              <Route path="/harmony" component={Harmony} />
+              <Route path="/mix" component={Mix} />
+              <Route path="/manipulate" component={Manipulate} />
+              <Redirect from="/" to="/contrast" />
+            </Switch>
+          </Suspense>
 
-        <Menu pointing secondary>
-          <Dropdown item text={isMobile ? "A11y" : "Accessibility"}>
-            <Dropdown.Menu>
-              {MENU_TABS.slice(0, 2).map((item) => {
-                const path = "/accessibility/" + item;
-                return (
-                  <Dropdown.Item
-                    as={NavLink}
-                    key={path}
-                    to={path}
-                    active={active === path}
-                    onClick={() => setActive(path)}
-                  >
-                    {item[0].toUpperCase() + item.slice(1)}
-                  </Dropdown.Item>
-                );
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-
-          {MENU_TABS.slice(2).map((item) => {
-            const path = "/" + item;
-            return (
-              <Menu.Item as={NavLink} key={path} to={path} active={active === path} onClick={() => setActive(path)}>
-                {item[0].toUpperCase() + item.slice(1)}
-              </Menu.Item>
-            );
-          })}
-
-          {!isMobile && (
-            <Menu.Item position="right">
-              <SocialMedia />
-            </Menu.Item>
-          )}
-        </Menu>
-
-        <Content $mobile={isMobile}>
-          <Switch>
-            <Route path="/accessibility/contrast" component={ContrastAnalysis} />
-            <Route path="/accessibility/statistics" component={A11yStatisticsAnalysis} />
-            <Route path="/harmony" component={HarmonyAnalysis} />
-            <Route path="/mix" component={MixAnalysis} />
-            <Route path="/manipulate" component={ManipulateAnalysis} />
-            <Redirect from="/" to="/harmony" />
-          </Switch>
-        </Content>
-      </Suspense>
-    </StyledContainer>
+          <Footer />
+        </BreakpointsContext.Provider>
+      </ThemeProvider>
+    </Container>
   );
 }

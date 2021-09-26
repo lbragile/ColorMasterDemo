@@ -7,7 +7,7 @@ import NamePlugin from "colormaster/plugins/name";
 extendPlugins([MixPlugin, HarmonyPlugin, NamePlugin]);
 
 const nameOpts = { exact: false };
-const precision = [2, 2, 2, 2] as Required<TNumArr>;
+const precision = [0, 0, 0, 2] as Required<TNumArr>;
 
 export function ContrastSample(
   fgColor: ColorMaster,
@@ -16,7 +16,7 @@ export function ContrastSample(
   readableOn: boolean[],
   ratio: boolean
 ): string {
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 
 extendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin
@@ -36,7 +36,7 @@ console.log(fgColor.readableOn({ bgColor, level: "enhanced", size: "large" })); 
 export function HarmonySample(color: ColorMaster, type: THarmony, effect: TMonoEffect, amount: number): string {
   const harmonyArr = color.harmony({ type, effect, amount });
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 
 extendPlugins([HarmonyPlugin]); // add ColorMaster's harmony plugin
@@ -72,7 +72,7 @@ export function MixSample(
 ): string {
   const mix = primary.mix({ color: secondary, ratio, colorspace });
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 
 extendPlugins([MixPlugin]); // add ColorMaster's mix plugin
@@ -90,23 +90,22 @@ console.log(mix.stringHSL({ alpha: ${alpha} })); // ${mix.stringHSL({ alpha })} 
 export function ManipulationSample(
   color: ColorMaster,
   incrementColor: ColorMaster,
-  isIncrement: boolean,
+  incArr: boolean[],
   alpha: { [K in "adjust" | "rotate" | "invert" | "grayscale"]: boolean }
 ): string {
   const { h, s, l, a } = incrementColor.hsla();
-  const sign = isIncrement ? 1 : -1;
 
-  const rotate = CM(color.hsla()).hueBy(sign * h);
-
+  const signs = incArr.map((val) => (val ? 1 : -1));
+  const rotate = CM(color.hsla()).hueBy(signs[0] * h);
   const adjust = CM(rotate.hsla())
-    .saturateBy(sign * s)
-    .lighterBy(sign * l)
-    .alphaBy(sign * a);
+    .saturateBy(signs[1] * s)
+    .lighterBy(signs[2] * l)
+    .alphaBy(signs[3] * a);
 
   const invert = CM(color.hsla()).invert({ alpha: alpha.invert });
   const grayscale = CM(color.hsla()).grayscale();
 
-  return `import CM from 'colormaster';
+  return `import CM from "colormaster";
 
 const color = CM("${color.stringHSL({ precision })}"); // ${color.name(nameOpts)}
 const incrementColor = CM("${incrementColor.stringHSL({ precision })}"); // ${incrementColor.name(nameOpts)}
@@ -114,20 +113,22 @@ const incrementColor = CM("${incrementColor.stringHSL({ precision })}"); // ${in
 // note we use \`CM(color.hsla())\` to "deep copy" \`color\` and avoid manipulating it unintentionally
 
 const adjust = CM(color.hsla())
-    .hueBy(${!isIncrement ? sign + " * " : ""}incrementColor.hue)
-    .${isIncrement ? "saturateBy" : "desaturateBy"}(incrementColor.saturation)
-    .${isIncrement ? "lighterBy" : "darkenBy"}(incrementColor.lightness)
-    .alphaBy(${!isIncrement ? sign + " * " : ""}incrementColor.alpha);
-const rotate = CM(color.hsla()).hueBy(${!isIncrement ? sign + " * " : ""}incrementColor.hue);
+    .hueBy(${signs[0] === -1 ? signs[0] + " * " : ""}incrementColor.hue)
+    .${signs[1] === 1 ? "saturateBy" : "desaturateBy"}(incrementColor.saturation)
+    .${signs[2] === 1 ? "lighterBy" : "darkenBy"}(incrementColor.lightness)
+    .alphaBy(${signs[3] === -1 ? signs[3] + " * " : ""}incrementColor.alpha);
+const rotate = CM(color.hsla()).hueBy(${signs[0] === -1 ? signs[0] + " * " : ""}incrementColor.hue);
 const invert = CM(color.hsla()).invert({ alpha: ${alpha.invert} });
 const grayscale = CM(color.hsla()).grayscale();
 
 /**
  * Here we provide the above \`adjust\` & \`rotate\` variables with parameters that adjust dynamically:
- * const adjust = CM(color.hsla()).hueBy(${(sign * h).toFixed(2)}).${
-    isIncrement ? "saturateBy" : "desaturateBy"
-  }(${s.toFixed(2)}).${isIncrement ? "lighterBy" : "darkenBy"}(${l.toFixed(2)}).alphaBy(${(sign * a).toFixed(4)});
- * const rotate = CM(color.hsla()).hueBy(${(sign * h).toFixed(2)});
+ * const adjust = CM(color.hsla()).hueBy(${(signs[0] * h).toFixed(2)}).${
+    signs[1] === 1 ? "saturateBy" : "desaturateBy"
+  }(${s.toFixed(2)}).${signs[2] === 1 ? "lighterBy" : "darkenBy"}(${l.toFixed(2)}).alphaBy(${(signs[3] * a).toFixed(
+    4
+  )});
+ * const rotate = CM(color.hsla()).hueBy(${(signs[0] * h).toFixed(2)});
  */
 
 console.log(adjust.stringHSL({ alpha: ${alpha.adjust} }))); // ${adjust.stringHSL({
@@ -158,7 +159,7 @@ export function A11yStatisticsSample(
   const pure = CM(color.hsla()).closestPureHue();
   const web = CM(color.hsla()).closestWebSafe();
 
-  return `import CM, { extendPlugins } from 'colormaster';
+  return `import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 
 extendPlugins([A11yPlugin]); // add ColorMaster's accessibility plugin

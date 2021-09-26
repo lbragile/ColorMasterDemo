@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
-import useCanvasContext from "../../hooks/useCanvasContext";
+import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import HSVPlugin from "colormaster/plugins/hsv";
-import { CanvasContainer } from "../../styles/Canvas";
+import { FadeIn } from "../../styles/Fade";
 
 extendPlugins([HSVPlugin]);
 
@@ -13,7 +13,7 @@ interface ISketchPicker {
   color: ColorMaster;
   setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
   pickerRadius?: number;
-  verticalPickers?: boolean;
+  vertical?: boolean;
 }
 
 /**
@@ -28,13 +28,12 @@ export default function SketchPicker({
   color,
   setColor,
   pickerRadius = 5,
-  verticalPickers = true
+  vertical = true
 }: ISketchPicker): JSX.Element {
-  const colorSketch = useRef<HTMLCanvasElement>(null);
-  const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxSketch, ctxPicker] = useCanvasContext(colorSketch, colorPicker);
+  const [refSketch, ctxSketch] = useCanvas();
+  const [refPicker, ctxPicker] = useCanvas();
 
   useEffect(() => {
     if (ctxSketch) {
@@ -93,15 +92,14 @@ export default function SketchPicker({
     canDrag.current = false;
   };
 
-  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
+  const CommonProps = { thickness: 15, vertical, color, setColor };
 
   return (
-    <CanvasContainer $vertical={verticalPickers}>
+    <FadeIn $gap="8px">
       <CanvasGroup
-        className="main"
-        mainRef={colorSketch}
+        mainRef={refSketch}
         picker={{
-          ref: colorPicker,
+          ref: refPicker,
           onPointerDown: handlePointerDown,
           onPointerMove: handlePointerMove,
           onPointerUp: handlePointerUp
@@ -110,6 +108,6 @@ export default function SketchPicker({
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </CanvasContainer>
+    </FadeIn>
   );
 }
