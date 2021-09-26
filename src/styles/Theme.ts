@@ -26,10 +26,12 @@ const light: DefaultTheme = {
     bgNegativeDark: "hsla(0, 100%, 25%, 1)",
     bgTooltip: "hsla(0, 0%, 10%, 1)",
     arrowColor: "hsla(0, 0%, 25%, 1)",
-    arrowColorHover: "hsla(0, 0%, 80%, 1)",
+    arrowColorHover: "hsla(0, 0%, 70%, 1)",
     heading: "hsla(0, 0%, 45%, 1)",
     text: "black",
-    textInverse: "white"
+    textInverse: "white",
+    alphaPickerCheckers: "hsla(0, 0%, 0%, 0.2)",
+    wheelPicker: "hsla(0, 0%, 0%, 0.6)"
   }
 };
 
@@ -54,10 +56,12 @@ const dark: DefaultTheme = {
     bgNegativeDark: "hsla(0, 100%, 75%, 1)",
     bgTooltip: "hsla(0, 0%, 90%, 1)",
     arrowColor: "hsla(0, 0%, 75%, 1)",
-    arrowColorHover: "hsla(0, 0%, 20%, 1)",
+    arrowColorHover: "hsla(0, 0%, 30%, 1)",
     heading: "hsla(0, 0%, 55%, 1)",
     text: "white",
-    textInverse: "black"
+    textInverse: "black",
+    alphaPickerCheckers: "hsla(0, 0%, 100%, 0.2)",
+    wheelPicker: "hsla(0, 0%, 100%, 0.6)"
   }
 };
 

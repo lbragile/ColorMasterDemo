@@ -51,7 +51,7 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   }
 
   & path {
-    fill: ${(props) => (props.disabled ? "rgba(0, 0, 0, 0.2)" : "")};
+    fill: ${(props) => (props.disabled ? props.theme.colors.arrowColorHover : "")};
   }
 `;
 

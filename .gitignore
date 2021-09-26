@@ -26,7 +26,6 @@ react-app-env.d.ts
 /.vscode
 /.vercel
 
-
 # PWA
 public/sw.*
 public/workbox-*

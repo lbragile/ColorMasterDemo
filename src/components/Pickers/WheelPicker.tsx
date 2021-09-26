@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
 import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
 import { FadeIn } from "../../styles/Fade";
+import { ThemeContext } from "styled-components";
 
 interface IWheelPicker {
   color: ColorMaster;
@@ -32,6 +33,7 @@ export default function WheelPicker({
   harmony = undefined,
   vertical = true
 }: IWheelPicker): JSX.Element {
+  const themeContext = useContext(ThemeContext);
   const canDrag = useRef(false);
 
   const [refWheel, ctxWheel] = useCanvas();
@@ -78,7 +80,7 @@ export default function WheelPicker({
 
         ctxPicker.arc(x + 5, y + 5, pickerRadius, 0, 2 * Math.PI);
 
-        const pickerColor = "rgba(0,0,0,0.6)";
+        const pickerColor = themeContext.colors.wheelPicker;
         ctxPicker.fillStyle = pickerColor;
         ctxPicker.strokeStyle = pickerColor;
         ctxPicker.lineWidth = 1;
@@ -86,7 +88,7 @@ export default function WheelPicker({
         ctxPicker.stroke();
 
         if (colorArr.length > 1) {
-          ctxPicker.fillStyle = "white";
+          ctxPicker.fillStyle = themeContext.colors.textInverse;
           ctxPicker.font = "bold 10px Arial";
           ctxPicker.textAlign = "center";
           ctxPicker.textBaseline = "middle";
@@ -94,7 +96,7 @@ export default function WheelPicker({
         }
       });
     }
-  }, [pickerRadius, rotate, color, harmony, ctxPicker]);
+  }, [pickerRadius, rotate, color, harmony, ctxPicker, themeContext.colors]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
