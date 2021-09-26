@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from "react";
 import AlphaPicker from "./AlphaPicker";
 import HuePicker from "./HuePicker";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../../hooks/useCanvasContext";
+import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
-import { FlexRow } from "../../styles/Flex";
+import { FadeIn } from "../../styles/Fade";
 
 interface IWheelPicker {
   color: ColorMaster;
@@ -12,7 +12,7 @@ interface IWheelPicker {
   pickerRadius?: number;
   rotate?: number;
   harmony?: ColorMaster[];
-  verticalPickers?: boolean;
+  vertical?: boolean;
 }
 
 /**
@@ -30,13 +30,12 @@ export default function WheelPicker({
   pickerRadius = 5,
   rotate = 90,
   harmony = undefined,
-  verticalPickers = true
+  vertical = true
 }: IWheelPicker): JSX.Element {
-  const colorWheel = useRef<HTMLCanvasElement>(null);
-  const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxWheel, ctxPicker] = useCanvasContext(colorWheel, colorPicker);
+  const [refWheel, ctxWheel] = useCanvas();
+  const [refPicker, ctxPicker] = useCanvas();
 
   useEffect(() => {
     const radScale = Math.PI / 180;
@@ -126,15 +125,15 @@ export default function WheelPicker({
     canDrag.current = false;
   };
 
-  const CommonProps = { thickness: 15, vertical: verticalPickers, color, setColor };
+  const CommonProps = { thickness: 15, vertical, color, setColor };
 
   return (
-    <FlexRow $gap="4px">
+    <FadeIn $gap="8px">
       <CanvasGroup
         className="wheel"
-        mainRef={colorWheel}
+        mainRef={refWheel}
         picker={{
-          ref: colorPicker,
+          ref: refPicker,
           onPointerDown: handlePointerDown,
           onPointerMove: handlePointerMove,
           onPointerUp: handlePointerUp
@@ -143,6 +142,6 @@ export default function WheelPicker({
 
       <HuePicker {...CommonProps} />
       <AlphaPicker {...CommonProps} />
-    </FlexRow>
+    </FadeIn>
   );
 }

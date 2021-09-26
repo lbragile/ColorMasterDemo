@@ -13,7 +13,6 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: numbe
     transform: translateX(-50%);
     background: ${(props) => props.theme.colors.text};
     color: ${(props) => props.theme.colors.textInverse};
-    box-shadow: 0 0 2px 2px ${(props) => props.theme.colors.textInverse} inset;
     white-space: pre;
     line-height: 1.5;
     padding: 12px;

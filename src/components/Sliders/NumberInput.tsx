@@ -34,7 +34,7 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   left: 1px;
   top: ${(props) => (props.$dir === "up" ? "1px" : "")};
   bottom: ${(props) => (props.$dir === "down" ? "1px" : "")};
-  background-color: ${(props) => props.theme.colors.borderLight};
+  background-color: ${(props) => props.theme.colors.bgActive};
   height: calc(50% - 1px);
   border-radius: ${(props) => (props.$dir === "up" ? "2px 0 0 0" : "0 0 0 2px")};
   padding: 0 4px;

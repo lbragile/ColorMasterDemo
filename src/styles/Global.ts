@@ -10,6 +10,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     background-color: ${(props) => props.theme.colors.bgDefault};
-    color: ${(props) => props.theme.colors.text}
+    color: ${(props) => props.theme.colors.text};
+    transition: background-color 0.5s ease-in-out;
   }
 `;

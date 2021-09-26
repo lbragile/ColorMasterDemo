@@ -45,7 +45,7 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
         onClick={() => swatchIndex > 0 && setSwatchIndex(swatchIndex - 1)}
       />
 
-      <Spacers width="2px" />
+      <Spacers width="1px" />
 
       {SWATCH_COLORS.slice(swatchIndex, swatchIndex + numVisibleSwatches.current).map((background) => (
         <Swatch
@@ -54,13 +54,12 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
           background={background}
           onClick={() => setColor(CM(background))}
           $radius={15}
-          $borderColor="rgba(0,0,0,0.3)"
           $borderRadius="4px"
           $cursor="pointer"
         />
       ))}
 
-      <Spacers width="2px" />
+      <Spacers width="1px" />
 
       <StyledAngleIcon
         icon={faAngleRight}

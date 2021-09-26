@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../../hooks/useCanvasContext";
+import useCanvas from "../../hooks/useCanvas";
 import { drawCheckeredBackground } from "../../utils/alphaBackground";
 import CanvasGroup from "../CanvasGroup";
 
@@ -12,11 +12,10 @@ interface IAlphaPicker {
 }
 
 export default function AlphaPicker({ color, setColor, thickness = 15, vertical = true }: IAlphaPicker): JSX.Element {
-  const colorAlpha = useRef<HTMLCanvasElement>(null);
-  const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxAlpha, ctxPicker] = useCanvasContext(colorAlpha, colorPicker, thickness, vertical);
+  const [refAlpha, ctxAlpha] = useCanvas(thickness, vertical);
+  const [refPicker, ctxPicker] = useCanvas(thickness, vertical);
 
   useEffect(() => {
     if (ctxAlpha) {
@@ -81,9 +80,9 @@ export default function AlphaPicker({ color, setColor, thickness = 15, vertical 
 
   return (
     <CanvasGroup
-      mainRef={colorAlpha}
+      mainRef={refAlpha}
       picker={{
-        ref: colorPicker,
+        ref: refPicker,
         onPointerDown: handlePointerDown,
         onPointerMove: handlePointerMove,
         onPointerUp: handlePointerUp

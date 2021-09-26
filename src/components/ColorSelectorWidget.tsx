@@ -16,6 +16,7 @@ import SwatchCarousel from "./SwatchCarousel";
 import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
 import { BreakpointsContext } from "./App";
+import { FadeIn } from "../styles/Fade";
 
 extendPlugins([NamePlugin]);
 
@@ -104,11 +105,11 @@ export default function ColorSelectorWidget({
       <Spacers height="30px" />
 
       {picker === "sketch" ? (
-        <SketchPicker color={color} setColor={setColor} verticalPickers />
+        <SketchPicker color={color} setColor={setColor} vertical />
       ) : picker === "wheel" ? (
-        <WheelPicker color={color} setColor={setColor} harmony={harmony} verticalPickers />
+        <WheelPicker color={color} setColor={setColor} harmony={harmony} vertical />
       ) : (
-        currentSliders.sliders
+        <FadeIn>{currentSliders.sliders}</FadeIn>
       )}
     </BorderedSegment>
   );

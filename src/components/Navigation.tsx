@@ -21,6 +21,7 @@ const MENU_TABS: { type: string; icon: IconDefinition }[] = [
 const Bars = styled(FontAwesomeIcon).attrs((props: { $responsive: boolean }) => props)`
   display: ${(props) => (props.$responsive ? "flex" : "none")};
   margin-bottom: 8px;
+  cursor: pointer;
 `;
 
 const MenuContainer = styled.nav.attrs((props: { $responsive: boolean }) => props)`

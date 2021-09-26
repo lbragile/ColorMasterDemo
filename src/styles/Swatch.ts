@@ -7,7 +7,6 @@ export const Swatch = styled.div.attrs(
     position?: string;
     display?: string;
     $radius: number;
-    $borderColor: string;
     $units?: string;
     $borderRadius?: string;
     $cursor?: string;
@@ -19,7 +18,7 @@ export const Swatch = styled.div.attrs(
   width: ${(props) => props.$radius * 2 + (props.$units ?? "px")};
   height: ${(props) => props.$radius * 2 + (props.$units ?? "px")};
   border-radius: ${(props) => props.$borderRadius ?? "50%"};
-  border: ${(props) => props.$borderColor ?? "hsla(0, 0%, 90%, 1)"} 1px solid;
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
   cursor: ${(props) => props.$cursor};
 `;
 

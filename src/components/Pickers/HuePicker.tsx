@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
-import useCanvasContext from "../../hooks/useCanvasContext";
+import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
 
 interface IHuePicker {
@@ -11,11 +11,10 @@ interface IHuePicker {
 }
 
 export default function HuePicker({ color, setColor, thickness = 25, vertical = true }: IHuePicker): JSX.Element {
-  const colorHue = useRef<HTMLCanvasElement>(null);
-  const colorPicker = useRef<HTMLCanvasElement>(null);
   const canDrag = useRef(false);
 
-  const [ctxHue, ctxPicker] = useCanvasContext(colorHue, colorPicker, thickness, vertical);
+  const [refHue, ctxHue] = useCanvas(thickness, vertical);
+  const [refPicker, ctxPicker] = useCanvas(thickness, vertical);
 
   useEffect(() => {
     if (ctxHue) {
@@ -80,9 +79,9 @@ export default function HuePicker({ color, setColor, thickness = 25, vertical = 
 
   return (
     <CanvasGroup
-      mainRef={colorHue}
+      mainRef={refHue}
       picker={{
-        ref: colorPicker,
+        ref: refPicker,
         onPointerDown: handlePointerDown,
         onPointerMove: handlePointerMove,
         onPointerUp: handlePointerUp

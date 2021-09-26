@@ -20,8 +20,8 @@ interface ICanvasGroup {
 
 const GroupContainer = styled.div.attrs((props: { $canvas: HTMLCanvasElement | null }) => props)`
   position: relative;
-  height: ${(props) => (props.$canvas?.height ?? 500) + "px"};
-  width: ${(props) => (props.$canvas?.width ?? 500) + "px"};
+  height: ${(props) => (props.$canvas?.height ?? 300) + "px"};
+  width: ${(props) => (props.$canvas?.width ?? 300) + "px"};
 
   & canvas {
     position: absolute;

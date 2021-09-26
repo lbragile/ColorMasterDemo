@@ -14,7 +14,7 @@ const Button = styled.button`
   padding: 10px;
   background-color: transparent;
   color: ${(props) => props.theme.colors.text};
-  border: 1px solid ${(props) => props.theme.colors.border};
+  border: 1px solid ${(props) => props.theme.colors.borderLight};
   border-radius: 4px;
   width: 100%;
   cursor: pointer;
@@ -128,7 +128,7 @@ export default function Dropdown({
                   $active={item === activeItem}
                   $selected={item === value}
                   $last={i === opts.length - 1}
-                  onClick={() => {
+                  onPointerDown={() => {
                     setValue(item);
                     setShow(false);
                   }}
