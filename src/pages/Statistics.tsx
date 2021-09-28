@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
-import { useHistory } from "react-router";
-import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter } from "../styles/Swatch";
 import { A11yStatisticsSample } from "../utils/codeSamples";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
@@ -17,6 +15,7 @@ import { faCheck, faFire, faMoon, faSnowflake, faSun, faTimes } from "@fortaweso
 import Spacers from "../components/Spacers";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 extendPlugins([A11yPlugin]);
 
@@ -54,26 +53,22 @@ const LabelledSwatch = styled(Swatch)`
 `;
 
 export default function Statistics(): JSX.Element {
-  const history = useHistory();
-  const query = useQuery();
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
-  const [color, setColor] = useState(CM(query.color ?? "hsla(45, 75%, 50%, 1)"));
+  const [color, setColor] = useLocalStorage("leftWidget", CM("hsla(45, 75%, 50%, 1)"));
+  const [alpha, setAlpha] = useLocalStorage<IStatistics<boolean>>("alphaGridStatistics", {
+    cool: true,
+    warm: true,
+    pure: true,
+    web: true
+  });
+
   const [pureHue, setPureHue] = useState<IPureHue>(color.isPureHue() as IPureHue);
   const [closest, setClosest] = useState<IStatistics<ColorMaster>>({
     warm: CM(color.hsla()).closestWarm(),
     cool: CM(color.hsla()).closestCool(),
     pure: CM(color.hsla()).closestPureHue(),
     web: CM(color.hsla()).closestWebSafe()
-  });
-
-  const [alpha, setAlpha] = useState<IStatistics<boolean>>(() => {
-    if (query.alpha) {
-      const alphaArr = JSON.parse(query.alpha);
-      return { cool: alphaArr[0], warm: alphaArr[1], pure: alphaArr[2], web: alphaArr[3] };
-    } else {
-      return { cool: true, warm: true, pure: true, web: true };
-    }
   });
 
   const colorDebounce = useDebounce(color, 100);
@@ -87,13 +82,6 @@ export default function Statistics(): JSX.Element {
       web: CM(color.hsla()).closestWebSafe()
     });
   }, [color]);
-
-  useEffect(() => {
-    history.replace({
-      pathname: "/statistics",
-      search: `?color=${colorDebounce.stringHEX().slice(1).toLowerCase()}&alpha=[${Object.values(alpha).join(",")}]`
-    });
-  }, [history, colorDebounce, alpha]);
 
   const GridSwatch = ({ state, alpha, count }: IGridSwatch) => {
     return (

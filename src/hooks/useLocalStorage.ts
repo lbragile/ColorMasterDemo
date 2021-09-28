@@ -1,16 +1,17 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
-
-type SetValue<T> = Dispatch<SetStateAction<T>>;
+import CM, { ColorMaster } from "colormaster";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * @see https://usehooks-typescript.com/react-hook/use-local-storage
  */
-export default function useLocalStorage<T>(key: string, initialValue: T): [T, SetValue<T>] {
+export default function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const readValue = useCallback((): T => {
     if (typeof window === "undefined") return initialValue;
 
     try {
       const item = window.localStorage.getItem(key);
+      // ColorMaster parsing
+      if (item && CM(item).isValid()) return CM(item) as unknown as T;
       return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
       console.warn(`Error reading localStorage key “${key}”:`, error);
@@ -20,15 +21,19 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, Se
 
   const [storedValue, setStoredValue] = useState<T>(readValue);
 
-  const setValue: SetValue<T> = (value) => {
+  const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
     if (typeof window == "undefined") {
       console.warn(`Tried setting localStorage key “${key}” even though environment is not a client`);
     }
 
     try {
-      const newValue = value instanceof Function ? value(storedValue) : value;
+      const newValue =
+        value instanceof Function ? value(storedValue) : value instanceof ColorMaster ? value.stringRGB() : value;
       window.localStorage.setItem(key, JSON.stringify(newValue));
-      setStoredValue(newValue);
+
+      // need to adjust incase new value is a ColorMaster string
+      const stateNewValue = (CM(newValue as string).isValid() ? CM(newValue as string) : newValue) as T;
+      setStoredValue(stateNewValue);
       window.dispatchEvent(new Event("local-storage"));
     } catch (error) {
       console.warn(`Error setting localStorage key “${key}”:`, error);

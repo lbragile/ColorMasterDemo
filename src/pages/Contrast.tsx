@@ -4,8 +4,6 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import useDebounce from "../hooks/useDebounce";
 import styled from "styled-components";
 import { ContrastSample } from "../utils/codeSamples";
-import { useHistory } from "react-router";
-import useQuery from "../hooks/useQuery";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
@@ -18,6 +16,7 @@ import { faCaretDown, faCheckCircle, faCircle, faSquareFull, faTimesCircle } fro
 import Dropdown from "../components/Dropdown";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 extendPlugins([A11yPlugin]);
 
@@ -106,17 +105,16 @@ const RadioInput = styled.span`
 `;
 
 export default function Contrast(): JSX.Element {
-  const history = useHistory();
-  const query = useQuery();
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
-  const [fgColor, setFgColor] = useState(CM(query.fgColor ?? "hsla(60, 100%, 50%, 1)"));
-  const [bgColor, setBgColor] = useState(CM(query.bgColor ?? "hsla(240, 100%, 50%, 1)"));
+  const [fgColor, setFgColor] = useLocalStorage("leftWidget", CM("hsla(60, 100%, 50%, 1)"));
+  const [bgColor, setBgColor] = useLocalStorage("rightWidget", CM("hsla(240, 100%, 50%, 1)"));
+  const [isLarge, setIsLarge] = useLocalStorage("contrastTextSize", true);
+  const [ratio, setRatio] = useLocalStorage("contrastRatio", true);
+
+  const [sampleOutput, setSampleOutput] = useLocalStorage("sampleOutputType", "text");
   const [contrast, setContrast] = useState<number | string>("1:1");
-  const [readableOn, setReadableOn] = useState(new Array(4).fill(false));
-  const [isLarge, setIsLarge] = useState(query.size ? query.size === "large" : true);
-  const [ratio, setRatio] = useState(query.ratio ? query.ratio === "true" : true);
-  const [sampleOutput, setSampleOutput] = useState("text");
+  const [readableOn, setReadableOn] = useState(new Array(3).fill(false)); // body/minimum === large/enhanced so need only 3 states
 
   const fgDebounce = useDebounce(fgColor, 100);
   const bgDebounce = useDebounce(bgColor, 100);
@@ -124,24 +122,14 @@ export default function Contrast(): JSX.Element {
   const readableOnDebounce = useDebounce(readableOn, 100);
 
   useEffect(() => {
-    setContrast(fgColor.contrast({ bgColor: bgColor, ratio, precision: 3 }));
+    setContrast(fgColor.contrast({ bgColor, ratio, precision: 3 }));
+
     setReadableOn([
-      fgColor.readableOn({ bgColor: bgColor, level: "minimum", size: "body" }),
-      fgColor.readableOn({ bgColor: bgColor, level: "enhanced", size: "body" }),
-      fgColor.readableOn({ bgColor: bgColor, level: "minimum", size: "large" }),
-      fgColor.readableOn({ bgColor: bgColor, level: "enhanced", size: "large" })
+      fgColor.readableOn({ bgColor, level: "minimum", size: "body" }),
+      fgColor.readableOn({ bgColor, level: "enhanced", size: "body" }),
+      fgColor.readableOn({ bgColor, level: "minimum", size: "large" })
     ]);
   }, [fgColor, bgColor, ratio]);
-
-  useEffect(() => {
-    history.replace({
-      pathname: "/contrast",
-      search: `?fgColor=${fgDebounce.stringHEX().slice(1).toLowerCase()}&bgColor=${bgDebounce
-        .stringHEX()
-        .slice(1)
-        .toLowerCase()}&ratio=${ratio}&size=${isLarge ? "large" : "body"}`
-    });
-  }, [history, fgDebounce, bgDebounce, ratio, isLarge]);
 
   return (
     <FadeIn $wrap="wrap" $gap="48px">
@@ -266,8 +254,8 @@ export default function Contrast(): JSX.Element {
                     3.0:1
                   </TableCell>
 
-                  <TableCell $positive={readableOn[3]} $negative={!readableOn[3]}>
-                    <FontAwesomeIcon icon={readableOn[3] ? faCheckCircle : faTimesCircle} /> 4.5:1
+                  <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
+                    <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
                   </TableCell>
                 </tr>
               </>

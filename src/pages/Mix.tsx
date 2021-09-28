@@ -2,13 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
 import { TFormat } from "colormaster/types";
-import { useHistory } from "react-router";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
-import useQuery from "../hooks/useQuery";
 import { Swatch } from "../styles/Swatch";
 import { MixSample } from "../utils/codeSamples";
 import { FlexColumn, FlexRow } from "../styles/Flex";
@@ -22,6 +20,7 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import NumberInput from "../components/Sliders/NumberInput";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 extendPlugins([MixPlugin, A11yPlugin]);
 
@@ -78,17 +77,14 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
 `;
 
 export default function Mix(): JSX.Element {
-  const history = useHistory();
-  const query = useQuery();
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
-  const [primary, setPrimary] = useState(CM(query.primary ? "#" + query.primary : "hsla(180, 100%, 50%, 1)"));
-  const [secondary, setSecondary] = useState(CM(query.secondary ? "#" + query.secondary : "hsla(0, 100%, 50%, 1)"));
-  const [ratio, setRatio] = useState(query.ratio ? +query.ratio : 0.5);
-  const [colorspace, setColorspace] = useState<TFormatDropdown>(
-    (colorspaceOpts.find((item) => item === query.colorspace) as TFormatDropdown) ?? "luv"
-  );
+  const [primary, setPrimary] = useLocalStorage("leftWidget", CM("hsla(180, 100%, 50%, 1)"));
+  const [secondary, setSecondary] = useLocalStorage("rightWidget", CM("hsla(0, 100%, 50%, 1)"));
+  const [ratio, setRatio] = useLocalStorage("mixRatio", 0.5);
+  const [colorspace, setColorspace] = useLocalStorage<TFormatDropdown>("mixColorspace", "luv");
   const [alpha, setAlpha] = useState(true);
+
   const [mix, setMix] = useState(primary.mix({ color: secondary, ratio, colorspace }).stringHSL({ alpha }));
 
   const primaryDebounce = useDebounce(primary, 100);
@@ -98,16 +94,6 @@ export default function Mix(): JSX.Element {
   useEffect(() => {
     setMix(primary.mix({ color: secondary, ratio, colorspace }).stringHSL({ alpha }));
   }, [primary, secondary, ratio, colorspace, alpha]);
-
-  useEffect(() => {
-    history.replace({
-      pathname: "/mix",
-      search: `?primary=${primaryDebounce.stringHEX().slice(1).toLowerCase()}&secondary=${secondaryDebounce
-        .stringHEX()
-        .slice(1)
-        .toLowerCase()}&ratio=${ratioDebounce}&colorspace=${colorspace}`
-    });
-  }, [history, primaryDebounce, secondaryDebounce, ratioDebounce, colorspace]);
 
   return (
     <FadeIn $wrap="wrap" $gap="20px">

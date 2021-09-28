@@ -52,8 +52,8 @@ export default function ColorSelectorWidget({
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [alpha, setAlpha] = useState(true);
-  const [colorspace, setColorspace] = useState(colorspaceOpts.find((x) => x === initColorspace) ?? colorspaceOpts[0]);
-  const [picker, setPicker] = useState(pickerOpts.find((x) => x === initPicker) ?? pickerOpts[0]);
+  const [colorspace, setColorspace] = useState(initColorspace);
+  const [picker, setPicker] = useState(initPicker);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
   const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });

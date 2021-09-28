@@ -1,11 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
-import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter } from "../styles/Swatch";
 import addColor from "../utils/addColor";
 import { ManipulationSample } from "../utils/codeSamples";
@@ -22,6 +20,7 @@ import CM, { ColorMaster, extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 extendPlugins([A11yPlugin]);
 
@@ -69,28 +68,19 @@ const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) =
 `;
 
 export default function Manipulate(): JSX.Element {
-  const history = useHistory();
-  const query = useQuery();
   const { isMobile, isTablet, isLaptop, isComputer } = useContext(BreakpointsContext);
 
-  const [alpha, setAlpha] = useState<IAlphaManipulation>(() => {
-    if (query.alpha) {
-      const alphaArr = JSON.parse(query.alpha);
-      return { adjust: alphaArr[0], rotate: alphaArr[1], invert: alphaArr[2], grayscale: alphaArr[3] };
-    } else {
-      return { adjust: true, rotate: true, invert: true, grayscale: true };
-    }
+  const [alpha, setAlpha] = useLocalStorage<IAlphaManipulation>("alphaGridManipulate", {
+    adjust: true,
+    rotate: true,
+    invert: true,
+    grayscale: true
   });
 
-  const [color, setColor] = useState(CM(query.color ?? "hsla(180, 50%, 50%, 0.5)"));
-  const [incrementColor, setIncrementColor] = useState(
-    CM(
-      `hsla(${query.hueBy ?? 72}, ${query.satBy ?? 15}%, ${query.lightBy ?? 10}%, ${
-        query.alphaBy ? +query.alphaBy / 100 : 0.05
-      })`
-    )
-  );
-  const [incrementArr, setIncrementArr] = useState<boolean[]>([true, true, true, true]);
+  const [color, setColor] = useLocalStorage("leftWidget", CM("hsla(180, 50%, 50%, 0.5)"));
+  const [incrementColor, setIncrementColor] = useLocalStorage("adjustColor", CM("hsla(72, 15%, 10%, 0.05)"));
+  const [incrementArr, setIncrementArr] = useLocalStorage<boolean[]>("adjustDirection", new Array(4).fill(true));
+
   const [adjust, setAdjust] = useState(addColor(color, incrementColor, incrementArr));
 
   const colorDebounce = useDebounce(color, 100);
@@ -99,17 +89,6 @@ export default function Manipulate(): JSX.Element {
   useEffect(() => {
     setAdjust(addColor(color, incrementColor, incrementArr));
   }, [color, incrementColor, alpha.invert, incrementArr]);
-
-  useEffect(() => {
-    const { h, s, l, a } = incrementColorDebounce.hsla();
-    const color = colorDebounce.stringHEX().slice(1).toLowerCase();
-    history.replace({
-      pathname: "/manipulate",
-      search: `?color=${color}&hueBy=${h.toFixed(2)}&satBy=${s.toFixed(2)}&lightBy=${l.toFixed(2)}&alphaBy=${(
-        a * 100
-      ).toFixed(2)}&adjustSettings=[${incrementArr.join(",")}]&alpha=[${Object.values(alpha).join(",")}]`
-    });
-  }, [history, colorDebounce, incrementColorDebounce, incrementArr, alpha]);
 
   const handleChange = useCallback(
     (channel: keyof Ihsla) => {
