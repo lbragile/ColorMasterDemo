@@ -25,10 +25,10 @@ const pickerOpts = ["slider", "sketch", "wheel"];
 
 const BorderedSegment = styled(FlexColumn)`
   position: relative;
-  border: 1px solid ${(props) => props.theme.colors.border};
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 2px 2px 6px 1px ${(props) => props.theme.colors.boxShadow};
+  box-shadow: 2px 2px 6px 1px ${(props) => props.theme.boxShadow};
   overflow: hidden;
 `;
 

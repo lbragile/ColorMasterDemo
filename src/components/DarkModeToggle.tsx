@@ -16,10 +16,11 @@ const Toggle = styled.button.attrs((props: { $isDark: boolean }) => props)`
   position: relative;
   width: 4.5rem;
   height: 2rem;
-  background-color: ${(props) => (props.$isDark ? "hsla(200, 100%, 75%, 1)" : "hsla(0, 0%, 55%, 1)")};
+  background-color: ${(props) => (props.$isDark ? "hsla(200, 100%, 50%, 1)" : "hsla(0, 0%, 55%, 1)")};
   border: 1px solid lightgray;
   border-radius: 10em;
   cursor: pointer;
+  transform: scale(0.8);
 
   &:focus {
     outline: none;

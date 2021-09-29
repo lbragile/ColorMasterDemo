@@ -17,9 +17,9 @@ const StyledColorDisplay = styled.input`
   padding: 0 10px;
   border-radius: 4px 0 0 4px;
   text-align: center;
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
-  background-color: ${(props) => props.theme.colors.bgDefault};
-  color: ${(props) => props.theme.colors.text};
+  border: 1px solid ${(props) => props.theme.borderLight};
+  background-color: ${(props) => props.theme.bgDefault};
+  color: ${(props) => props.theme.text};
   border-right: none;
   outline: none;
   line-height: 1.8em;
@@ -29,7 +29,7 @@ const CopyButton = styled.button.attrs((props: { $copied: string | null }) => pr
   height: 36px;
   padding: 0 10px;
   background: ${(props) => `hsl(${props.$copied ? 120 : 180}, 100%, 40%)`};
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   border-left: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;

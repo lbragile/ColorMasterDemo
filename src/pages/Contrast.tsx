@@ -29,7 +29,7 @@ const SampleOutput = styled.div.attrs(
   padding: ${(props) => (props.size === "image" ? "12px 24px" : "12px")};
   font-size: ${(props) => (props.size === "large" ? "14pt" : "1rem")};
   font-weight: ${(props) => (props.size === "large" ? "bold" : "normal")};
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   text-align: left;
   line-height: 2rem;
   margin-top: 12px;
@@ -45,7 +45,7 @@ const StyledTable = styled.table`
   margin: auto;
   font-size: 1.1rem;
   empty-cells: hide;
-  color: ${(props) => props.theme.colors.text};
+  color: ${(props) => props.theme.text};
 
   & *:not(svg) {
     padding: 16px;
@@ -53,7 +53,7 @@ const StyledTable = styled.table`
   }
 
   & th {
-    background: ${(props) => props.theme.colors.bgActive};
+    background: ${(props) => props.theme.bgActive};
   }
 
   & .top-left,
@@ -75,13 +75,9 @@ const StyledTable = styled.table`
 const TableCell = styled.td.attrs((props: { $positive?: boolean; $negative?: boolean }) => props)`
   position: relative;
   background: ${(props) =>
-    props.$positive ? props.theme.colors.bgPositive : props.$negative ? props.theme.colors.bgNegative : "transparent"};
+    props.$positive ? props.theme.bgPositive : props.$negative ? props.theme.bgNegative : "transparent"};
   color: ${(props) =>
-    props.$positive
-      ? props.theme.colors.bgPositiveDark
-      : props.$negative
-      ? props.theme.colors.bgNegativeDark
-      : props.theme.colors.text};
+    props.$positive ? props.theme.bgPositiveDark : props.$negative ? props.theme.bgNegativeDark : props.theme.text};
   text-align: center;
 
   & svg {

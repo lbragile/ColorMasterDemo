@@ -15,6 +15,6 @@ export function drawCheckeredBackground(ctx: CanvasRenderingContext2D, theme: De
     ctx.rect(vertical ? w : (2 * j + 1) * w, vertical ? (2 * j + 1) * h : h, w, h); // second row/col
   }
 
-  ctx.fillStyle = theme.colors.alphaPickerCheckers;
+  ctx.fillStyle = theme.alphaPickerCheckers;
   ctx.fill();
 }

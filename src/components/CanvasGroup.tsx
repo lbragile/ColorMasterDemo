@@ -33,7 +33,7 @@ const GroupContainer = styled.div.attrs((props: { $canvas: HTMLCanvasElement | n
     background: transparent;
 
     &:not(.wheel) {
-      border: 1px solid ${(props) => props.theme.colors.borderLight};
+      border: 1px solid ${(props) => props.theme.borderLight};
     }
   }
 `;

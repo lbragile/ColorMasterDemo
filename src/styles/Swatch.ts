@@ -18,7 +18,7 @@ export const Swatch = styled.div.attrs(
   width: ${(props) => props.$radius * 2 + (props.$units ?? "px")};
   height: ${(props) => props.$radius * 2 + (props.$units ?? "px")};
   border-radius: ${(props) => props.$borderRadius ?? "50%"};
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   cursor: ${(props) => props.$cursor};
 `;
 

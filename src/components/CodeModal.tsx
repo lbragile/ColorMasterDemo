@@ -8,7 +8,7 @@ import { BreakpointsContext } from "./App";
 const PrimaryButton = styled.button`
   padding: 8px 24px;
   border-radius: 10em;
-  background-color: ${(props) => props.theme.colors.primaryBtn};
+  background-color: ${(props) => props.theme.primaryBtn};
   border: none;
   color: white;
   font-weight: bolder;
@@ -18,7 +18,7 @@ const PrimaryButton = styled.button`
   outline: none;
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.primaryBtnHover};
+    background-color: ${(props) => props.theme.primaryBtnHover};
   }
 `;
 

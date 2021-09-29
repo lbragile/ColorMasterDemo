@@ -13,8 +13,8 @@ const Container = styled.div.attrs((props: { $cols: number }) => props)`
 const Button = styled.button`
   padding: 10px;
   background-color: transparent;
-  color: ${(props) => props.theme.colors.text};
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  color: ${(props) => props.theme.text};
+  border: 1px solid ${(props) => props.theme.borderLight};
   border-radius: 4px;
   width: 100%;
   cursor: pointer;
@@ -32,11 +32,11 @@ const ItemsWrapper = styled.div`
 `;
 
 const Item = styled.div.attrs((props: { $active: boolean; $selected: boolean; $last: boolean }) => props)`
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   border-top: none;
   border-radius: ${(props) => (props.$last ? "0 0 10px 10px" : "")};
-  background-color: ${(props) => (props.$active ? props.theme.colors.bgActive : props.theme.colors.bgDefault)};
-  color: ${(props) => props.theme.colors.text};
+  background-color: ${(props) => (props.$active ? props.theme.bgActive : props.theme.bgDefault)};
+  color: ${(props) => props.theme.text};
   font-weight: ${(props) => (props.$selected ? "bold" : "normal")};
   width: 100%;
   padding: 10px;
@@ -47,7 +47,7 @@ const StyledIcon = styled.span.attrs((props: { $iconPos: "right" | "left" }) => 
   position: absolute;
   left: ${(props) => (props.$iconPos === "left" ? "8px" : "")};
   right: ${(props) => (props.$iconPos === "right" ? "8px" : "")};
-  color: ${(props) => props.theme.colors.arrowColor};
+  color: ${(props) => props.theme.arrowColor};
 `;
 
 interface IDropdown {

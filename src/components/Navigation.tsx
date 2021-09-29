@@ -31,7 +31,7 @@ const MenuContainer = styled.nav.attrs((props: { $responsive: boolean }) => prop
   justify-content: space-between;
   margin: ${(props) => (props.$responsive ? "0 0 28px 0" : "12px 0 0 0")};
   padding-bottom: ${(props) => (props.$responsive ? "0" : "11px")};
-  border-bottom: 2px solid ${(props) => props.theme.colors.border};
+  border-bottom: 2px solid ${(props) => props.theme.border};
   width: 100%;
 `;
 
@@ -58,15 +58,15 @@ const Item = styled.li`
 `;
 
 const Anchor = styled(NavLink).attrs((props: { $active: boolean; $responsive: boolean }) => props)`
-  color: ${(props) => props.theme.colors.text};
+  color: ${(props) => props.theme.text};
   padding-bottom: 12px;
   text-decoration: none;
   font-size: 1.2rem;
-  border-bottom: 2px solid ${(props) => (props.$active && !props.$responsive ? props.theme.colors.text : "none")};
+  border-bottom: 2px solid ${(props) => (props.$active && !props.$responsive ? props.theme.text : "none")};
   font-weight: ${(props) => (props.$active && props.$responsive ? "bold" : "normal")};
 
   &:hover {
-    color: ${(props) => props.theme.colors.text};
+    color: ${(props) => props.theme.text};
   }
 `;
 
@@ -146,7 +146,7 @@ export default function Navigation(): JSX.Element {
 
       <MenuRight $responsive={responsive} onClick={closeMenu}>
         <DarkModelToggle isDarkMode={isDarkMode} toggle={toggle} />
-        <Spacers width="4px" />
+        <Spacers width="2px" />
         <SocialMedia />
       </MenuRight>
     </MenuContainer>

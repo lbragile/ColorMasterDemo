@@ -16,36 +16,13 @@ import Spacers from "../components/Spacers";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { IAlphaStatistics, IGridRow, IGridRowDetails, IGridSwatch } from "../types/grid";
 
 extendPlugins([A11yPlugin]);
 
 interface IPureHue {
   pure: boolean;
   reason: string;
-}
-
-interface IGridSwatch {
-  state: ColorMaster;
-  alpha: boolean;
-  count: number;
-}
-
-interface IGridRowDetails {
-  type: "warm" | "cool" | "pure" | "web";
-  text: string;
-  state: ColorMaster;
-}
-
-interface IGridRow {
-  arr: IGridRowDetails[];
-  startCount: number;
-}
-
-interface IStatistics<T = boolean | ColorMaster> {
-  warm: T;
-  cool: T;
-  pure: T;
-  web: T;
 }
 
 const LabelledSwatch = styled(Swatch)`
@@ -56,7 +33,7 @@ export default function Statistics(): JSX.Element {
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [color, setColor] = useLocalStorage("leftWidget", CM("hsla(45, 75%, 50%, 1)"));
-  const [alpha, setAlpha] = useLocalStorage<IStatistics<boolean>>("alphaGridStatistics", {
+  const [alpha, setAlpha] = useLocalStorage<IAlphaStatistics<boolean>>("alphaGridStatistics", {
     cool: true,
     warm: true,
     pure: true,
@@ -64,7 +41,7 @@ export default function Statistics(): JSX.Element {
   });
 
   const [pureHue, setPureHue] = useState<IPureHue>(color.isPureHue() as IPureHue);
-  const [closest, setClosest] = useState<IStatistics<ColorMaster>>({
+  const [closest, setClosest] = useState<IAlphaStatistics<ColorMaster>>({
     warm: CM(color.hsla()).closestWarm(),
     cool: CM(color.hsla()).closestCool(),
     pure: CM(color.hsla()).closestPureHue(),
@@ -98,7 +75,7 @@ export default function Statistics(): JSX.Element {
     );
   };
 
-  const GridRow = ({ arr, startCount }: IGridRow) => {
+  const GridRow = ({ arr, startCount }: IGridRow<IAlphaStatistics>) => {
     return (
       <FlexRow $wrap="wrap" $gap="12px">
         {arr.map((item, i) => (
@@ -165,7 +142,7 @@ export default function Statistics(): JSX.Element {
               {color.isWarm() ? (
                 <FontAwesomeIcon icon={faFire} color="hsla(0, 100%, 40%, 1)" />
               ) : (
-                <FontAwesomeIcon icon={faSnowflake} color="hsla(240, 100%, 40%, 1)" />
+                <FontAwesomeIcon icon={faSnowflake} color="hsla(210, 100%, 40%, 1)" />
               )}
             </h2>
           </FlexRow>
@@ -198,7 +175,7 @@ export default function Statistics(): JSX.Element {
               { type: "pure", text: "Closest Pure Hue", state: closest.pure },
               { type: "web", text: "Closest Web Safe", state: closest.web }
             ]
-          ] as IGridRowDetails[][]
+          ] as IGridRowDetails<IAlphaStatistics>[][]
         ).map((arr, i) => (
           <GridRow key={arr[0].type + arr[1].type} arr={arr} startCount={i * 2 + 1} />
         ))}

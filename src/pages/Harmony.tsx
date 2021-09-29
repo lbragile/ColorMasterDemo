@@ -35,23 +35,23 @@ const typeOptions: THarmony[] = [
 const effectOptions: TMonoEffect[] = ["shades", "tints", "tones"];
 
 const VerticalMenu = styled.div`
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   border-radius: 8px;
-  background: ${(props) => props.theme.colors.bgDefault};
+  background: ${(props) => props.theme.bgDefault};
   overflow: hidden;
   position: relative;
 `;
 
 const MenuItem = styled.div.attrs((props: { $active: boolean; $last: boolean }) => props)`
   padding: 4px 16px 0 4px;
-  border-bottom: ${(props) => (props.$last ? "none" : `1px solid ${props.theme.colors.borderLight}`)};
+  border-bottom: ${(props) => (props.$last ? "none" : `1px solid ${props.theme.borderLight}`)};
   text-transform: capitalize;
   cursor: pointer;
-  background: ${(props) => (props.$active ? props.theme.colors.bgActive : "transparent")};
+  background: ${(props) => (props.$active ? props.theme.bgActive : "transparent")};
   font-weight: ${(props) => (props.$active ? "bolder" : "normal")};
 
   &:hover {
-    background: ${(props) => (props.$active ? props.theme.colors.bgActive : props.theme.colors.bgHover)};
+    background: ${(props) => (props.$active ? props.theme.bgActive : props.theme.bgHover)};
   }
 `;
 

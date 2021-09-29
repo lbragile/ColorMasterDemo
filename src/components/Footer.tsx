@@ -9,7 +9,5 @@ const CopyrightText = styled.span`
 `;
 
 export default function Footer(): JSX.Element {
-  return (
-    <CopyrightText>{`Site Design & Development © ${new Date().getFullYear()} Lior Bragilevsky, et al.`}</CopyrightText>
-  );
+  return <CopyrightText>{`Site Design & Development © ${new Date().getFullYear()} Lior Bragilevsky`}</CopyrightText>;
 }

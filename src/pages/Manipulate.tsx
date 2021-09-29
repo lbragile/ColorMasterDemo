@@ -16,11 +16,12 @@ import styled from "styled-components";
 import { Ihsla } from "colormaster/types";
 import { Label } from "../styles/Label";
 import FullSlider from "../components/Sliders/FullSlider";
-import CM, { ColorMaster, extendPlugins } from "colormaster";
+import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { IAlphaManipulation, IGridRow, IGridRowDetails, IGridSwatch } from "../types/grid";
 
 extendPlugins([A11yPlugin]);
 
@@ -35,35 +36,12 @@ const INFORMATIVE_TEXT = {
     'Based on "Adjust". Output will vary slightly in most cases.\nLarge variance if lightness is changed.\nCentered on 2D color wheel for all lightness values.'
 };
 
-interface IAlphaManipulation {
-  adjust: boolean;
-  rotate: boolean;
-  invert: boolean;
-  grayscale: boolean;
-}
-
-interface IGridSwatch {
-  state: ColorMaster;
-  alpha: boolean;
-  count: number;
-}
-
-interface IGridRowDetails {
-  type: keyof IAlphaManipulation;
-  state: ColorMaster;
-}
-
-interface IGridRow {
-  arr: IGridRowDetails[];
-  startCount: number;
-}
-
 const LabelledSwatch = styled(Swatch)`
   position: relative;
 `;
 
 const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) => props)`
-  color: ${(props) => (props.$active ? props.theme.colors.arrowColor : props.theme.colors.arrowColorHover)};
+  color: ${(props) => (props.$active ? props.theme.arrowColor : props.theme.arrowColorHover)};
   cursor: pointer;
 `;
 
@@ -131,7 +109,7 @@ export default function Manipulate(): JSX.Element {
     );
   };
 
-  const GridRow = ({ arr, startCount }: IGridRow) => {
+  const GridRow = ({ arr, startCount }: IGridRow<IAlphaManipulation>) => {
     return (
       <FlexRow $wrap="wrap" $gap="12px">
         {arr.map((item, i) => (
@@ -272,7 +250,7 @@ export default function Manipulate(): JSX.Element {
               { type: "invert", state: CM(adjust.hsla()).invert({ alpha: alpha.invert }) },
               { type: "grayscale", state: CM(adjust.hsla()).grayscale() }
             ]
-          ] as IGridRowDetails[][]
+          ] as Required<IGridRowDetails<IAlphaManipulation>>[][]
         ).map((arr, i) => (
           <GridRow key={arr[0].type + arr[1].type} arr={arr} startCount={(i + 1) * 2} />
         ))}

@@ -80,7 +80,7 @@ export default function WheelPicker({
 
         ctxPicker.arc(x + 5, y + 5, pickerRadius, 0, 2 * Math.PI);
 
-        const pickerColor = themeContext.colors.wheelPicker;
+        const pickerColor = themeContext.wheelPicker;
         ctxPicker.fillStyle = pickerColor;
         ctxPicker.strokeStyle = pickerColor;
         ctxPicker.lineWidth = 1;
@@ -88,7 +88,7 @@ export default function WheelPicker({
         ctxPicker.stroke();
 
         if (colorArr.length > 1) {
-          ctxPicker.fillStyle = themeContext.colors.textInverse;
+          ctxPicker.fillStyle = themeContext.textInverse;
           ctxPicker.font = "bold 10px Arial";
           ctxPicker.textAlign = "center";
           ctxPicker.textBaseline = "middle";
@@ -96,7 +96,7 @@ export default function WheelPicker({
         }
       });
     }
-  }, [pickerRadius, rotate, color, harmony, ctxPicker, themeContext.colors]);
+  }, [pickerRadius, rotate, color, harmony, ctxPicker, themeContext]);
 
   const handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
