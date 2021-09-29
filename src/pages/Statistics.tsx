@@ -15,6 +15,7 @@ import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { IAlphaStatistics, IGridRowDetails } from "../types/grid";
 import GridRow from "../components/GridRow";
+import { TSetState } from "../types/react";
 
 extendPlugins([A11yPlugin]);
 
@@ -142,7 +143,7 @@ export default function Statistics(): JSX.Element {
             page="statistics"
             setColor={setColor}
             alpha={alpha}
-            setAlpha={setAlpha as React.Dispatch<React.SetStateAction<Partial<IAlphaStatistics>>>}
+            setAlpha={setAlpha as TSetState<Partial<IAlphaStatistics>>}
           />
         ))}
 

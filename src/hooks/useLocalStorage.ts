@@ -1,10 +1,11 @@
 import CM, { ColorMaster } from "colormaster";
 import { useCallback, useEffect, useState } from "react";
+import { TSetState } from "../types/react";
 
 /**
  * @see https://usehooks-typescript.com/react-hook/use-local-storage
  */
-export default function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+export default function useLocalStorage<T>(key: string, initialValue: T): [T, TSetState<T>] {
   const readValue = useCallback((): T => {
     if (typeof window === "undefined") return initialValue;
 
@@ -21,7 +22,7 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, Re
 
   const [storedValue, setStoredValue] = useState<T>(readValue);
 
-  const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
+  const setValue: TSetState<T> = (value) => {
     if (typeof window == "undefined") {
       console.warn(`Tried setting localStorage key “${key}” even though environment is not a client`);
     }

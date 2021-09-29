@@ -19,6 +19,7 @@ import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { IAlphaManipulation, IGridRowDetails } from "../types/grid";
 import GridRow from "../components/GridRow";
+import { TSetState } from "../types/react";
 
 extendPlugins([A11yPlugin]);
 
@@ -207,7 +208,7 @@ export default function Manipulate(): JSX.Element {
             page="manipulate"
             setColor={setColor}
             alpha={alpha}
-            setAlpha={setAlpha as React.Dispatch<React.SetStateAction<Partial<IAlphaManipulation>>>}
+            setAlpha={setAlpha as TSetState<Partial<IAlphaManipulation>>}
           />
         ))}
 

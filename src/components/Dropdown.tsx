@@ -3,6 +3,7 @@ import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import { StyledAngleIcon } from "../styles/AngleIcon";
 import { FlexColumn } from "../styles/Flex";
+import { TSetState } from "../types/react";
 import Spacers from "./Spacers";
 
 const Container = styled.div.attrs((props: { $cols: number }) => props)`
@@ -53,7 +54,7 @@ const StyledIcon = styled.span.attrs((props: { $iconPos: "right" | "left" }) => 
 interface IDropdown {
   opts: string[];
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  setValue: TSetState<string>;
   icon: JSX.Element;
   iconPos: "left" | "right";
   /** The up/down angle brackets that let the user adjust dropdown values without opening it */

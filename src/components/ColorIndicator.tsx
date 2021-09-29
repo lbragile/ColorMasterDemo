@@ -9,6 +9,7 @@ import { faCheckCircle, faCopy } from "@fortawesome/free-solid-svg-icons";
 import useCopyToClipboard from "../hooks/useCopytoClipboard";
 import { Tooltip } from "../styles/Tooltip";
 import { Heading } from "../styles/Heading";
+import { TSetState } from "../types/react";
 
 extendPlugins([NamePlugin]);
 
@@ -42,7 +43,7 @@ const RowOrCol = styled(FlexRow).attrs((props: { $dir?: "row" | "column" }) => p
 interface IColorIndicator {
   color: string;
   alpha: boolean;
-  setAlpha: React.Dispatch<React.SetStateAction<boolean>>;
+  setAlpha: TSetState<boolean>;
   showName?: boolean;
   dir?: "row" | "column";
 }

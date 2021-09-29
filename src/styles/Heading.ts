@@ -17,4 +17,9 @@ export const Heading = styled.p.attrs((props: { $size?: "h1" | "h2" | "h3" | "h4
       : props.$size === "h5"
       ? "0.83em"
       : "0.67em"};
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
 `;

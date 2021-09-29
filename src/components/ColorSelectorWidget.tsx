@@ -17,6 +17,7 @@ import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
 import { BreakpointsContext } from "./App";
 import { FadeIn } from "../styles/Fade";
+import { TSetState } from "../types/react";
 
 extendPlugins([NamePlugin]);
 
@@ -34,7 +35,7 @@ const BorderedSegment = styled(FlexColumn)`
 
 interface IColorSelectorWidget {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   children?: JSX.Element;
   initColorspace?: string;
   initPicker?: string;
@@ -78,7 +79,7 @@ export default function ColorSelectorWidget({
         <Dropdown
           opts={colorspaceOpts}
           value={colorspace}
-          setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
+          setValue={setColorspace as TSetState<string>}
           icon={<FontAwesomeIcon icon={faPalette} />}
           iconPos="left"
           switcherPos="left"
@@ -90,7 +91,7 @@ export default function ColorSelectorWidget({
         <Dropdown
           opts={pickerOpts}
           value={picker}
-          setValue={setPicker as React.Dispatch<React.SetStateAction<string>>}
+          setValue={setPicker as TSetState<string>}
           icon={<FontAwesomeIcon icon={faCrosshairs} />}
           iconPos="right"
           switcherPos="right"

@@ -4,10 +4,11 @@ import useCanvas from "../../hooks/useCanvas";
 import { drawCheckeredBackground } from "../../utils/alphaBackground";
 import CanvasGroup from "../CanvasGroup";
 import { ThemeContext } from "styled-components";
+import { TSetState } from "../../types/react";
 
 interface IAlphaPicker {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   thickness?: number;
   vertical?: boolean;
 }

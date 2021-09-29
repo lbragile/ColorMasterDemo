@@ -15,6 +15,13 @@ const LabelledSwatch = styled(Swatch)`
   position: relative;
 `;
 
+const InformationIcon = styled(FontAwesomeIcon)`
+  border: 1px solid ${(props) => props.theme.borderLight};
+  border-radius: 50%;
+  background-color: ${(props) => props.theme.borderLight};
+  font-size: 1.2rem;
+`;
+
 export default function GridRow({ arr, startCount, page, setColor, alpha, setAlpha }: IGridRow): JSX.Element {
   const { isMobile } = useContext(BreakpointsContext);
 
@@ -25,7 +32,7 @@ export default function GridRow({ arr, startCount, page, setColor, alpha, setAlp
         <Spacers width="4px" />
         <Tooltip $top={text.split("\n").length * -30 - 10}>
           <span>{text}</span>
-          <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
+          <InformationIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" />
         </Tooltip>
       </FlexRow>
     ) : (

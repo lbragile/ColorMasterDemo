@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
 import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
+import { TSetState } from "../../types/react";
 
 interface IHuePicker {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   thickness?: number;
   vertical?: boolean;
 }

@@ -1,17 +1,18 @@
 import React, { useMemo } from "react";
 import { ColorMaster } from "colormaster";
 import SliderGroup from "../components/Sliders/SliderGroup";
-import { TFormat } from "colormaster/types";
+import { TSetState } from "../types/react";
+import { TValidColorspace } from "../types/colormaster";
 
 interface IUseSliderChange {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   colorspace: string;
   alpha?: boolean;
   min?: string;
 }
 interface IUseSliderChangeReturn {
-  type: Exclude<TFormat, "name" | "invalid">;
+  type: TValidColorspace;
   colorStr: string;
   sliders: JSX.Element;
 }

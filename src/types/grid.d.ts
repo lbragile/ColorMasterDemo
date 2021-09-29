@@ -1,5 +1,5 @@
 import { ColorMaster } from "colormaster";
-import React from "react";
+import { TSetState } from "./react";
 
 export interface IGridSwatch {
   state: ColorMaster;
@@ -17,9 +17,9 @@ export interface IGridRow {
   arr: IGridRowDetails[];
   startCount: number;
   page: "statistics" | "manipulate";
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   alpha: T;
-  setAlpha: React.Dispatch<React.SetStateAction<Partial<IAlphaManipulation & IAlphaStatistics>>>;
+  setAlpha: TSetState<Partial<IAlphaManipulation & IAlphaStatistics>>;
 }
 
 export interface IAlphaStatistics<T = boolean> {

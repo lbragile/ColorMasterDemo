@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import CM, { extendPlugins } from "colormaster";
 import MixPlugin from "colormaster/plugins/mix";
-import { TFormat } from "colormaster/types";
 import CodeModal from "../components/CodeModal";
 import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
@@ -21,10 +20,10 @@ import NumberInput from "../components/Sliders/NumberInput";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { TSetState } from "../types/react";
+import { TValidColorspace } from "../types/colormaster";
 
 extendPlugins([MixPlugin, A11yPlugin]);
-
-type TFormatDropdown = Exclude<TFormat, "invalid" | "name">;
 
 const colorspaceOpts = ["rgb", "hex", "hsl", "hsv", "hwb", "lab", "lch", "luv", "uvw", "ryb", "cmyk", "xyz"];
 
@@ -82,7 +81,7 @@ export default function Mix(): JSX.Element {
   const [primary, setPrimary] = useLocalStorage("leftWidget", CM("hsla(180, 100%, 50%, 1)"));
   const [secondary, setSecondary] = useLocalStorage("rightWidget", CM("hsla(0, 100%, 50%, 1)"));
   const [ratio, setRatio] = useLocalStorage("mixRatio", 0.5);
-  const [colorspace, setColorspace] = useLocalStorage<TFormatDropdown>("mixColorspace", "luv");
+  const [colorspace, setColorspace] = useLocalStorage<TValidColorspace>("mixColorspace", "luv");
   const [alpha, setAlpha] = useState(true);
 
   const [mix, setMix] = useState(primary.mix({ color: secondary, ratio, colorspace }).stringHSL({ alpha }));
@@ -166,7 +165,7 @@ export default function Mix(): JSX.Element {
           <Dropdown
             opts={colorspaceOpts}
             value={colorspace}
-            setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
+            setValue={setColorspace as TSetState<string>}
             icon={<FontAwesomeIcon icon={faPalette} />}
             iconPos="left"
             switcherPos="left"

@@ -6,10 +6,11 @@ import useCanvas from "../../hooks/useCanvas";
 import CanvasGroup from "../CanvasGroup";
 import { FadeIn } from "../../styles/Fade";
 import { ThemeContext } from "styled-components";
+import { TSetState } from "../../types/react";
 
 interface IWheelPicker {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   pickerRadius?: number;
   rotate?: number;
   harmony?: ColorMaster[];

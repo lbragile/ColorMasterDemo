@@ -238,6 +238,7 @@ export default function Contrast(): JSX.Element {
                   <TableCell $positive={readableOn[0]} $negative={!readableOn[0]}>
                     <FontAwesomeIcon icon={readableOn[0] ? faCheckCircle : faTimesCircle} /> 4.5:1
                   </TableCell>
+
                   <TableCell $positive={readableOn[1]} $negative={!readableOn[1]}>
                     <FontAwesomeIcon icon={readableOn[1] ? faCheckCircle : faTimesCircle} />
                     7.0:1

@@ -6,6 +6,7 @@ import CM from "colormaster";
 import { FlexRow } from "../styles/Flex";
 import { BreakpointsContext } from "./App";
 import { StyledAngleIcon } from "../styles/AngleIcon";
+import { TSetState } from "../types/react";
 
 const SWATCH_COLORS = [
   "hsla(0, 100%, 50%, 1)",
@@ -28,7 +29,7 @@ const SWATCH_COLORS = [
 ];
 
 interface ISwatchCarousel {
-  setColor: React.Dispatch<React.SetStateAction<ReturnType<typeof CM>>>;
+  setColor: TSetState<ReturnType<typeof CM>>;
   num?: number;
 }
 
