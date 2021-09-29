@@ -1,17 +1,13 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import CodeModal from "../components/CodeModal";
-import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
-import { Swatch, SwatchCounter } from "../styles/Swatch";
 import addColor from "../utils/addColor";
 import { ManipulationSample } from "../utils/codeSamples";
 import { FlexColumn, FlexRow } from "../styles/Flex";
-import { Tooltip } from "../styles/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Heading } from "../styles/Heading";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { Ihsla } from "colormaster/types";
 import { Label } from "../styles/Label";
@@ -21,7 +17,8 @@ import A11yPlugin from "colormaster/plugins/accessibility";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { IAlphaManipulation, IGridRow, IGridRowDetails, IGridSwatch } from "../types/grid";
+import { IAlphaManipulation, IGridRowDetails } from "../types/grid";
+import GridRow from "../components/GridRow";
 
 extendPlugins([A11yPlugin]);
 
@@ -35,10 +32,6 @@ const INFORMATIVE_TEXT = {
   grayscale:
     'Based on "Adjust". Output will vary slightly in most cases.\nLarge variance if lightness is changed.\nCentered on 2D color wheel for all lightness values.'
 };
-
-const LabelledSwatch = styled(Swatch)`
-  position: relative;
-`;
 
 const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) => props)`
   color: ${(props) => (props.$active ? props.theme.arrowColor : props.theme.arrowColorHover)};
@@ -80,55 +73,6 @@ export default function Manipulate(): JSX.Element {
     },
     [incrementColor, setIncrementColor]
   );
-
-  const Title = ({ title, text }: { title: string; text: string }) => {
-    return (
-      <FlexRow>
-        <Heading $size="h1">{title[0].toUpperCase() + title.slice(1)}</Heading>
-        <Spacers width="4px" />
-        <Tooltip $top={text.split("\n").length * -30 - 10}>
-          <span>{text}</span>
-          <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
-        </Tooltip>
-      </FlexRow>
-    );
-  };
-
-  const GridSwatch = ({ state, alpha, count }: IGridSwatch) => {
-    return (
-      <LabelledSwatch
-        title={state.stringHSL({ precision: [0, 0, 0, 2], alpha })}
-        background={state.stringHSL()}
-        onClick={() => setColor(state)}
-        $radius={75}
-        $borderRadius="4px"
-        $cursor="pointer"
-      >
-        <SwatchCounter $isLight={state.isLight()}>{count}</SwatchCounter>
-      </LabelledSwatch>
-    );
-  };
-
-  const GridRow = ({ arr, startCount }: IGridRow<IAlphaManipulation>) => {
-    return (
-      <FlexRow $wrap="wrap" $gap="12px">
-        {arr.map((item, i) => (
-          <FlexColumn key={item.type} $gap="8px" $cols={isMobile ? 24 : 11}>
-            <Title title={item.type} text={INFORMATIVE_TEXT[item.type]} />
-
-            <ColorIndicator
-              color={item.state.stringHSL({ precision: [0, 0, 0, 2], alpha: alpha[item.type] })}
-              alpha={alpha[item.type]}
-              setAlpha={(arg) => setAlpha({ ...alpha, [item.type]: arg })}
-              dir="column"
-            />
-
-            <GridSwatch state={item.state} alpha={alpha[item.type]} count={i + startCount} />
-          </FlexColumn>
-        ))}
-      </FlexRow>
-    );
-  };
 
   const IncrementOrDecrement = ({ channel }: { channel: number }): JSX.Element => {
     const newArr = [...incrementArr];
@@ -243,16 +187,28 @@ export default function Manipulate(): JSX.Element {
         {(
           [
             [
-              { type: "adjust", state: adjust },
-              { type: "rotate", state: CM({ ...color.hsla(), h: adjust.hue }) }
+              { type: "adjust", text: INFORMATIVE_TEXT.adjust, state: adjust },
+              { type: "rotate", text: INFORMATIVE_TEXT.rotate, state: CM({ ...color.hsla(), h: adjust.hue }) }
             ],
             [
-              { type: "invert", state: CM(adjust.hsla()).invert({ alpha: alpha.invert }) },
-              { type: "grayscale", state: CM(adjust.hsla()).grayscale() }
+              {
+                type: "invert",
+                text: INFORMATIVE_TEXT.invert,
+                state: CM(adjust.hsla()).invert({ alpha: alpha.invert })
+              },
+              { type: "grayscale", text: INFORMATIVE_TEXT.grayscale, state: CM(adjust.hsla()).grayscale() }
             ]
-          ] as Required<IGridRowDetails<IAlphaManipulation>>[][]
+          ] as IGridRowDetails[][]
         ).map((arr, i) => (
-          <GridRow key={arr[0].type + arr[1].type} arr={arr} startCount={(i + 1) * 2} />
+          <GridRow
+            key={arr[0].type + arr[1].type}
+            arr={arr}
+            startCount={(i + 1) * 2}
+            page="manipulate"
+            setColor={setColor}
+            alpha={alpha}
+            setAlpha={setAlpha as React.Dispatch<React.SetStateAction<Partial<IAlphaManipulation>>>}
+          />
         ))}
 
         <CodeModal code={ManipulationSample(colorDebounce, incrementColorDebounce, incrementArr, alpha)} />

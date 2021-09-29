@@ -1,22 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
-import { Swatch, SwatchCounter } from "../styles/Swatch";
 import { A11yStatisticsSample } from "../utils/codeSamples";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import CodeModal from "../components/CodeModal";
-import ColorIndicator from "../components/ColorIndicator";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
-import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFire, faMoon, faSnowflake, faSun, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Spacers from "../components/Spacers";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { IAlphaStatistics, IGridRow, IGridRowDetails, IGridSwatch } from "../types/grid";
+import { IAlphaStatistics, IGridRowDetails } from "../types/grid";
+import GridRow from "../components/GridRow";
 
 extendPlugins([A11yPlugin]);
 
@@ -24,10 +22,6 @@ interface IPureHue {
   pure: boolean;
   reason: string;
 }
-
-const LabelledSwatch = styled(Swatch)`
-  position: relative;
-`;
 
 export default function Statistics(): JSX.Element {
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
@@ -59,42 +53,6 @@ export default function Statistics(): JSX.Element {
       web: CM(color.hsla()).closestWebSafe()
     });
   }, [color]);
-
-  const GridSwatch = ({ state, alpha, count }: IGridSwatch) => {
-    return (
-      <LabelledSwatch
-        title={state.stringHSL({ precision: [0, 0, 0, 2], alpha })}
-        background={state.stringHSL()}
-        onClick={() => setColor(state)}
-        $radius={75}
-        $borderRadius="4px"
-        $cursor="pointer"
-      >
-        <SwatchCounter $isLight={state.isLight()}>{count}</SwatchCounter>
-      </LabelledSwatch>
-    );
-  };
-
-  const GridRow = ({ arr, startCount }: IGridRow<IAlphaStatistics>) => {
-    return (
-      <FlexRow $wrap="wrap" $gap="12px">
-        {arr.map((item, i) => (
-          <FlexColumn key={item.type} $gap="8px" $cols={isMobile ? 24 : 11}>
-            <Heading $size="h1">{item.text}</Heading>
-
-            <ColorIndicator
-              color={item.state.stringHSL({ precision: [0, 0, 0, 2], alpha: alpha[item.type] })}
-              alpha={alpha[item.type]}
-              setAlpha={(arg) => setAlpha({ ...alpha, [item.type]: arg })}
-              dir="column"
-            />
-
-            <GridSwatch state={item.state} alpha={alpha[item.type]} count={i + startCount} />
-          </FlexColumn>
-        ))}
-      </FlexRow>
-    );
-  };
 
   return (
     <FadeIn $wrap="wrap" $gap={isMobile || isTablet || isLaptop || isComputer ? "32px" : "28px"}>
@@ -175,9 +133,17 @@ export default function Statistics(): JSX.Element {
               { type: "pure", text: "Closest Pure Hue", state: closest.pure },
               { type: "web", text: "Closest Web Safe", state: closest.web }
             ]
-          ] as IGridRowDetails<IAlphaStatistics>[][]
+          ] as IGridRowDetails[][]
         ).map((arr, i) => (
-          <GridRow key={arr[0].type + arr[1].type} arr={arr} startCount={i * 2 + 1} />
+          <GridRow
+            key={arr[0].type + arr[1].type}
+            arr={arr}
+            startCount={i * 2 + 1}
+            page="statistics"
+            setColor={setColor}
+            alpha={alpha}
+            setAlpha={setAlpha as React.Dispatch<React.SetStateAction<Partial<IAlphaStatistics>>>}
+          />
         ))}
 
         <CodeModal code={A11yStatisticsSample(colorDebounce, alpha)} />

@@ -1,18 +1,25 @@
+import { ColorMaster } from "colormaster";
+import React from "react";
+
 export interface IGridSwatch {
   state: ColorMaster;
   alpha: boolean;
   count: number;
 }
 
-export interface IGridRowDetails<T> {
-  type: keyof T;
+export interface IGridRowDetails {
+  type: keyof (IAlphaManipulation & IAlphaStatistics);
   state: ColorMaster;
-  text?: string;
+  text: string;
 }
 
-export interface IGridRow<T> {
-  arr: IGridRowDetails<T>[];
+export interface IGridRow {
+  arr: IGridRowDetails[];
   startCount: number;
+  page: "statistics" | "manipulate";
+  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  alpha: T;
+  setAlpha: React.Dispatch<React.SetStateAction<Partial<IAlphaManipulation & IAlphaStatistics>>>;
 }
 
 export interface IAlphaStatistics<T = boolean> {
@@ -22,9 +29,9 @@ export interface IAlphaStatistics<T = boolean> {
   web: T;
 }
 
-export interface IAlphaManipulation<T = boolean> {
-  adjust: T;
-  rotate: T;
-  invert: T;
-  grayscale: T;
+export interface IAlphaManipulation {
+  adjust: boolean;
+  rotate: boolean;
+  invert: boolean;
+  grayscale: boolean;
 }
