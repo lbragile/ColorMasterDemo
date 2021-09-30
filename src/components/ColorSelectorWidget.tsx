@@ -17,6 +17,7 @@ import { FlexColumn, FlexRow } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
 import { BreakpointsContext } from "./App";
 import { FadeIn } from "../styles/Fade";
+import { TSetState } from "../types/react";
 
 extendPlugins([NamePlugin]);
 
@@ -25,20 +26,21 @@ const pickerOpts = ["slider", "sketch", "wheel"];
 
 const BorderedSegment = styled(FlexColumn)`
   position: relative;
-  border: 1px solid ${(props) => props.theme.colors.border};
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 2px 2px 6px 1px ${(props) => props.theme.colors.boxShadow};
+  box-shadow: 2px 2px 6px 1px ${(props) => props.theme.boxShadow};
   overflow: hidden;
 `;
 
 interface IColorSelectorWidget {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   children?: JSX.Element;
   initColorspace?: string;
   initPicker?: string;
   harmony?: ColorMaster[];
+  adjustors?: JSX.Element[];
 }
 
 export default function ColorSelectorWidget({
@@ -47,16 +49,17 @@ export default function ColorSelectorWidget({
   children,
   initColorspace = colorspaceOpts[0],
   initPicker = pickerOpts[0],
-  harmony = undefined
+  harmony = undefined,
+  adjustors = undefined
 }: IColorSelectorWidget): JSX.Element {
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [alpha, setAlpha] = useState(true);
-  const [colorspace, setColorspace] = useState(colorspaceOpts.find((x) => x === initColorspace) ?? colorspaceOpts[0]);
-  const [picker, setPicker] = useState(pickerOpts.find((x) => x === initPicker) ?? pickerOpts[0]);
+  const [colorspace, setColorspace] = useState(initColorspace);
+  const [picker, setPicker] = useState(initPicker);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-  const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });
+  const currentSliders = useSliderChange({ color, setColor, colorspace, alpha, adjustors });
 
   return (
     <BorderedSegment $cols={isMobile ? 24 : isTablet ? 16 : isLaptop ? 12 : isComputer ? 10 : isWideScreen ? 8 : 6}>
@@ -78,7 +81,7 @@ export default function ColorSelectorWidget({
         <Dropdown
           opts={colorspaceOpts}
           value={colorspace}
-          setValue={setColorspace as React.Dispatch<React.SetStateAction<string>>}
+          setValue={setColorspace as TSetState<string>}
           icon={<FontAwesomeIcon icon={faPalette} />}
           iconPos="left"
           switcherPos="left"
@@ -90,7 +93,7 @@ export default function ColorSelectorWidget({
         <Dropdown
           opts={pickerOpts}
           value={picker}
-          setValue={setPicker as React.Dispatch<React.SetStateAction<string>>}
+          setValue={setPicker as TSetState<string>}
           icon={<FontAwesomeIcon icon={faCrosshairs} />}
           iconPos="right"
           switcherPos="right"

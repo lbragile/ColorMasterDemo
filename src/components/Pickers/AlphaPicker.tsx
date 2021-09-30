@@ -1,17 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import CM, { ColorMaster } from "colormaster";
 import useCanvas from "../../hooks/useCanvas";
 import { drawCheckeredBackground } from "../../utils/alphaBackground";
 import CanvasGroup from "../CanvasGroup";
+import { ThemeContext } from "styled-components";
+import { TSetState } from "../../types/react";
 
 interface IAlphaPicker {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   thickness?: number;
   vertical?: boolean;
 }
 
 export default function AlphaPicker({ color, setColor, thickness = 15, vertical = true }: IAlphaPicker): JSX.Element {
+  const themeContext = useContext(ThemeContext);
   const canDrag = useRef(false);
 
   const [refAlpha, ctxAlpha] = useCanvas(thickness, vertical);
@@ -22,7 +25,7 @@ export default function AlphaPicker({ color, setColor, thickness = 15, vertical 
       const { width, height } = ctxAlpha.canvas;
       ctxAlpha.clearRect(0, 0, width, height);
       ctxAlpha.beginPath();
-      drawCheckeredBackground(ctxAlpha, vertical);
+      drawCheckeredBackground(ctxAlpha, themeContext, vertical);
 
       ctxAlpha.rect(0, 0, width, height);
       const gradient = ctxAlpha.createLinearGradient(0, 0, vertical ? 0 : width, vertical ? height : 0);
@@ -32,7 +35,7 @@ export default function AlphaPicker({ color, setColor, thickness = 15, vertical 
       ctxAlpha.fillStyle = gradient;
       ctxAlpha.fill();
     }
-  }, [color, vertical, ctxAlpha]);
+  }, [color, vertical, ctxAlpha, themeContext]);
 
   useEffect(() => {
     if (ctxPicker) {

@@ -1,10 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import { TSetState } from "../types/react";
 import Spacers from "./Spacers";
 
 interface ICheckbox {
   value: boolean;
-  setValue: React.Dispatch<React.SetStateAction<boolean>>;
+  setValue: TSetState<boolean>;
   label: string;
 }
 

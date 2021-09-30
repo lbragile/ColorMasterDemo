@@ -3,13 +3,11 @@ import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 import { THarmony, TMonoEffect } from "colormaster/types";
-import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
 import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
-import useQuery from "../hooks/useQuery";
 import { Swatch, SwatchCounter, CurrentColorIcon } from "../styles/Swatch";
 import { HarmonySample } from "../utils/codeSamples";
 import { FlexColumn, FlexRow } from "../styles/Flex";
@@ -19,6 +17,7 @@ import RangeInput from "../components/Sliders/RangeInput";
 import { BreakpointsContext } from "../components/App";
 import { FadeIn } from "../styles/Fade";
 import { HarmonyIcons } from "../utils/harmonyIcons";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 extendPlugins([HarmonyPlugin, A11yPlugin]);
 
@@ -36,23 +35,23 @@ const typeOptions: THarmony[] = [
 const effectOptions: TMonoEffect[] = ["shades", "tints", "tones"];
 
 const VerticalMenu = styled.div`
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   border-radius: 8px;
-  background: ${(props) => props.theme.colors.bgDefault};
+  background: ${(props) => props.theme.bgDefault};
   overflow: hidden;
   position: relative;
 `;
 
 const MenuItem = styled.div.attrs((props: { $active: boolean; $last: boolean }) => props)`
   padding: 4px 16px 0 4px;
-  border-bottom: ${(props) => (props.$last ? "none" : `1px solid ${props.theme.colors.borderLight}`)};
+  border-bottom: ${(props) => (props.$last ? "none" : `1px solid ${props.theme.borderLight}`)};
   text-transform: capitalize;
   cursor: pointer;
-  background: ${(props) => (props.$active ? props.theme.colors.bgActive : "transparent")};
+  background: ${(props) => (props.$active ? props.theme.bgActive : "transparent")};
   font-weight: ${(props) => (props.$active ? "bolder" : "normal")};
 
   &:hover {
-    background: ${(props) => (props.$active ? props.theme.colors.bgActive : props.theme.colors.bgHover)};
+    background: ${(props) => (props.$active ? props.theme.bgActive : props.theme.bgHover)};
   }
 `;
 
@@ -110,19 +109,14 @@ const SwatchContainer = styled.div`
 `;
 
 export default function Harmony(): JSX.Element {
-  const history = useHistory();
-  const query = useQuery();
   const { isMobile, isTablet, isLaptop, isComputer } = useContext(BreakpointsContext);
 
-  const [color, setColor] = useState(CM(query.color ?? "hsla(0, 75%, 50%, 1)"));
+  const [color, setColor] = useLocalStorage("leftWidget", CM("hsla(0, 75%, 50%, 1)"));
+  const [type, setType] = useLocalStorage<THarmony>("harmonyType", "analogous");
+  const [effect, setEffect] = useLocalStorage<TMonoEffect>("monochromaticEffect", "shades");
+  const [amount, setAmount] = useLocalStorage("monochromaticAmount", 7);
+
   const [harmony, setHarmony] = useState(color.harmony().map((c) => c.stringHSL({ precision: [2, 2, 2, 2] })));
-  const [type, setType] = useState<THarmony>(
-    (typeOptions.find((item) => item === query.type) as THarmony) ?? "analogous"
-  );
-  const [effect, setEffect] = useState<TMonoEffect>(
-    (effectOptions.find((item) => item === query.effect) as TMonoEffect) ?? "shades"
-  );
-  const [amount, setAmount] = useState(Number(query.amount ?? 7));
 
   const colorDebounce = useDebounce(color, 100);
 
@@ -134,15 +128,6 @@ export default function Harmony(): JSX.Element {
         .filter((val, i, arr) => arr.indexOf(val) === i) // filter duplicates in case of picker overlap
     );
   }, [colorDebounce, type, effect, amount]);
-
-  useEffect(() => {
-    const baseSearch = `?color=${colorDebounce.stringHEX().slice(1).toLowerCase()}&type=${type}`;
-
-    history.replace({
-      pathname: "/harmony",
-      search: type !== "monochromatic" ? baseSearch : `${baseSearch}&effect=${effect}&amount=${amount}`
-    });
-  }, [history, colorDebounce, type, effect, amount]);
 
   return (
     <FadeIn $wrap="wrap" $gap="28px">

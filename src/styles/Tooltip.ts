@@ -11,13 +11,14 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: numbe
     top: ${(props) => (props.$top ?? -45) + 5 + "px"};
     left: 50%;
     transform: translateX(-50%);
-    background: ${(props) => props.theme.colors.text};
-    color: ${(props) => props.theme.colors.textInverse};
+    background: ${(props) => props.theme.text};
+    color: ${(props) => props.theme.textInverse};
     white-space: pre;
     line-height: 1.5;
     padding: 12px;
     border-radius: 4px;
     opacity: 0;
+    z-index: 10;
     transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out;
 
     &::after {
@@ -28,7 +29,7 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: numbe
       transform: translateX(-50%);
       border-width: 5px;
       border-style: solid;
-      border-color: ${(props) => props.theme.colors.text} transparent transparent transparent;
+      border-color: ${(props) => props.theme.text} transparent transparent transparent;
     }
   }
 

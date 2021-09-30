@@ -17,7 +17,7 @@ const InputContainer = styled.div`
 
 const StyledNumberInput = styled.input`
   width: 90px;
-  border: 1px solid ${(props) => props.theme.colors.borderLight};
+  border: 1px solid ${(props) => props.theme.borderLight};
   padding: 6px;
   border-radius: 4px;
   text-align: center;
@@ -25,7 +25,7 @@ const StyledNumberInput = styled.input`
   font-size: 1.1rem;
 
   &:focus {
-    border: 1px solid ${(props) => props.theme.colors.borderFocus};
+    border: 1px solid ${(props) => props.theme.borderFocus};
   }
 `;
 
@@ -34,7 +34,7 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   left: 1px;
   top: ${(props) => (props.$dir === "up" ? "1px" : "")};
   bottom: ${(props) => (props.$dir === "down" ? "1px" : "")};
-  background-color: ${(props) => props.theme.colors.bgActive};
+  background-color: ${(props) => props.theme.bgActive};
   height: calc(50% - 1px);
   border-radius: ${(props) => (props.$dir === "up" ? "2px 0 0 0" : "0 0 0 2px")};
   padding: 0 4px;
@@ -42,16 +42,16 @@ const ArrowButton = styled.button.attrs((props: { $dir: "up" | "down"; disabled:
   align-items: center;
   justify-content: center;
   border: none;
-  border-bottom: ${(props) => (props.$dir === "up" ? `1px solid ${props.theme.colors.border}` : "")};
+  border-bottom: ${(props) => (props.$dir === "up" ? `1px solid ${props.theme.border}` : "")};
   outline: none;
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   &:hover {
-    background-color: ${(props) => props.theme.colors.bgDark};
+    background-color: ${(props) => props.theme.bgDark};
   }
 
   & path {
-    fill: ${(props) => (props.disabled ? "rgba(0, 0, 0, 0.2)" : "")};
+    fill: ${(props) => (props.disabled ? props.theme.arrowColorHover : "")};
   }
 `;
 
@@ -61,7 +61,7 @@ const StyledLabel = styled.div`
   top: 1px;
   width: 20px;
   height: calc(100% - 2px);
-  background: ${(props) => props.theme.colors.bgActive};
+  background: ${(props) => props.theme.bgActive};
   border-radius: 0 4px 4px 0;
   font-weight: bolder;
   display: flex;
@@ -70,7 +70,7 @@ const StyledLabel = styled.div`
 `;
 
 const ArrowIcon = styled(FontAwesomeIcon)`
-  color: ${(props) => props.theme.colors.arrowColor};
+  color: ${(props) => props.theme.arrowColor};
 `;
 
 export default function NumberInput({

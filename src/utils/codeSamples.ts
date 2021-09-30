@@ -1,8 +1,9 @@
 import CM, { ColorMaster, extendPlugins } from "colormaster";
-import { TFormat, THarmony, TMonoEffect, TNumArr } from "colormaster/types";
+import { THarmony, TMonoEffect, TNumArr } from "colormaster/types";
 import MixPlugin from "colormaster/plugins/mix";
 import HarmonyPlugin from "colormaster/plugins/harmony";
 import NamePlugin from "colormaster/plugins/name";
+import { TValidColorspace } from "../types/colormaster";
 
 extendPlugins([MixPlugin, HarmonyPlugin, NamePlugin]);
 
@@ -67,7 +68,7 @@ export function MixSample(
   primary: ColorMaster,
   secondary: ColorMaster,
   ratio: number,
-  colorspace: Exclude<TFormat, "invalid" | "name">,
+  colorspace: TValidColorspace,
   alpha: boolean
 ): string {
   const mix = primary.mix({ color: secondary, ratio, colorspace });

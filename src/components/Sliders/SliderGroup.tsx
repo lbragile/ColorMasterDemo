@@ -2,16 +2,19 @@ import React, { useCallback, useMemo } from "react";
 import FullSlider from "./FullSlider";
 import { FlexColumn } from "../../styles/Flex";
 import CM, { ColorMaster } from "colormaster";
-import { TFormat, THexStr } from "colormaster/types";
+import { THexStr } from "colormaster/types";
+import { TSetState } from "../../types/react";
+import { TValidColorspace } from "../../types/colormaster";
 
 interface ISliderGroup {
   colorArr: number[];
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
-  format: Exclude<TFormat, "name" | "invalid">;
+  setColor: TSetState<ColorMaster>;
+  format: TValidColorspace;
   gap?: string;
+  children?: JSX.Element[];
 }
 
-export default function SliderGroup({ colorArr, setColor, format, gap = "" }: ISliderGroup): JSX.Element {
+export default function SliderGroup({ colorArr, setColor, format, gap = "", children }: ISliderGroup): JSX.Element {
   const generateCMStr = useCallback(
     (arr: number[]): ColorMaster => {
       switch (format) {
@@ -95,7 +98,9 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "" }: IS
             postfix={postfix[i]}
             format={format}
             onChange={(e) => handleChange(e, i)}
-          />
+          >
+            {children?.[i]}
+          </FullSlider>
         );
       })}
     </FlexColumn>

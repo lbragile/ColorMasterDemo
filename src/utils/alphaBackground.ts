@@ -1,5 +1,7 @@
+import { DefaultTheme } from "styled-components";
+
 // Based on https://stackoverflow.com/a/27667424/4298115
-export function drawCheckeredBackground(ctx: CanvasRenderingContext2D, vertical?: boolean): void {
+export function drawCheckeredBackground(ctx: CanvasRenderingContext2D, theme: DefaultTheme, vertical?: boolean): void {
   let { width: w, height: h } = ctx.canvas;
 
   const numBlocks = (vertical ? w : h) + 10;
@@ -13,6 +15,6 @@ export function drawCheckeredBackground(ctx: CanvasRenderingContext2D, vertical?
     ctx.rect(vertical ? w : (2 * j + 1) * w, vertical ? (2 * j + 1) * h : h, w, h); // second row/col
   }
 
-  ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+  ctx.fillStyle = theme.alphaPickerCheckers;
   ctx.fill();
 }

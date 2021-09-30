@@ -9,8 +9,8 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: ${(props) => props.theme.colors.bgDefault};
-    color: ${(props) => props.theme.colors.text};
+    background-color: ${(props) => props.theme.bgDefault};
+    color: ${(props) => props.theme.text};
     transition: background-color 0.5s ease-in-out;
   }
 `;

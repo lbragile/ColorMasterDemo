@@ -6,12 +6,13 @@ import CanvasGroup from "../CanvasGroup";
 import CM, { ColorMaster, extendPlugins } from "colormaster";
 import HSVPlugin from "colormaster/plugins/hsv";
 import { FadeIn } from "../../styles/Fade";
+import { TSetState } from "../../types/react";
 
 extendPlugins([HSVPlugin]);
 
 interface ISketchPicker {
   color: ColorMaster;
-  setColor: React.Dispatch<React.SetStateAction<ColorMaster>>;
+  setColor: TSetState<ColorMaster>;
   pickerRadius?: number;
   vertical?: boolean;
 }

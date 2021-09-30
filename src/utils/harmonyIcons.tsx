@@ -6,8 +6,8 @@ const StyledSVG = styled.svg`
   transform: scale(0.5);
 
   & g {
-    stroke: ${(props) => props.theme.colors.text};
-    fill: ${(props) => props.theme.colors.text};
+    stroke: ${(props) => props.theme.text};
+    fill: ${(props) => props.theme.text};
   }
 `;
 

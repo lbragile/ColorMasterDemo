@@ -1,12 +1,12 @@
-import { TFormat } from "colormaster/types";
 import React from "react";
+import { TValidColorspace } from "./colormaster";
 
 interface ICommon {
   value: number | string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   min?: string;
   max?: string;
-  format?: Exclude<TFormat, "name" | "invalid">;
+  format?: TValidColorspace;
 }
 
 export interface INumberInput extends ICommon {
@@ -21,4 +21,5 @@ export interface IRangeInput extends ICommon {
 
 export interface IFullSlider extends INumberInput, IRangeInput {
   title?: string;
+  children?: JSX.Element;
 }
