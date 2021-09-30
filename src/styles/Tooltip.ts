@@ -18,6 +18,7 @@ export const Tooltip = styled.div.attrs((props: { $copied: boolean; $top?: numbe
     padding: 12px;
     border-radius: 4px;
     opacity: 0;
+    z-index: 10;
     transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out;
 
     &::after {

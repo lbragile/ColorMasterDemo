@@ -29,7 +29,11 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, TS
 
     try {
       const newValue =
-        value instanceof Function ? value(storedValue) : value instanceof ColorMaster ? value.stringRGB() : value;
+        value instanceof Function
+          ? value(storedValue)
+          : value instanceof ColorMaster
+          ? value.stringRGB({ precision: [5, 5, 5, 5] }) // high precision makes round off errors less likely
+          : value;
       window.localStorage.setItem(key, JSON.stringify(newValue));
 
       // need to adjust incase new value is a ColorMaster string

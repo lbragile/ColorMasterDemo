@@ -40,6 +40,7 @@ interface IColorSelectorWidget {
   initColorspace?: string;
   initPicker?: string;
   harmony?: ColorMaster[];
+  adjustors?: JSX.Element[];
 }
 
 export default function ColorSelectorWidget({
@@ -48,7 +49,8 @@ export default function ColorSelectorWidget({
   children,
   initColorspace = colorspaceOpts[0],
   initPicker = pickerOpts[0],
-  harmony = undefined
+  harmony = undefined,
+  adjustors = undefined
 }: IColorSelectorWidget): JSX.Element {
   const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
@@ -57,7 +59,7 @@ export default function ColorSelectorWidget({
   const [picker, setPicker] = useState(initPicker);
 
   const colorNameDebounce = useDebounce(color.name({ exact: false }), 100);
-  const currentSliders = useSliderChange({ color, setColor, colorspace, alpha });
+  const currentSliders = useSliderChange({ color, setColor, colorspace, alpha, adjustors });
 
   return (
     <BorderedSegment $cols={isMobile ? 24 : isTablet ? 16 : isLaptop ? 12 : isComputer ? 10 : isWideScreen ? 8 : 6}>

@@ -21,4 +21,5 @@ export interface IRangeInput extends ICommon {
 
 export interface IFullSlider extends INumberInput, IRangeInput {
   title?: string;
+  children?: JSX.Element;
 }

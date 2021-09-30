@@ -11,9 +11,10 @@ interface ISliderGroup {
   setColor: TSetState<ColorMaster>;
   format: TValidColorspace;
   gap?: string;
+  children?: JSX.Element[];
 }
 
-export default function SliderGroup({ colorArr, setColor, format, gap = "" }: ISliderGroup): JSX.Element {
+export default function SliderGroup({ colorArr, setColor, format, gap = "", children }: ISliderGroup): JSX.Element {
   const generateCMStr = useCallback(
     (arr: number[]): ColorMaster => {
       switch (format) {
@@ -97,7 +98,9 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "" }: IS
             postfix={postfix[i]}
             format={format}
             onChange={(e) => handleChange(e, i)}
-          />
+          >
+            {children?.[i]}
+          </FullSlider>
         );
       })}
     </FlexColumn>

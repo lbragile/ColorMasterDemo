@@ -1,17 +1,14 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CodeModal from "../components/CodeModal";
 import ColorSelectorWidget from "../components/ColorSelectorWidget";
-import Spacers from "../components/Spacers";
 import useDebounce from "../hooks/useDebounce";
 import addColor from "../utils/addColor";
 import { ManipulationSample } from "../utils/codeSamples";
-import { FlexColumn, FlexRow } from "../styles/Flex";
+import { FlexColumn } from "../styles/Flex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import { Ihsla } from "colormaster/types";
 import { Label } from "../styles/Label";
-import FullSlider from "../components/Sliders/FullSlider";
 import CM, { extendPlugins } from "colormaster";
 import A11yPlugin from "colormaster/plugins/accessibility";
 import { BreakpointsContext } from "../components/App";
@@ -25,9 +22,9 @@ extendPlugins([A11yPlugin]);
 
 const INFORMATIVE_TEXT = {
   adjust:
-    "Color picker & each of the above sliders!\nCombines both color picker (input) and slider (delta)\ncolors according to dropdown selection.",
+    "Combines both input and adjustor color picker values.\nThe combination is based on the adjustor color\npicker increment/decrement switches.\n",
   rotate:
-    "Color picker & hue slider from above sliders only!\nRotation is simply moving at a fixed radius\n(arc) along the color wheel.",
+    "Input color picker & hue slider of adjustor color picker!\nRotation is simply moving at a fixed radius\n(arc) along the color wheel.",
   invert:
     'Based on "Adjust". Similar to complementary harmony.\nRotates 180° and flips the lightness value.\nAlpha channel included based on selection.',
   grayscale:
@@ -50,7 +47,7 @@ export default function Manipulate(): JSX.Element {
   });
 
   const [color, setColor] = useLocalStorage("leftWidget", CM("hsla(180, 50%, 50%, 0.5)"));
-  const [incrementColor, setIncrementColor] = useLocalStorage("adjustColor", CM("hsla(72, 15%, 10%, 0.05)"));
+  const [incrementColor, setIncrementColor] = useLocalStorage("rightWidget", CM("hsla(72, 15%, 10%, 0.05)"));
   const [incrementArr, setIncrementArr] = useLocalStorage<boolean[]>("adjustDirection", new Array(4).fill(true));
 
   const [adjust, setAdjust] = useState(addColor(color, incrementColor, incrementArr));
@@ -62,22 +59,9 @@ export default function Manipulate(): JSX.Element {
     setAdjust(addColor(color, incrementColor, incrementArr));
   }, [color, incrementColor, alpha.invert, incrementArr]);
 
-  const handleChange = useCallback(
-    (channel: keyof Ihsla) => {
-      return (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = +e.target.value;
-
-        if (!Number.isNaN(val)) {
-          setIncrementColor(CM({ ...incrementColor.hsla(), [channel]: channel === "a" ? val / 100 : val }));
-        }
-      };
-    },
-    [incrementColor, setIncrementColor]
-  );
-
   const IncrementOrDecrement = ({ channel }: { channel: number }): JSX.Element => {
     const newArr = [...incrementArr];
-    newArr.splice(channel, 0, !incrementArr[channel]);
+    newArr.splice(channel, 1, !incrementArr[channel]);
 
     return (
       <FlexColumn $cols={1}>
@@ -113,76 +97,9 @@ export default function Manipulate(): JSX.Element {
         ]}
       >
         <Label $where="left" $bgColor="hsla(0, 0%, 90%, 1)" $color="black">
-          1
+          Input (1)
         </Label>
       </ColorSelectorWidget>
-
-      <FlexColumn $cols={isMobile ? 24 : isTablet ? 20 : isLaptop ? 10 : isComputer ? 8 : 5} $gap="12px">
-        <FlexRow>
-          <FullSlider
-            color={`hsla(${incrementColor.hue}, 100%, 50%, 1)`}
-            value={incrementColor.hue}
-            onChange={handleChange("h")}
-            min="0"
-            max="359.99"
-            format="hsl"
-            postfix="°"
-            title="H"
-          />
-
-          <Spacers width="6px" />
-
-          <IncrementOrDecrement channel={0} />
-        </FlexRow>
-        <FlexRow>
-          <FullSlider
-            color={`hsla(${incrementColor.hue}, ${incrementColor.saturation}%, 50%, 1)`}
-            min="0.01"
-            max="100"
-            value={incrementColor.saturation}
-            onChange={handleChange("s")}
-            format="hsl"
-            postfix="%"
-            title="S"
-          />
-
-          <Spacers width="6px" />
-
-          <IncrementOrDecrement channel={1} />
-        </FlexRow>
-        <FlexRow>
-          <FullSlider
-            color={`hsla(0, 0%, ${incrementColor.lightness - 5}%, 1)`}
-            min="0.01"
-            max="100"
-            value={incrementColor.lightness}
-            onChange={handleChange("l")}
-            format="hsl"
-            postfix="%"
-            title="L"
-          />
-
-          <Spacers width="6px" />
-
-          <IncrementOrDecrement channel={2} />
-        </FlexRow>
-        <FlexRow>
-          <FullSlider
-            color="rgba(0, 0, 0, 0.6)"
-            min="0"
-            max="100"
-            value={incrementColor.alpha * 100}
-            onChange={handleChange("a")}
-            format="hsl"
-            postfix="%"
-            title="A"
-          />
-
-          <Spacers width="6px" />
-
-          <IncrementOrDecrement channel={3} />
-        </FlexRow>
-      </FlexColumn>
 
       <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer ? 16 : 10} $gap="24px">
         {(
@@ -214,6 +131,20 @@ export default function Manipulate(): JSX.Element {
 
         <CodeModal code={ManipulationSample(colorDebounce, incrementColorDebounce, incrementArr, alpha)} />
       </FlexColumn>
+
+      <ColorSelectorWidget
+        color={incrementColor}
+        setColor={setIncrementColor}
+        initPicker="slider"
+        initColorspace="hsl"
+        adjustors={[0, 1, 2, 3].map((_, i) => (
+          <IncrementOrDecrement key={"increment-decrement-" + i} channel={i} />
+        ))}
+      >
+        <Label $where="right" $bgColor="hsla(0, 0%, 90%, 1)" $color="black">
+          Adjustor
+        </Label>
+      </ColorSelectorWidget>
     </FadeIn>
   );
 }
