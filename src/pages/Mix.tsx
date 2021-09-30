@@ -49,13 +49,13 @@ const MixtureSwatch = styled(Swatch).attrs((props: { $isLight: boolean }) => pro
       background-color: transparent;
       color: ${(props) => (props.$isLight ? "black" : "white")};
       border: 1px solid ${(props) => (props.$isLight ? "black" : "white")};
-      width: 5ch;
+      width: 6ch;
       font-size: 1.3rem;
       text-align: right;
     }
 
     & button {
-      width: 10px;
+      width: 16px;
       background: ${(props) => (props.$isLight ? "black" : "white")};
 
       &:hover {

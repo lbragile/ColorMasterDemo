@@ -12,10 +12,10 @@ import useDarkMode from "../hooks/useDarkMode";
 
 const MENU_TABS: { type: string; icon: IconDefinition }[] = [
   { type: "contrast", icon: faAdjust },
-  { type: "statistics", icon: faChartPie },
   { type: "harmony", icon: faDharmachakra },
   { type: "mix", icon: faMix },
-  { type: "manipulate", icon: faSlidersH }
+  { type: "manipulate", icon: faSlidersH },
+  { type: "statistics", icon: faChartPie }
 ];
 
 const Bars = styled(FontAwesomeIcon).attrs((props: { $responsive: boolean }) => props)`
@@ -33,6 +33,7 @@ const MenuContainer = styled.nav.attrs((props: { $responsive: boolean }) => prop
   padding-bottom: ${(props) => (props.$responsive ? "0" : "11px")};
   border-bottom: 2px solid ${(props) => props.theme.border};
   width: 100%;
+  margin-bottom: 2rem;
 `;
 
 const List = styled.ul.attrs(

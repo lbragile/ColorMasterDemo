@@ -22,7 +22,7 @@ extendPlugins([A11yPlugin]);
 
 const INFORMATIVE_TEXT = {
   adjust:
-    "Combines both input and adjustor color picker values.\nThe combination is based on the adjustor color\npicker increment/decrement switches.\n",
+    "Combines both input and adjustor color picker values.\nThe combination is based on the adjustor color\npicker increment/decrement switches.",
   rotate:
     "Input color picker & hue slider of adjustor color picker!\nRotation is simply moving at a fixed radius\n(arc) along the color wheel.",
   invert:
@@ -37,7 +37,7 @@ const AdjustIcon = styled(FontAwesomeIcon).attrs((props: { $active: boolean }) =
 `;
 
 export default function Manipulate(): JSX.Element {
-  const { isMobile, isTablet, isLaptop, isComputer } = useContext(BreakpointsContext);
+  const { isMobile, isTablet, isLaptop, isComputer, isWideScreen } = useContext(BreakpointsContext);
 
   const [alpha, setAlpha] = useLocalStorage<IAlphaManipulation>("alphaGridManipulate", {
     adjust: true,
@@ -101,7 +101,11 @@ export default function Manipulate(): JSX.Element {
         </Label>
       </ColorSelectorWidget>
 
-      <FlexColumn $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer ? 16 : 10} $gap="24px">
+      <FlexColumn
+        $cols={isMobile || isTablet ? 24 : isLaptop ? 20 : isComputer ? 16 : isWideScreen ? 14 : 11}
+        $gap="20px"
+        $order={isComputer || isWideScreen ? 1 : 0}
+      >
         {(
           [
             [
