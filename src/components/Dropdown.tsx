@@ -1,7 +1,7 @@
 import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import { StyledAngleIcon } from "../styles/AngleIcon";
+import { AngleIcon } from "../styles/Icons";
 import { FlexColumn } from "../styles/Flex";
 import { TSetState } from "../types/react";
 import Spacers from "./Spacers";
@@ -65,12 +65,12 @@ interface IDropdown {
 const Switcher = ({ adjustSelection }: { adjustSelection: (dir: "up" | "down") => void }): JSX.Element => {
   return (
     <FlexColumn $cols={1}>
-      <StyledAngleIcon
+      <AngleIcon
         icon={faAngleUp}
         onClick={() => adjustSelection("up")}
         aria-label="Automatically switch dropdown value up"
       />
-      <StyledAngleIcon
+      <AngleIcon
         icon={faAngleDown}
         onClick={() => adjustSelection("down")}
         aria-label="Automatically switch dropdown value down"

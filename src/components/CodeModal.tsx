@@ -28,7 +28,7 @@ const Modal = styled.div.attrs((props: { $open: boolean }) => props)`
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: ${(props) => props.theme.text.replace("1)", "0.7)")};
   display: ${(props) => (props.$open ? "flex" : "none")};
   justify-content: center;
   align-items: center;
@@ -48,7 +48,7 @@ const ContentContainer = styled.div.attrs((props: { $responsive: boolean }) => p
 `;
 
 const Content = styled.div`
-  background-color: white;
+  background-color: ${(props) => props.theme.textInverse};
   padding: 20px;
   border-radius: 8px;
   max-width: 100%;
@@ -65,6 +65,7 @@ const Content = styled.div`
 `;
 
 const CloseIcon = styled(FontAwesomeIcon)`
+  color: ${(props) => props.theme.textInverse};
   cursor: pointer;
   position: absolute;
   top: -30px;
@@ -99,7 +100,7 @@ export default function CodeModal({ code }: { code: string }): JSX.Element {
           <Content>
             <CopyBlock text={code} theme={dracula} language="typescript" wrapLines />
           </Content>
-          <CloseIcon icon={faTimes} onClick={close} color="white" size="2x" />
+          <CloseIcon icon={faTimes} onClick={close} size="2x" />
         </ContentContainer>
       </Modal>
     </React.Fragment>

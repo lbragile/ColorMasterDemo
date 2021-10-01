@@ -67,8 +67,8 @@ const MonoItem = styled.div.attrs((props: { $active: boolean }) => props)`
 `;
 
 const MonoLabelIndicator = styled.div`
-  background-color: hsla(180, 100%, 40%);
-  color: white;
+  background-color: ${(props) => props.theme.info};
+  color: ${(props) => props.theme.textInverse};
   font-weight: bold;
   padding: 4px;
   border-radius: 4px;
@@ -77,6 +77,10 @@ const MonoLabelIndicator = styled.div`
   position: absolute;
   right: 12px;
   bottom: 12px;
+`;
+
+const DownIcon = styled(FontAwesomeIcon)`
+  color: ${(props) => props.theme.textInverse};
 `;
 
 const MonoEffectList = styled.li`
@@ -98,10 +102,10 @@ const LeftAlignedFlexRow = styled(FlexRow)`
 
 const AmountLabel = styled.div`
   padding: 4px 8px;
-  background-color: hsla(180, 100%, 40%, 1);
+  background-color: ${(props) => props.theme.info};
+  color: ${(props) => props.theme.textInverse};
   width: fit-content;
   border-radius: 4px 0 4px 0;
-  color: white;
 `;
 
 const SwatchContainer = styled.div`
@@ -158,7 +162,7 @@ export default function Harmony(): JSX.Element {
               </LeftAlignedFlexRow>
               {t === "monochromatic" && t !== type && (
                 <MonoLabelIndicator>
-                  <FontAwesomeIcon icon={faChevronCircleDown} color="white" />
+                  <DownIcon icon={faChevronCircleDown} />
                   <Spacers width="2px" />
                   {effectOptions.length}
                 </MonoLabelIndicator>

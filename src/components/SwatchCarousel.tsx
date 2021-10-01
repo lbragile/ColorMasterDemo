@@ -5,7 +5,7 @@ import Spacers from "./Spacers";
 import CM from "colormaster";
 import { FlexRow } from "../styles/Flex";
 import { BreakpointsContext } from "./App";
-import { StyledAngleIcon } from "../styles/AngleIcon";
+import { AngleIcon } from "../styles/Icons";
 import { TSetState } from "../types/react";
 
 const SWATCH_COLORS = [
@@ -40,7 +40,7 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
 
   return (
     <FlexRow $gap="4px">
-      <StyledAngleIcon
+      <AngleIcon
         icon={faAngleLeft}
         $disabled={swatchIndex === 0}
         onClick={() => swatchIndex > 0 && setSwatchIndex(swatchIndex - 1)}
@@ -62,7 +62,7 @@ export default function SwatchCarousel({ setColor, num = 9 }: ISwatchCarousel): 
 
       <Spacers width="1px" />
 
-      <StyledAngleIcon
+      <AngleIcon
         icon={faAngleRight}
         $disabled={swatchIndex === SWATCH_COLORS.length - numVisibleSwatches.current}
         onClick={() =>

@@ -27,5 +27,8 @@ declare module "styled-components" {
     textInverse: string;
     alphaPickerCheckers: string;
     wheelPicker: string;
+    info: string;
+    success: string;
+    loader: string[];
   }
 }

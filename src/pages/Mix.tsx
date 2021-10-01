@@ -22,6 +22,7 @@ import { FadeIn } from "../styles/Fade";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { TSetState } from "../types/react";
 import { TValidColorspace } from "../types/colormaster";
+import { InformationIcon } from "../styles/Icons";
 
 extendPlugins([MixPlugin, A11yPlugin]);
 
@@ -176,7 +177,7 @@ export default function Mix(): JSX.Element {
 
           <Tooltip>
             <span>The two colors will be converted to this color space when mixing</span>
-            <FontAwesomeIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" size="1x" />
+            <InformationIcon icon={faInfoCircle} />
           </Tooltip>
         </FlexRow>
 
