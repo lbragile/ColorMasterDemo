@@ -5,6 +5,10 @@ import CM, { ColorMaster } from "colormaster";
 import { THexStr } from "colormaster/types";
 import { TSetState } from "../../types/react";
 import { TValidColorspace } from "../../types/colormaster";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import styled, { css } from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
 interface ISliderGroup {
   colorArr: number[];
@@ -14,7 +18,50 @@ interface ISliderGroup {
   children?: JSX.Element[];
 }
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd for KBD tag style
+ */
+const InfoText = styled.div`
+  position: relative;
+  width: 100%;
+
+  & p {
+    background-color: ${(props) => props.theme.info};
+    border-radius: 4px;
+    padding: 8px;
+    color: ${(props) => props.theme.textInverse};
+    line-height: 1.75rem;
+    text-align: center;
+    font-weight: bold;
+
+    & kbd {
+      ${(props) => css`
+        background-color: ${props.theme.kbd.bg};
+        border: 1px solid ${props.theme.kbd.border};
+        box-shadow: 0 1px 1px ${props.theme.kbd.shadow[0]}, 0 2px 0 0 ${props.theme.kbd.shadow[1]} inset;
+      `}
+      border-radius: 3px;
+      display: inline-block;
+      font-size: 0.85em;
+      font-weight: 700;
+      line-height: 1;
+      padding: 2px 4px;
+      white-space: nowrap;
+    }
+  }
+`;
+
+const CloseIcon = styled(FontAwesomeIcon)`
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: ${(props) => props.theme.textInverse};
+  cursor: pointer;
+`;
+
 export default function SliderGroup({ colorArr, setColor, format, gap = "", children }: ISliderGroup): JSX.Element {
+  const [info, setInfo] = useLocalStorage("numberInputInfo", true);
+
   const generateCMStr = useCallback(
     (arr: number[]): ColorMaster => {
       switch (format) {
@@ -82,27 +129,40 @@ export default function SliderGroup({ colorArr, setColor, format, gap = "", chil
   };
 
   return (
-    <FlexColumn $gap={gap}>
-      {colorArr.map((val, i) => {
-        const isAlpha = i === colorArr.length - 1;
-        const { color, title, min, max, postfix } = formattedProps;
+    <FlexColumn $gap="32px">
+      <FlexColumn $gap={gap}>
+        {colorArr.map((val, i) => {
+          const isAlpha = i === colorArr.length - 1;
+          const { color, title, min, max, postfix } = formattedProps;
 
-        return (
-          <FullSlider
-            key={"slider-" + i}
-            value={isAlpha ? val * (format === "hex" ? 255 : 100) : val}
-            color={color[i]}
-            title={isAlpha ? "A" : title[i]}
-            min={min[i]}
-            max={max[i]}
-            postfix={postfix[i]}
-            format={format}
-            onChange={(e) => handleChange(e, i)}
-          >
-            {children?.[i]}
-          </FullSlider>
-        );
-      })}
+          return (
+            <FullSlider
+              key={"slider-" + i}
+              value={isAlpha ? val * (format === "hex" ? 255 : 100) : val}
+              color={color[i]}
+              title={isAlpha ? "A" : title[i]}
+              min={min[i]}
+              max={max[i]}
+              postfix={postfix[i]}
+              format={format}
+              onChange={(e) => handleChange(e, i)}
+            >
+              {children?.[i]}
+            </FullSlider>
+          );
+        })}
+      </FlexColumn>
+
+      {info && (
+        <InfoText>
+          <p>
+            Scroll over an input to adjust it. <br /> Scaling: <kbd>alt</kbd> ±5, <kbd>shift</kbd> ±10, <kbd>ctrl</kbd>{" "}
+            ±25
+          </p>
+
+          <CloseIcon icon={faTimes} onClick={() => setInfo(false)} />
+        </InfoText>
+      )}
     </FlexColumn>
   );
 }

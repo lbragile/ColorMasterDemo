@@ -1,7 +1,17 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 // Based on https://loading.io/css/
+
+const LoadingAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+`;
 
 const Loader = styled.div`
   display: inline-block;
@@ -13,7 +23,7 @@ const Loader = styled.div`
   height: 80px;
 
   & div {
-    animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    animation: ${LoadingAnimation} 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     transform-origin: 40px 40px;
   }
 
@@ -35,7 +45,7 @@ const Loader = styled.div`
   & div:nth-child(1):after {
     top: 63px;
     left: 63px;
-    background-color: hsla(0, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[0]};
   }
 
   & div:nth-child(2) {
@@ -45,7 +55,7 @@ const Loader = styled.div`
   & div:nth-child(2):after {
     top: 68px;
     left: 56px;
-    background-color: hsla(45, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[1]};
   }
 
   & div:nth-child(3) {
@@ -55,7 +65,7 @@ const Loader = styled.div`
   & div:nth-child(3):after {
     top: 71px;
     left: 48px;
-    background-color: hsla(90, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[2]};
   }
 
   & div:nth-child(4) {
@@ -65,7 +75,7 @@ const Loader = styled.div`
   & div:nth-child(4):after {
     top: 72px;
     left: 40px;
-    background-color: hsla(135, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[3]};
   }
 
   & div:nth-child(5) {
@@ -75,7 +85,7 @@ const Loader = styled.div`
   & div:nth-child(5):after {
     top: 71px;
     left: 32px;
-    background-color: hsla(180, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[4]};
   }
 
   & div:nth-child(6) {
@@ -85,7 +95,7 @@ const Loader = styled.div`
   & div:nth-child(6):after {
     top: 68px;
     left: 24px;
-    background-color: hsla(225, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[5]};
   }
 
   & div:nth-child(7) {
@@ -95,7 +105,7 @@ const Loader = styled.div`
   & div:nth-child(7):after {
     top: 63px;
     left: 17px;
-    background-color: hsla(270, 100%, 40%, 1);
+    background-color: ${(props) => props.theme.loader[6]};
   }
 
   & div:nth-child(8) {
@@ -105,17 +115,7 @@ const Loader = styled.div`
   & div:nth-child(8):after {
     top: 56px;
     left: 12px;
-    background-color: hsla(315, 100%, 40%, 1);
-  }
-
-  @keyframes lds-roller {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
+    background-color: ${(props) => props.theme.loader[7]};
   }
 `;
 

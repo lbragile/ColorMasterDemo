@@ -19,18 +19,35 @@ const light: DefaultTheme = {
   bgDark: "hsla(0, 0%, 80%, 1)",
   bgSliderRight: "hsla(0, 0%, 95%, 1)",
   bgSliderThumb: "hsla(0, 0%, 95%, 1)",
-  bgPositive: "hsla(120, 100%, 90%, 1)",
-  bgNegative: "hsla(0, 100%, 90%, 1)",
-  bgPositiveDark: "hsla(120, 100%, 25%, 1)",
-  bgNegativeDark: "hsla(0, 100%, 25%, 1)",
+  bgPositive: "hsla(120, 80%, 90%, 1)",
+  bgNegative: "hsla(0, 80%, 90%, 1)",
+  bgPositiveDark: "hsla(120, 80%, 25%, 1)",
+  bgNegativeDark: "hsla(0, 80%, 25%, 1)",
   bgTooltip: "hsla(0, 0%, 10%, 1)",
   arrowColor: "hsla(0, 0%, 25%, 1)",
   arrowColorHover: "hsla(0, 0%, 70%, 1)",
   heading: "hsla(0, 0%, 45%, 1)",
-  text: "black",
-  textInverse: "white",
+  text: "hsla(0, 0%, 0%, 1)",
+  textInverse: "hsla(0, 0%, 100%, 1)",
   alphaPickerCheckers: "hsla(0, 0%, 0%, 0.2)",
-  wheelPicker: "hsla(0, 0%, 0%, 0.6)"
+  wheelPicker: "hsla(0, 0%, 0%, 0.6)",
+  info: "hsla(180, 90%, 40%, 1)",
+  success: "hsla(120, 90%, 40%, 1)",
+  loader: [
+    "hsla(0, 80%, 40%, 1)",
+    "hsla(45, 80%, 40%, 1)",
+    "hsla(90, 80%, 40%, 1)",
+    "hsla(135, 80%, 40%, 1)",
+    "hsla(180, 80%, 40%, 1)",
+    "hsla(225, 80%, 40%, 1)",
+    "hsla(270, 80%, 40%, 1)",
+    "hsla(315, 80%, 40%, 1)"
+  ],
+  kbd: {
+    bg: "hsla(180, 85%, 30%, 1)",
+    border: "hsla(180, 85%, 25%, 1)",
+    shadow: ["hsla(0, 0%, 0%, 0.2)", "hsla(0, 0%, 100%, 0.7)"]
+  }
 };
 
 const dark: DefaultTheme = {
@@ -47,18 +64,35 @@ const dark: DefaultTheme = {
   bgDark: "hsla(0, 0%, 80%, 1)",
   bgSliderRight: "hsla(0, 0%, 95%, 1)",
   bgSliderThumb: "hsla(0, 0%, 95%, 1)",
-  bgPositive: "hsla(120, 100%, 10%, 1)",
-  bgNegative: "hsla(0, 100%, 10%, 1)",
-  bgPositiveDark: "hsla(120, 100%, 75%, 1)",
-  bgNegativeDark: "hsla(0, 100%, 75%, 1)",
+  bgPositive: "hsla(120, 80%, 10%, 1)",
+  bgNegative: "hsla(0, 80%, 10%, 1)",
+  bgPositiveDark: "hsla(120, 80%, 75%, 1)",
+  bgNegativeDark: "hsla(0, 80%, 75%, 1)",
   bgTooltip: "hsla(0, 0%, 90%, 1)",
   arrowColor: "hsla(0, 0%, 75%, 1)",
   arrowColorHover: "hsla(0, 0%, 30%, 1)",
   heading: "hsla(0, 0%, 55%, 1)",
-  text: "white",
-  textInverse: "black",
+  text: "hsla(0, 0%, 100%, 1)",
+  textInverse: "hsla(0, 0%, 0%, 1)",
   alphaPickerCheckers: "hsla(0, 0%, 100%, 0.2)",
-  wheelPicker: "hsla(0, 0%, 100%, 0.6)"
+  wheelPicker: "hsla(0, 0%, 100%, 0.6)",
+  info: "hsla(180, 90%, 60%, 1)",
+  success: "hsla(120, 90%, 60%, 1)",
+  loader: [
+    "hsla(0, 80%, 60%, 1)",
+    "hsla(45, 80%, 60%, 1)",
+    "hsla(90, 80%, 60%, 1)",
+    "hsla(135, 80%, 60%, 1)",
+    "hsla(180, 80%, 60%, 1)",
+    "hsla(225, 80%, 60%, 1)",
+    "hsla(270, 80%, 60%, 1)",
+    "hsla(315, 80%, 60%, 1)"
+  ],
+  kbd: {
+    bg: "hsla(180, 70%, 50%, 1)",
+    border: "hsla(180, 70%, 45%, 1)",
+    shadow: ["hsla(0, 0%, 0%, 0.2)", "hsla(0, 0%, 100%, 0.7)"]
+  }
 };
 
 const theme: ITheme = { light, dark };

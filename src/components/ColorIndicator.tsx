@@ -29,8 +29,9 @@ const StyledColorDisplay = styled.input`
 const CopyButton = styled.button.attrs((props: { $copied: string | null }) => props)`
   height: 36px;
   padding: 0 10px;
-  background: ${(props) => `hsl(${props.$copied ? 120 : 180}, 100%, 40%)`};
+  background: ${(props) => (props.$copied ? props.theme.success : props.theme.info)};
   border: 1px solid ${(props) => props.theme.borderLight};
+  color: ${(props) => props.theme.bgDefault};
   border-left: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
@@ -78,7 +79,7 @@ export default function ColorIndicator({
               onBlur={() => setCopy("")}
               aria-label="Copy to Clipboard"
             >
-              <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} color="white" />
+              <FontAwesomeIcon icon={copy ? faCheckCircle : faCopy} />
             </CopyButton>
           </Tooltip>
         </span>

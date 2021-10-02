@@ -1,6 +1,5 @@
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext } from "react";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { FlexRow, FlexColumn } from "../styles/Flex";
 import { Heading } from "../styles/Heading";
@@ -10,16 +9,10 @@ import { IGridSwatch, IGridRow } from "../types/grid";
 import { BreakpointsContext } from "./App";
 import ColorIndicator from "./ColorIndicator";
 import Spacers from "./Spacers";
+import { InformationIcon } from "../styles/Icons";
 
 const LabelledSwatch = styled(Swatch)`
   position: relative;
-`;
-
-const InformationIcon = styled(FontAwesomeIcon)`
-  border: 1px solid ${(props) => props.theme.borderLight};
-  border-radius: 50%;
-  background-color: ${(props) => props.theme.borderLight};
-  font-size: 1.2rem;
 `;
 
 export default function GridRow({ arr, startCount, page, setColor, alpha, setAlpha }: IGridRow): JSX.Element {
@@ -32,7 +25,7 @@ export default function GridRow({ arr, startCount, page, setColor, alpha, setAlp
         <Spacers width="4px" />
         <Tooltip $top={text.split("\n").length * -30 - 10}>
           <span>{text}</span>
-          <InformationIcon icon={faInfoCircle} color="hsla(180, 100%, 40%, 1)" />
+          <InformationIcon icon={faInfoCircle} />
         </Tooltip>
       </FlexRow>
     ) : (
