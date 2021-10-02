@@ -30,7 +30,7 @@ export default function useSliderChange({
         type: "rgb",
         colorStr: color.stringRGB({ alpha, precision: [0, 0, 0, 2] }),
         sliders: (
-          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="rgb" gap="28px">
+          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="rgb" gap="53px">
             {adjustors}
           </SliderGroup>
         )
@@ -39,7 +39,7 @@ export default function useSliderChange({
         type: "hex",
         colorStr: color.stringHEX({ alpha }),
         sliders: (
-          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="hex" gap="28px">
+          <SliderGroup colorArr={Object.values(color.rgba()) as number[]} setColor={setColor} format="hex" gap="53px">
             {adjustors}
           </SliderGroup>
         )
@@ -48,7 +48,7 @@ export default function useSliderChange({
         type: "hsl",
         colorStr: color.stringHSL({ alpha, precision: [0, 0, 0, 2] }),
         sliders: (
-          <SliderGroup colorArr={Object.values(color.hsla()) as number[]} setColor={setColor} format="hsl" gap="28px">
+          <SliderGroup colorArr={Object.values(color.hsla()) as number[]} setColor={setColor} format="hsl" gap="53px">
             {adjustors}
           </SliderGroup>
         )

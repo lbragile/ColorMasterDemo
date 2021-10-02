@@ -42,7 +42,12 @@ const light: DefaultTheme = {
     "hsla(225, 80%, 40%, 1)",
     "hsla(270, 80%, 40%, 1)",
     "hsla(315, 80%, 40%, 1)"
-  ]
+  ],
+  kbd: {
+    bg: "hsla(180, 85%, 30%, 1)",
+    border: "hsla(180, 85%, 25%, 1)",
+    shadow: ["hsla(0, 0%, 0%, 0.2)", "hsla(0, 0%, 100%, 0.7)"]
+  }
 };
 
 const dark: DefaultTheme = {
@@ -82,7 +87,12 @@ const dark: DefaultTheme = {
     "hsla(225, 80%, 60%, 1)",
     "hsla(270, 80%, 60%, 1)",
     "hsla(315, 80%, 60%, 1)"
-  ]
+  ],
+  kbd: {
+    bg: "hsla(180, 70%, 50%, 1)",
+    border: "hsla(180, 70%, 45%, 1)",
+    shadow: ["hsla(0, 0%, 0%, 0.2)", "hsla(0, 0%, 100%, 0.7)"]
+  }
 };
 
 const theme: ITheme = { light, dark };

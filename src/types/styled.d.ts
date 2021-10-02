@@ -30,5 +30,10 @@ declare module "styled-components" {
     info: string;
     success: string;
     loader: string[];
+    kbd: {
+      bg: string;
+      border: string;
+      shadow: string[];
+    };
   }
 }
